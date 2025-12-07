@@ -1,0 +1,221 @@
+// ============================================
+// Data Library Test (Pandas-like)
+// ============================================
+
+import "modules/flextable.jm" as ft
+
+print("=== FLEXTABLE TEST ===\n")
+
+// --- Series ---
+print("--- Series ---")
+s = ft.Series([10, 20, 30, 40, 50], "values")
+print("Series created:")
+ft.printS(s)
+
+print("\nSeries statistics:")
+print("sum:", ft.sSum(s))
+print("mean:", ft.sMean(s))
+print("min:", ft.sMin(s))
+print("max:", ft.sMax(s))
+print("std:", ft.sStd(s))
+print("median:", ft.sMedian(s))
+
+print("\nSeries describe:")
+desc = ft.sDescribe(s)
+print("count:", desc.count, "mean:", desc.mean, "std:", desc.std)
+
+print("\nSeries apply (x * 2):")
+s2 = ft.sApply(s, (x) => x * 2)
+ft.printS(s2)
+
+print("\nSeries filter (x > 25):")
+s3 = ft.sFilter(s, (x) => x > 25)
+ft.printS(s3)
+
+// --- DataFrame Creation ---
+print("\n--- DataFrame ---")
+
+df = ft.DataFrame({
+    name: ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+    age: [25, 30, 35, 28, 32],
+    city: ["Berlin", "Munich", "Berlin", "Hamburg", "Munich"],
+    salary: [50000, 60000, 75000, 55000, 65000]
+})
+
+print("DataFrame:")
+ft.printDF(df)
+
+print("\nShape:", ft.shape(df))
+
+// --- CSV ---
+print("\n--- CSV Parsing ---")
+csvData = "name,age,score
+Alice,25,85
+Bob,30,90
+Charlie,35,78"
+
+df2 = ft.dfFromCSV(csvData, ",")
+ft.printDF(df2)
+
+// --- Column Operations ---
+print("\n--- Column Operations ---")
+
+print("Get 'age' column:")
+ages = ft.col(df, "age")
+ft.printS(ages)
+
+print("\nSelect ['name', 'salary']:")
+subset = ft.cols(df, ["name", "salary"])
+ft.printDF(subset)
+
+print("\nAdd 'bonus' column:")
+df = ft.addCol(df, "bonus", [5000, 6000, 7500, 5500, 6500])
+ft.printDF(df)
+
+print("\nAdd calculated 'total' column:")
+df = ft.assign(df, "total", (r) => r.salary + r.bonus)
+ft.printDF(df)
+
+// --- Filtering ---
+print("\n--- Filtering ---")
+
+print("Filter city == 'Berlin':")
+berlin = ft.filterEq(df, "city", "Berlin")
+ft.printDF(berlin)
+
+print("\nFilter age > 28:")
+older = ft.filterGt(df, "age", 28)
+ft.printDF(older)
+
+print("\nFilter salary >= 60000:")
+highPay = ft.filterGe(df, "salary", 60000)
+ft.printDF(highPay)
+
+// --- Sorting ---
+print("\n--- Sorting ---")
+
+print("Sort by age (asc):")
+sorted1 = ft.sortBy(df, "age", true)
+ft.printDF(sorted1)
+
+print("\nSort by salary (desc):")
+sorted2 = ft.sortBy(df, "salary", false)
+ft.printDF(sorted2)
+
+// --- Grouping ---
+print("\n--- Grouping ---")
+
+print("Group by city, sum salary:")
+g1 = ft.groupSum(df, "city", "salary")
+ft.printDF(g1)
+
+print("\nGroup by city, mean age:")
+g2 = ft.groupMean(df, "city", "age")
+ft.printDF(g2)
+
+print("\nGroup by city, count:")
+g3 = ft.groupCount(df, "city")
+ft.printDF(g3)
+
+// --- Statistics ---
+print("\n--- Statistics ---")
+
+print("Describe:")
+stats = ft.describe(df)
+ft.printDF(stats)
+
+// --- Head/Tail ---
+print("\n--- Head/Tail ---")
+
+print("Head(2):")
+ft.printDF(ft.head(df, 2))
+
+print("\nTail(2):")
+ft.printDF(ft.tail(df, 2))
+
+// --- Merge ---
+print("\n--- Merge ---")
+
+depts = ft.DataFrame({
+    name: ["Alice", "Bob", "Charlie"],
+    dept: ["Engineering", "Sales", "Engineering"]
+})
+
+print("Departments:")
+ft.printDF(depts)
+
+print("\nMerged:")
+merged = ft.merge(df, depts, "name")
+ft.printDF(merged)
+
+// --- Concat ---
+print("\n--- Concat ---")
+
+df_a = ft.DataFrame({id: [1, 2], val: ["a", "b"]})
+df_b = ft.DataFrame({id: [3, 4], val: ["c", "d"]})
+
+print("Concatenated:")
+combined = ft.concat([df_a, df_b])
+ft.printDF(combined)
+
+// --- Null Handling ---
+print("\n--- Null Handling ---")
+
+dfNull = ft.DataFrame({
+    a: [1, null, 3],
+    b: ["x", "y", null]
+})
+
+print("With nulls:")
+ft.printDF(dfNull)
+
+print("\nFilled with 0:")
+ft.printDF(ft.fillna(dfNull, 0))
+
+print("\nDropped nulls:")
+ft.printDF(ft.dropna(dfNull))
+
+// --- Duplicates ---
+print("\n--- Duplicates ---")
+
+dfDup = ft.DataFrame({
+    name: ["Alice", "Bob", "Alice"],
+    val: [1, 2, 1]
+})
+
+print("With duplicates:")
+ft.printDF(dfDup)
+
+print("\nUnique rows:")
+ft.printDF(ft.dropDuplicates(dfDup, null))
+
+// --- Value Counts ---
+print("\n--- Value Counts ---")
+
+print("City counts:")
+ft.printDF(ft.valueCounts(df, "city"))
+
+// --- Pivot ---
+print("\n--- Pivot Table ---")
+
+sales = ft.DataFrame({
+    region: ["North", "North", "South", "South"],
+    product: ["A", "B", "A", "B"],
+    amount: [100, 150, 200, 120]
+})
+
+print("Sales data:")
+ft.printDF(sales)
+
+print("\nPivot (sum):")
+piv = ft.pivot(sales, "region", "product", "amount", "sum")
+ft.printDF(piv)
+
+// --- Export ---
+print("\n--- Export ---")
+
+print("To CSV:")
+csv = ft.toCSV(ft.head(df, 2), ",")
+print(csv)
+
+print("\n=== FLEXTABLE TEST COMPLETE ===")

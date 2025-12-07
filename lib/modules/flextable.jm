@@ -1,0 +1,1177 @@
+// ============================================
+// FlexTable Library for Jeem
+// ============================================
+// Provides DataFrame and Series for data analysis
+// ============================================
+
+// ==========================================
+// SERIES - 1D Data Structure
+// ==========================================
+
+// Create a Series from array
+func Series(data, name) {
+    if (name == null) { name = "value" }
+    return {
+        _type: "Series",
+        data: data,
+        name: name
+    }
+}
+
+// Series from range
+func SeriesRange(start, end, name) {
+    data = []
+    for i in range(start, end) {
+        push(data, i)
+    }
+    return Series(data, name)
+}
+
+// Get Series length
+func sLen(s) {
+    return s.data.len()
+}
+
+// Get value at index
+func sGet(s, idx) {
+    return s.data[idx]
+}
+
+// Set value at index
+func sSet(s, idx, val) {
+    s.data[idx] = val
+    return s
+}
+
+// Series head (first n elements)
+func sHead(s, n) {
+    if (n == null) { n = 5 }
+    data = []
+    limit = n < s.data.len() ? n : s.data.len()
+    for i in range(limit) {
+        push(data, s.data[i])
+    }
+    return Series(data, s.name)
+}
+
+// Series tail (last n elements)
+func sTail(s, n) {
+    if (n == null) { n = 5 }
+    data = []
+    start = s.data.len() - n
+    if (start < 0) { start = 0 }
+    for i in range(start, s.data.len()) {
+        push(data, s.data[i])
+    }
+    return Series(data, s.name)
+}
+
+// Series sum
+func sSum(s) {
+    total = 0
+    for v in s.data {
+        if (typeof(v) == "integer" || typeof(v) == "float") {
+            total = total + v
+        }
+    }
+    return total
+}
+
+// Series mean
+func sMean(s) {
+    return sSum(s) / sLen(s)
+}
+
+// Series min
+func sMin(s) {
+    result = s.data[0]
+    for v in s.data {
+        if ((typeof(v) == "integer" || typeof(v) == "float") && v < result) {
+            result = v
+        }
+    }
+    return result
+}
+
+// Series max
+func sMax(s) {
+    result = s.data[0]
+    for v in s.data {
+        if ((typeof(v) == "integer" || typeof(v) == "float") && v > result) {
+            result = v
+        }
+    }
+    return result
+}
+
+// Series standard deviation
+func sStd(s) {
+    m = sMean(s)
+    sumSq = 0
+    for v in s.data {
+        if (typeof(v) == "integer" || typeof(v) == "float") {
+            sumSq = sumSq + (v - m) ** 2
+        }
+    }
+    return sqrt(sumSq / sLen(s))
+}
+
+// Series median
+func sMedian(s) {
+    sorted = clone(s.data)
+    sort(sorted)
+    n = sorted.len()
+    if (n % 2 == 1) {
+        return sorted[floor(n / 2)]
+    }
+    return (sorted[n / 2 - 1] + sorted[n / 2]) / 2
+}
+
+// Series describe (statistics)
+func sDescribe(s) {
+    return {
+        count: sLen(s),
+        mean: sMean(s),
+        std: sStd(s),
+        min: sMin(s),
+        max: sMax(s),
+        median: sMedian(s)
+    }
+}
+
+// Series unique values
+func sUnique(s) {
+    seen = {}
+    result = []
+    for v in s.data {
+        key = str(v)
+        if (!hasKey(seen, key)) {
+            seen[key] = true
+            push(result, v)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series value counts
+func sValueCounts(s) {
+    counts = {}
+    for v in s.data {
+        key = str(v)
+        if (hasKey(counts, key)) {
+            counts[key] = counts[key] + 1
+        } else {
+            counts[key] = 1
+        }
+    }
+    return counts
+}
+
+// Series apply function
+func sApply(s, callback) {
+    result = []
+    for v in s.data {
+        push(result, callback(v))
+    }
+    return Series(result, s.name)
+}
+
+// Series filter
+func sFilter(s, predicate) {
+    result = []
+    for v in s.data {
+        if (predicate(v)) {
+            push(result, v)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series map values
+func sMap(s, mapping) {
+    result = []
+    for v in s.data {
+        key = str(v)
+        if (hasKey(mapping, key)) {
+            push(result, mapping[key])
+        } else {
+            push(result, v)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series fillna (fill null values)
+func sFillna(s, value) {
+    result = []
+    for v in s.data {
+        if (v == null) {
+            push(result, value)
+        } else {
+            push(result, v)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series dropna (remove null values)
+func sDropna(s) {
+    result = []
+    for v in s.data {
+        if (v != null) {
+            push(result, v)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series sort
+func sSort(s, ascending) {
+    if (ascending == null) { ascending = true }
+    result = clone(s.data)
+    sort(result)
+    if (!ascending) {
+        reverse(result)
+    }
+    return Series(result, s.name)
+}
+
+// Series arithmetic operations
+func sAdd(s, val) {
+    result = []
+    for i in range(s.data.len()) {
+        if (typeof(val) == "object" && val._type == "Series") {
+            push(result, s.data[i] + val.data[i])
+        } else {
+            push(result, s.data[i] + val)
+        }
+    }
+    return Series(result, s.name)
+}
+
+func sSub(s, val) {
+    result = []
+    for i in range(s.data.len()) {
+        if (typeof(val) == "object" && val._type == "Series") {
+            push(result, s.data[i] - val.data[i])
+        } else {
+            push(result, s.data[i] - val)
+        }
+    }
+    return Series(result, s.name)
+}
+
+func sMul(s, val) {
+    result = []
+    for i in range(s.data.len()) {
+        if (typeof(val) == "object" && val._type == "Series") {
+            push(result, s.data[i] * val.data[i])
+        } else {
+            push(result, s.data[i] * val)
+        }
+    }
+    return Series(result, s.name)
+}
+
+func sDiv(s, val) {
+    result = []
+    for i in range(s.data.len()) {
+        if (typeof(val) == "object" && val._type == "Series") {
+            push(result, s.data[i] / val.data[i])
+        } else {
+            push(result, s.data[i] / val)
+        }
+    }
+    return Series(result, s.name)
+}
+
+// Series to string
+func sStr(s) {
+    lines = []
+    push(lines, "Series: " + s.name)
+    push(lines, "Length: " + str(sLen(s)))
+    push(lines, "---")
+    limit = sLen(s) < 10 ? sLen(s) : 10
+    for i in range(limit) {
+        push(lines, str(i) + ": " + str(s.data[i]))
+    }
+    if (sLen(s) > 10) {
+        push(lines, "...")
+    }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// DATAFRAME - 2D Data Structure
+// ==========================================
+
+// Create DataFrame from object of arrays
+func DataFrame(data) {
+    columns = keys(data)
+    nrows = 0
+    if (columns.len() > 0) {
+        nrows = data[columns[0]].len()
+    }
+    return {
+        _type: "DataFrame",
+        data: data,
+        columns: columns,
+        nrows: nrows,
+        ncols: columns.len()
+    }
+}
+
+// Create DataFrame from array of objects (records)
+func dfFromRecords(records) {
+    if (records.len() == 0) {
+        return DataFrame({})
+    }
+    columns = keys(records[0])
+    data = {}
+    for col in columns {
+        data[col] = []
+    }
+    for record in records {
+        for col in columns {
+            if (hasKey(record, col)) {
+                push(data[col], record[col])
+            } else {
+                push(data[col], null)
+            }
+        }
+    }
+    return DataFrame(data)
+}
+
+// Create DataFrame from CSV string
+func dfFromCSV(csvStr, sep) {
+    if (sep == null) { sep = "," }
+    lines = split(csvStr, "\n")
+    if (lines.len() == 0) {
+        return DataFrame({})
+    }
+    
+    // Parse header
+    header = split(lines[0], sep)
+    columns = []
+    for h in header {
+        push(columns, h.trim())
+    }
+    
+    // Initialize data
+    data = {}
+    for col in columns {
+        data[col] = []
+    }
+    
+    // Parse rows
+    for i in range(1, lines.len()) {
+        line = lines[i].trim()
+        if (line.len() == 0) { continue }
+        
+        values = split(line, sep)
+        for j in range(columns.len()) {
+            val = j < values.len() ? values[j].trim() : ""
+            // Try to convert to number
+            numVal = float(val)
+            if (str(numVal) == val || str(int(numVal)) == val) {
+                push(data[columns[j]], numVal)
+            } else {
+                push(data[columns[j]], val)
+            }
+        }
+    }
+    
+    return DataFrame(data)
+}
+
+// Read CSV file
+func readCSV(filename, sep) {
+    content = readFile(filename)
+    return dfFromCSV(content, sep)
+}
+
+// DataFrame to CSV string
+func toCSV(df, sep) {
+    if (sep == null) { sep = "," }
+    lines = []
+    push(lines, join(df.columns, sep))
+    for i in range(df.nrows) {
+        row = []
+        for col in df.columns {
+            push(row, str(df.data[col][i]))
+        }
+        push(lines, join(row, sep))
+    }
+    return join(lines, "\n")
+}
+
+// Save DataFrame to CSV file
+func saveCSV(df, filename, sep) {
+    content = toCSV(df, sep)
+    writeFile(filename, content)
+    return true
+}
+
+// Get DataFrame shape
+func shape(df) {
+    return [df.nrows, df.ncols]
+}
+
+// Get DataFrame info
+func info(df) {
+    lines = []
+    push(lines, "DataFrame")
+    push(lines, "Rows: " + str(df.nrows))
+    push(lines, "Columns: " + str(df.ncols))
+    push(lines, "---")
+    for col in df.columns {
+        firstVal = df.nrows > 0 ? df.data[col][0] : null
+        dtype = typeof(firstVal)
+        push(lines, col + ": " + dtype)
+    }
+    return join(lines, "\n")
+}
+
+// Get column as Series
+func col(df, colName) {
+    if (!hasKey(df.data, colName)) {
+        return null
+    }
+    return Series(df.data[colName], colName)
+}
+
+// Get multiple columns as new DataFrame
+func cols(df, colNames) {
+    data = {}
+    for c in colNames {
+        if (hasKey(df.data, c)) {
+            data[c] = df.data[c]
+        }
+    }
+    return DataFrame(data)
+}
+
+// Get row by index as object
+func row(df, idx) {
+    if (idx < 0 || idx >= df.nrows) {
+        return null
+    }
+    record = {}
+    for c in df.columns {
+        record[c] = df.data[c][idx]
+    }
+    return record
+}
+
+// Get rows by indices
+func getRows(df, indices) {
+    data = {}
+    for c in df.columns {
+        data[c] = []
+    }
+    for idx in indices {
+        if (idx >= 0 && idx < df.nrows) {
+            for c in df.columns {
+                push(data[c], df.data[c][idx])
+            }
+        }
+    }
+    return DataFrame(data)
+}
+
+// iloc - get rows by integer location
+func iloc(df, start, end) {
+    if (end == null) {
+        return row(df, start)
+    }
+    indices = []
+    for i in range(start, end) {
+        push(indices, i)
+    }
+    return getRows(df, indices)
+}
+
+// Head - first n rows
+func head(df, n) {
+    if (n == null) { n = 5 }
+    return iloc(df, 0, n < df.nrows ? n : df.nrows)
+}
+
+// Tail - last n rows
+func tail(df, n) {
+    if (n == null) { n = 5 }
+    start = df.nrows - n
+    if (start < 0) { start = 0 }
+    return iloc(df, start, df.nrows)
+}
+
+// Add new column
+func addCol(df, colName, values) {
+    newData = clone(df.data)
+    if (typeof(values) == "object" && values._type == "Series") {
+        newData[colName] = values.data
+    } else if (typeof(values) == "array") {
+        newData[colName] = values
+    } else {
+        arr = []
+        for i in range(df.nrows) {
+            push(arr, values)
+        }
+        newData[colName] = arr
+    }
+    return DataFrame(newData)
+}
+
+// Drop column
+func dropCol(df, colName) {
+    newData = {}
+    for c in df.columns {
+        if (c != colName) {
+            newData[c] = df.data[c]
+        }
+    }
+    return DataFrame(newData)
+}
+
+// Rename column
+func renameCol(df, oldName, newName) {
+    newData = {}
+    for c in df.columns {
+        if (c == oldName) {
+            newData[newName] = df.data[c]
+        } else {
+            newData[c] = df.data[c]
+        }
+    }
+    return DataFrame(newData)
+}
+
+// Filter rows by condition function
+func query(df, predicate) {
+    indices = []
+    for i in range(df.nrows) {
+        rowData = row(df, i)
+        if (predicate(rowData)) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter by column value (equals)
+func filterEq(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] == value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column > value
+func filterGt(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] > value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column < value
+func filterLt(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] < value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column >= value
+func filterGe(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] >= value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column <= value
+func filterLe(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] <= value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column != value
+func filterNe(df, colName, value) {
+    indices = []
+    for i in range(df.nrows) {
+        if (df.data[colName][i] != value) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column contains string
+func filterContains(df, colName, substr) {
+    indices = []
+    for i in range(df.nrows) {
+        val = str(df.data[colName][i])
+        if (indexOf(val, substr) >= 0) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Filter where column is in list
+func filterIn(df, colName, valueList) {
+    indices = []
+    for i in range(df.nrows) {
+        val = df.data[colName][i]
+        if (valueList.includes(val)) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Sort by column
+func sortBy(df, colName, ascending) {
+    if (ascending == null) { ascending = true }
+    
+    indexed = []
+    for i in range(df.nrows) {
+        push(indexed, {idx: i, val: df.data[colName][i]})
+    }
+    
+    // Bubble sort
+    for i in range(indexed.len()) {
+        for j in range(i + 1, indexed.len()) {
+            shouldSwap = ascending ? indexed[i].val > indexed[j].val : indexed[i].val < indexed[j].val
+            if (shouldSwap) {
+                temp = indexed[i]
+                indexed[i] = indexed[j]
+                indexed[j] = temp
+            }
+        }
+    }
+    
+    indices = []
+    for item in indexed {
+        push(indices, item.idx)
+    }
+    return getRows(df, indices)
+}
+
+// Group by column
+func groupBy(df, colName) {
+    groups = {}
+    for i in range(df.nrows) {
+        key = str(df.data[colName][i])
+        if (!hasKey(groups, key)) {
+            groups[key] = []
+        }
+        push(groups[key], i)
+    }
+    return {
+        _type: "GroupBy",
+        df: df,
+        colName: colName,
+        groups: groups,
+        groupKeys: keys(groups)
+    }
+}
+
+// Aggregate grouped data
+func agg(gb, aggCol, aggFunc) {
+    resultData = {}
+    resultData[gb.colName] = []
+    resultData[aggCol] = []
+    
+    for key in gb.groupKeys {
+        push(resultData[gb.colName], key)
+        indices = gb.groups[key]
+        
+        values = []
+        for idx in indices {
+            push(values, gb.df.data[aggCol][idx])
+        }
+        
+        aggResult = 0
+        case(aggFunc) {
+            "sum":
+                for v in values { aggResult = aggResult + v }
+                break
+            "mean", "avg":
+                for v in values { aggResult = aggResult + v }
+                aggResult = aggResult / values.len()
+                break
+            "min":
+                aggResult = values[0]
+                for v in values { if (v < aggResult) { aggResult = v } }
+                break
+            "max":
+                aggResult = values[0]
+                for v in values { if (v > aggResult) { aggResult = v } }
+                break
+            "count":
+                aggResult = values.len()
+                break
+            "first":
+                aggResult = values[0]
+                break
+            "last":
+                aggResult = values[values.len() - 1]
+                break
+            default:
+                aggResult = null
+        }
+        push(resultData[aggCol], aggResult)
+    }
+    
+    return DataFrame(resultData)
+}
+
+// Shorthand: group and sum
+func groupSum(df, groupCol, sumCol) {
+    gb = groupBy(df, groupCol)
+    return agg(gb, sumCol, "sum")
+}
+
+// Shorthand: group and mean
+func groupMean(df, groupCol, meanCol) {
+    gb = groupBy(df, groupCol)
+    return agg(gb, meanCol, "mean")
+}
+
+// Shorthand: group and count
+func groupCount(df, groupCol) {
+    gb = groupBy(df, groupCol)
+    countCol = df.columns[0]
+    result = agg(gb, countCol, "count")
+    return renameCol(result, countCol, "count")
+}
+
+// Apply function to column
+func apply(df, colName, transformer) {
+    newData = clone(df.data)
+    newCol = []
+    for v in df.data[colName] {
+        push(newCol, transformer(v))
+    }
+    newData[colName] = newCol
+    return DataFrame(newData)
+}
+
+// Apply function to create new column
+func assign(df, newColName, transformer) {
+    newCol = []
+    for i in range(df.nrows) {
+        rowData = row(df, i)
+        push(newCol, transformer(rowData))
+    }
+    return addCol(df, newColName, newCol)
+}
+
+// Describe DataFrame (statistics)
+func describe(df) {
+    stats = {
+        column: [],
+        count: [],
+        mean: [],
+        std: [],
+        min: [],
+        max: []
+    }
+    
+    for c in df.columns {
+        isNumeric = true
+        for v in df.data[c] {
+            if (typeof(v) != "number") {
+                isNumeric = false
+                break
+            }
+        }
+        
+        if (isNumeric) {
+            s = Series(df.data[c], c)
+            push(stats.column, c)
+            push(stats.count, sLen(s))
+            push(stats.mean, sMean(s))
+            push(stats.std, sStd(s))
+            push(stats.min, sMin(s))
+            push(stats.max, sMax(s))
+        }
+    }
+    
+    return DataFrame(stats)
+}
+
+// Merge two DataFrames (inner join)
+func merge(df1, df2, onCol) {
+    result = {}
+    for c in df1.columns {
+        result[c] = []
+    }
+    for c in df2.columns {
+        if (c != onCol && !hasKey(result, c)) {
+            result[c] = []
+        }
+    }
+    
+    for i in range(df1.nrows) {
+        key1 = df1.data[onCol][i]
+        for j in range(df2.nrows) {
+            key2 = df2.data[onCol][j]
+            if (key1 == key2) {
+                for c in df1.columns {
+                    push(result[c], df1.data[c][i])
+                }
+                for c in df2.columns {
+                    if (c != onCol) {
+                        push(result[c], df2.data[c][j])
+                    }
+                }
+            }
+        }
+    }
+    
+    return DataFrame(result)
+}
+
+// Left join
+func leftJoin(df1, df2, onCol) {
+    result = {}
+    for c in df1.columns {
+        result[c] = []
+    }
+    for c in df2.columns {
+        if (c != onCol && !hasKey(result, c)) {
+            result[c] = []
+        }
+    }
+    
+    for i in range(df1.nrows) {
+        key1 = df1.data[onCol][i]
+        found = false
+        for j in range(df2.nrows) {
+            key2 = df2.data[onCol][j]
+            if (key1 == key2) {
+                found = true
+                for c in df1.columns {
+                    push(result[c], df1.data[c][i])
+                }
+                for c in df2.columns {
+                    if (c != onCol) {
+                        push(result[c], df2.data[c][j])
+                    }
+                }
+            }
+        }
+        if (!found) {
+            for c in df1.columns {
+                push(result[c], df1.data[c][i])
+            }
+            for c in df2.columns {
+                if (c != onCol) {
+                    push(result[c], null)
+                }
+            }
+        }
+    }
+    
+    return DataFrame(result)
+}
+
+// Concatenate DataFrames vertically
+func concat(dfs) {
+    if (dfs.len() == 0) { return DataFrame({}) }
+    
+    allCols = []
+    for df in dfs {
+        for c in df.columns {
+            if (!allCols.includes(c)) {
+                push(allCols, c)
+            }
+        }
+    }
+    
+    result = {}
+    for c in allCols {
+        result[c] = []
+    }
+    
+    for df in dfs {
+        for i in range(df.nrows) {
+            for c in allCols {
+                if (hasKey(df.data, c)) {
+                    push(result[c], df.data[c][i])
+                } else {
+                    push(result[c], null)
+                }
+            }
+        }
+    }
+    
+    return DataFrame(result)
+}
+
+// Fill null values
+func fillna(df, value) {
+    result = {}
+    for c in df.columns {
+        result[c] = []
+        for v in df.data[c] {
+            if (v == null) {
+                push(result[c], value)
+            } else {
+                push(result[c], v)
+            }
+        }
+    }
+    return DataFrame(result)
+}
+
+// Drop rows with null values
+func dropna(df) {
+    indices = []
+    for i in range(df.nrows) {
+        hasNull = false
+        for c in df.columns {
+            if (df.data[c][i] == null) {
+                hasNull = true
+                break
+            }
+        }
+        if (!hasNull) {
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Drop duplicate rows
+func dropDuplicates(df, subset) {
+    if (subset == null) { subset = df.columns }
+    
+    seen = {}
+    indices = []
+    for i in range(df.nrows) {
+        keyParts = []
+        for c in subset {
+            push(keyParts, str(df.data[c][i]))
+        }
+        key = join(keyParts, "|")
+        if (!hasKey(seen, key)) {
+            seen[key] = true
+            push(indices, i)
+        }
+    }
+    return getRows(df, indices)
+}
+
+// Sample random rows
+func sample(df, n) {
+    if (n > df.nrows) { n = df.nrows }
+    indices = []
+    available = []
+    for i in range(df.nrows) {
+        push(available, i)
+    }
+    for i in range(n) {
+        idx = randomInt(0, available.len() - 1)
+        push(indices, available[idx])
+        newAvailable = []
+        for j in range(available.len()) {
+            if (j != idx) {
+                push(newAvailable, available[j])
+            }
+        }
+        available = newAvailable
+    }
+    return getRows(df, indices)
+}
+
+// Pivot table
+func pivot(df, indexCol, columnsCol, valuesCol, aggFunc) {
+    if (aggFunc == null) { aggFunc = "sum" }
+    
+    indexVals = sUnique(col(df, indexCol)).data
+    colVals = sUnique(col(df, columnsCol)).data
+    
+    result = {}
+    result[indexCol] = indexVals
+    for cv in colVals {
+        result[str(cv)] = []
+        for i in range(indexVals.len()) {
+            push(result[str(cv)], 0)
+        }
+    }
+    
+    for i in range(indexVals.len()) {
+        iv = indexVals[i]
+        for cv in colVals {
+            values = []
+            for j in range(df.nrows) {
+                if (df.data[indexCol][j] == iv && df.data[columnsCol][j] == cv) {
+                    push(values, df.data[valuesCol][j])
+                }
+            }
+            if (values.len() > 0) {
+                aggResult = 0
+                case(aggFunc) {
+                    "sum":
+                        for v in values { aggResult = aggResult + v }
+                        break
+                    "mean", "avg":
+                        for v in values { aggResult = aggResult + v }
+                        aggResult = aggResult / values.len()
+                        break
+                    "count":
+                        aggResult = values.len()
+                        break
+                    "min":
+                        aggResult = values[0]
+                        for v in values { if (v < aggResult) { aggResult = v } }
+                        break
+                    "max":
+                        aggResult = values[0]
+                        for v in values { if (v > aggResult) { aggResult = v } }
+                        break
+                    default:
+                        aggResult = values[0]
+                }
+                result[str(cv)][i] = aggResult
+            }
+        }
+    }
+    
+    return DataFrame(result)
+}
+
+// Value counts for column
+func valueCounts(df, colName) {
+    counts = sValueCounts(col(df, colName))
+    vals = []
+    cnts = []
+    for k in keys(counts) {
+        push(vals, k)
+        push(cnts, counts[k])
+    }
+    return DataFrame({value: vals, count: cnts})
+}
+
+// Correlation between two columns
+func corr(df, col1, col2) {
+    s1 = col(df, col1)
+    s2 = col(df, col2)
+    m1 = sMean(s1)
+    m2 = sMean(s2)
+    
+    sumProd = 0
+    sumSq1 = 0
+    sumSq2 = 0
+    
+    for i in range(sLen(s1)) {
+        d1 = s1.data[i] - m1
+        d2 = s2.data[i] - m2
+        sumProd = sumProd + d1 * d2
+        sumSq1 = sumSq1 + d1 * d1
+        sumSq2 = sumSq2 + d2 * d2
+    }
+    
+    return sumProd / sqrt(sumSq1 * sumSq2)
+}
+
+// DataFrame to string (pretty print)
+func dfStr(df) {
+    if (df.ncols == 0) {
+        return "Empty DataFrame"
+    }
+    
+    widths = {}
+    for c in df.columns {
+        widths[c] = c.len()
+        for v in df.data[c] {
+            vLen = str(v).len()
+            if (vLen > widths[c]) {
+                widths[c] = vLen
+            }
+        }
+        if (widths[c] > 15) { widths[c] = 15 }
+    }
+    
+    headerParts = []
+    for c in df.columns {
+        padded = c
+        while (padded.len() < widths[c]) {
+            padded = padded + " "
+        }
+        push(headerParts, padded)
+    }
+    header = "| " + join(headerParts, " | ") + " |"
+    
+    sepParts = []
+    for c in df.columns {
+        sep = ""
+        for i in range(widths[c]) {
+            sep = sep + "-"
+        }
+        push(sepParts, sep)
+    }
+    separator = "+-" + join(sepParts, "-+-") + "-+"
+    
+    lines = []
+    push(lines, separator)
+    push(lines, header)
+    push(lines, separator)
+    
+    displayRows = df.nrows < 15 ? df.nrows : 15
+    for i in range(displayRows) {
+        rowParts = []
+        for c in df.columns {
+            val = str(df.data[c][i])
+            if (val.len() > 15) {
+                val = slice(val, 0, 12) + "..."
+            }
+            while (val.len() < widths[c]) {
+                val = val + " "
+            }
+            push(rowParts, val)
+        }
+        push(lines, "| " + join(rowParts, " | ") + " |")
+    }
+    
+    if (df.nrows > 15) {
+        push(lines, "... (" + str(df.nrows - 15) + " more rows)")
+    }
+    
+    push(lines, separator)
+    push(lines, "[" + str(df.nrows) + " rows x " + str(df.ncols) + " columns]")
+    
+    return join(lines, "\n")
+}
+
+// Print DataFrame
+func printDF(df) {
+    print(dfStr(df))
+}
+
+// Print Series
+func printS(s) {
+    print(sStr(s))
+}
