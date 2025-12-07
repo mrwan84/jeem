@@ -1,0 +1,116 @@
+// ============================================
+// jPlot Library Test
+// ============================================
+
+import "modules/jplot.jm" as jplot
+
+print("=== JPLOT LIBRARY TEST ===\n")
+
+// --- Line Chart ---
+print("--- Line Chart ---")
+data = [1, 4, 2, 8, 5, 7, 3, 6, 9, 4, 2, 5]
+config = jplot.PlotConfig()
+config.title = "Monthly Sales"
+config.width = 50
+config.height = 12
+print(jplot.lineChart(data, config))
+print("")
+
+// --- Bar Chart (Horizontal) ---
+print("--- Bar Chart (Horizontal) ---")
+labels = ["Jan", "Feb", "Mar", "Apr", "May"]
+values = [120, 85, 142, 98, 165]
+config = jplot.PlotConfig()
+config.title = "Sales by Month"
+print(jplot.barChart(labels, values, config))
+print("")
+
+// --- Bar Chart (Vertical) ---
+print("--- Bar Chart (Vertical) ---")
+config = jplot.PlotConfig()
+config.title = "Quarterly Revenue"
+config.height = 10
+print(jplot.barChartVertical(["Q1", "Q2", "Q3", "Q4"], [45, 78, 62, 89], config))
+print("")
+
+// --- Scatter Plot ---
+print("--- Scatter Plot ---")
+xData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+yData = [2, 4, 5, 4, 5, 8, 7, 9, 8, 10]
+config = jplot.PlotConfig()
+config.title = "X vs Y Correlation"
+config.width = 40
+config.height = 12
+print(jplot.scatterPlot(xData, yData, config))
+print("")
+
+// --- Histogram ---
+print("--- Histogram ---")
+// Generate some random-ish data
+histData = []
+for i in range(50) {
+    push(histData, (i % 10) + (i % 7))
+}
+config = jplot.PlotConfig()
+config.title = "Value Distribution"
+print(jplot.histogram(histData, 8, config))
+print("")
+
+// --- Sparkline ---
+print("--- Sparkline ---")
+sparkData = [5, 3, 7, 2, 8, 4, 9, 1, 6, 5, 7, 3]
+print("Trend: [" + jplot.sparkline(sparkData) + "]")
+print("")
+
+// --- Box Plot ---
+print("--- Box Plot ---")
+boxData = [2, 3, 5, 7, 8, 10, 11, 12, 13, 15, 18, 20, 22, 25]
+config = jplot.PlotConfig()
+config.title = "Data Distribution"
+config.width = 50
+print(jplot.boxPlot(boxData, config))
+print("")
+
+// --- Pie Chart ---
+print("--- Pie Chart ---")
+pieLabels = ["Chrome", "Firefox", "Safari", "Edge", "Other"]
+pieValues = [65, 15, 10, 7, 3]
+config = jplot.PlotConfig()
+config.title = "Browser Market Share"
+print(jplot.pieChart(pieLabels, pieValues, config))
+print("")
+
+// --- Multi-Line Chart ---
+print("--- Multi-Line Chart ---")
+datasets = [
+    {name: "Product A", data: [10, 15, 12, 18, 20, 22, 25]},
+    {name: "Product B", data: [5, 8, 12, 10, 15, 18, 20]},
+    {name: "Product C", data: [8, 6, 9, 12, 11, 14, 16]}
+]
+config = jplot.PlotConfig()
+config.title = "Product Comparison"
+config.width = 50
+config.height = 12
+print(jplot.multiLineChart(datasets, config))
+print("")
+
+// --- Quick Plot Functions ---
+print("--- Quick Plot ---")
+jplot.plot([1, 3, 2, 5, 4, 6, 5, 8, 7, 9], "Quick Line Chart")
+print("")
+
+// --- SVG Output ---
+print("--- SVG Output ---")
+print("Generating SVG files...")
+
+svgData = [10, 25, 15, 30, 22, 35, 28, 40, 32, 45]
+jplot.saveSvgLine(svgData, "chart_line.svg", "Sales Trend")
+
+svgLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+svgValues = [150, 230, 180, 290, 210]
+jplot.saveSvgBar(svgLabels, svgValues, "chart_bar.svg", "Daily Revenue")
+
+jplot.saveSvgPie(["A", "B", "C", "D"], [40, 30, 20, 10], "chart_pie.svg", "Market Share")
+
+print("")
+print("=== JPLOT LIBRARY TEST COMPLETE ===")
