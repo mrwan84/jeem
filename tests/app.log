@@ -1,0 +1,6 @@
+=== Application Log ===
+[1765097720] [INFO] Application started
+[1765097720] [DEBUG] Loading configuration
+[1765097720] [INFO] Server listening on port 8080
+[1765097720] [WARN] High memory usage detected
+[1765097720] [ERROR] Failed to connect to database

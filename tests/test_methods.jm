@@ -1,0 +1,292 @@
+// =============================================
+// Test: All Methods (Array, String, Object)
+// =============================================
+
+print("=== Array Methods ===\n")
+
+// Setup
+nums = [1, 2, 3, 4, 5]
+print("Original array:", nums)
+
+// map
+print("\n--- map ---")
+doubled = nums.map(x => x * 2)
+print("  map(x => x * 2):", doubled)
+assert(doubled[0] == 2 && doubled[4] == 10, "map failed")
+print("  [OK] map works")
+
+// filter
+print("\n--- filter ---")
+evens = nums.filter(x => x % 2 == 0)
+print("  filter(x => x % 2 == 0):", evens)
+assert(evens.len() == 2, "filter failed")
+print("  [OK] filter works")
+
+// reduce
+print("\n--- reduce ---")
+sum = nums.reduce((acc, x) => acc + x, 0)
+print("  reduce((acc, x) => acc + x, 0):", sum)
+assert(sum == 15, "reduce failed")
+print("  [OK] reduce works")
+
+// reduce without initial value
+product = [2, 3, 4].reduce((acc, x) => acc * x)
+print("  reduce((acc, x) => acc * x):", product)
+assert(product == 24, "reduce without init failed")
+print("  [OK] reduce without initial works")
+
+// forEach
+print("\n--- forEach ---")
+total = 0
+nums.forEach(x => { total = total + x })
+print("  forEach sum:", total)
+assert(total == 15, "forEach failed")
+print("  [OK] forEach works")
+
+// find
+print("\n--- find ---")
+found = nums.find(x => x > 3)
+print("  find(x => x > 3):", found)
+assert(found == 4, "find failed")
+print("  [OK] find works")
+
+notFound = nums.find(x => x > 100)
+print("  find(x => x > 100):", notFound)
+assert(notFound == null, "find should return null")
+print("  [OK] find returns null when not found")
+
+// findIndex
+print("\n--- findIndex ---")
+idx = nums.findIndex(x => x > 3)
+print("  findIndex(x => x > 3):", idx)
+assert(idx == 3, "findIndex failed")
+print("  [OK] findIndex works")
+
+notFoundIdx = nums.findIndex(x => x > 100)
+print("  findIndex(x => x > 100):", notFoundIdx)
+assert(notFoundIdx == -1, "findIndex should return -1")
+print("  [OK] findIndex returns -1 when not found")
+
+// every
+print("\n--- every ---")
+allPositive = nums.every(x => x > 0)
+print("  every(x => x > 0):", allPositive)
+assert(allPositive == true, "every failed")
+print("  [OK] every works")
+
+allBig = nums.every(x => x > 3)
+print("  every(x => x > 3):", allBig)
+assert(allBig == false, "every should return false")
+print("  [OK] every returns false correctly")
+
+// some
+print("\n--- some ---")
+hasEven = nums.some(x => x % 2 == 0)
+print("  some(x => x % 2 == 0):", hasEven)
+assert(hasEven == true, "some failed")
+print("  [OK] some works")
+
+hasNegative = nums.some(x => x < 0)
+print("  some(x => x < 0):", hasNegative)
+assert(hasNegative == false, "some should return false")
+print("  [OK] some returns false correctly")
+
+// includes
+print("\n--- includes ---")
+has3 = nums.includes(3)
+print("  includes(3):", has3)
+assert(has3 == true, "includes failed")
+print("  [OK] includes works")
+
+has99 = nums.includes(99)
+print("  includes(99):", has99)
+assert(has99 == false, "includes should return false")
+print("  [OK] includes returns false correctly")
+
+// push, pop
+print("\n--- push/pop ---")
+arr = [1, 2]
+push(arr, 3)
+print("  after push(3):", arr)
+assert(arr.len() == 3, "push failed")
+popped = pop(arr)
+print("  pop() returned:", popped, "array now:", arr)
+assert(popped == 3 && arr.len() == 2, "pop failed")
+print("  [OK] push/pop work")
+
+// join
+print("\n--- join ---")
+joined = ["a", "b", "c"].join("-")
+print("  ['a','b','c'].join('-'):", joined)
+assert(joined == "a-b-c", "join failed")
+print("  [OK] join works")
+
+// reverse
+print("\n--- reverse ---")
+rev = [1, 2, 3]
+rev.reverse()
+print("  [1,2,3].reverse():", rev)
+assert(rev[0] == 3 && rev[2] == 1, "reverse failed")
+print("  [OK] reverse works")
+
+// sort
+print("\n--- sort ---")
+unsorted = [3, 1, 4, 1, 5, 9, 2, 6]
+unsorted.sort()
+print("  sort():", unsorted)
+assert(unsorted[0] == 1 && unsorted[7] == 9, "sort failed")
+print("  [OK] sort works")
+
+// slice
+print("\n--- slice ---")
+sliced = [1, 2, 3, 4, 5].slice(1, 4)
+print("  [1,2,3,4,5].slice(1,4):", sliced)
+assert(sliced.len() == 3 && sliced[0] == 2, "slice failed")
+print("  [OK] slice works")
+
+// indexOf
+print("\n--- indexOf ---")
+idx = [10, 20, 30, 40].indexOf(30)
+print("  indexOf(30):", idx)
+assert(idx == 2, "indexOf failed")
+print("  [OK] indexOf works")
+
+// length
+print("\n--- length ---")
+print("  [1,2,3].len():", [1, 2, 3].len())
+assert([1, 2, 3].len() == 3, "len failed")
+print("  [OK] length works")
+
+// Method chaining
+print("\n--- Method Chaining ---")
+result = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    .filter(x => x % 2 == 0)
+    .map(x => x * x)
+print("  filter(even).map(square):", result)
+assert(result.len() == 5 && result[0] == 4 && result[4] == 100, "chaining failed")
+print("  [OK] Method chaining works")
+
+
+print("\n\n=== String Methods ===\n")
+
+text = "  Hello World  "
+print("Original string: '" + text + "'")
+
+// toUpperCase / toLowerCase
+print("\n--- toUpperCase/toLowerCase ---")
+upper = "hello".upper()
+lower = "HELLO".lower()
+print("  'hello'.upper():", upper)
+print("  'HELLO'.lower():", lower)
+assert(upper == "HELLO" && lower == "hello", "case conversion failed")
+print("  [OK] Case conversion works")
+
+// trim
+print("\n--- trim ---")
+trimmed = text.trim()
+print("  .trim():", "'" + trimmed + "'")
+assert(trimmed == "Hello World", "trim failed")
+print("  [OK] trim works")
+
+// split
+print("\n--- split ---")
+parts = "a,b,c".split(",")
+print("  'a,b,c'.split(','):", parts)
+assert(parts.len() == 3 && parts[1] == "b", "split failed")
+print("  [OK] split works")
+
+// replace
+print("\n--- replace ---")
+replaced = "Hello World".replace("World", "Jeem")
+print("  replace('World', 'Jeem'):", replaced)
+assert(replaced == "Hello Jeem", "replace failed")
+print("  [OK] replace works")
+
+// indexOf (string)
+print("\n--- indexOf ---")
+idx = "Hello World".indexOf("World")
+print("  'Hello World'.indexOf('World'):", idx)
+assert(idx == 6, "string indexOf failed")
+print("  [OK] string indexOf works")
+
+// includes (string)
+print("\n--- includes ---")
+has = "Hello World".includes("World")
+print("  includes('World'):", has)
+assert(has == true, "string includes failed")
+print("  [OK] string includes works")
+
+// startsWith / endsWith
+print("\n--- startsWith/endsWith ---")
+sw = "Hello World".startsWith("Hello")
+ew = "Hello World".endsWith("World")
+print("  startsWith('Hello'):", sw)
+print("  endsWith('World'):", ew)
+assert(sw && ew, "startsWith/endsWith failed")
+print("  [OK] startsWith/endsWith work")
+
+// slice (string)
+print("\n--- slice ---")
+sliced = "Hello World".slice(0, 5)
+print("  slice(0, 5):", sliced)
+assert(sliced == "Hello", "string slice failed")
+print("  [OK] string slice works")
+
+// charAt
+print("\n--- charAt ---")
+ch = "Hello".charAt(1)
+print("  'Hello'.charAt(1):", ch)
+assert(ch == "e", "charAt failed")
+print("  [OK] charAt works")
+
+// length (string)
+print("\n--- length ---")
+slen = "Hello".len()
+print("  'Hello'.len():", slen)
+assert(slen == 5, "string length failed")
+print("  [OK] string length works")
+
+// String method chaining
+print("\n--- String Chaining ---")
+result = "  hello world  ".trim().upper()
+print("  '  hello world  '.trim().upper():", result)
+assert(result == "HELLO WORLD", "string chaining failed")
+print("  [OK] String chaining works")
+
+
+print("\n\n=== Object Methods ===\n")
+
+obj = {name: "Alice", age: 30, city: "Berlin"}
+print("Original object:", obj)
+
+// keys
+print("\n--- keys ---")
+k = obj.keys()
+print("  keys():", k)
+assert(k.len() == 3, "keys failed")
+print("  [OK] keys works")
+
+// values
+print("\n--- values ---")
+v = obj.values()
+print("  values():", v)
+assert(v.len() == 3, "values failed")
+print("  [OK] values works")
+
+// entries
+print("\n--- entries ---")
+e = obj.entries()
+print("  entries():", e)
+assert(e.len() == 3 && e[0].len() == 2, "entries failed")
+print("  [OK] entries works")
+
+// hasOwnProperty
+print("\n--- hasOwnProperty ---")
+hasName = obj.hasOwnProperty("name")
+hasXyz = obj.hasOwnProperty("xyz")
+print("  hasOwnProperty('name'):", hasName)
+print("  hasOwnProperty('xyz'):", hasXyz)
+assert(hasName && !hasXyz, "hasOwnProperty failed")
+print("  [OK] hasOwnProperty works")
+
+print("\n\n=== All Method Tests Complete ===")

@@ -1,0 +1,705 @@
+// ============================================
+// Math Library for Jeem
+// ============================================
+// Provides advanced mathematical operations
+// ============================================
+
+// --- Constants (as functions) ---
+func PI() { return 3.14159265358979323846 }
+func E() { return 2.71828182845904523536 }
+func TAU() { return 6.28318530717958647692 }
+func PHI() { return 1.61803398874989484820 }    // Golden ratio
+func LN2() { return 0.69314718055994530942 }
+func LN10() { return 2.30258509299404568402 }
+func SQRT2() { return 1.41421356237309504880 }
+func SQRT3() { return 1.73205080756887729352 }
+
+// --- Trigonometric Functions ---
+
+// Compute sine using Taylor series
+func sin(x) {
+    // Normalize x to [-PI, PI]
+    pi = 3.14159265358979323846
+    tau = 6.28318530717958647692
+    x = x % tau
+    if (x > pi) { x = x - tau }
+    if (x < -pi) { x = x + tau }
+    
+    result = 0
+    term = x
+    for n in range(1, 20) {
+        result = result + term
+        term = -term * x * x / ((2 * n) * (2 * n + 1))
+    }
+    return result
+}
+
+// Compute cosine using Taylor series
+func cos(x) {
+    // Normalize x to [-PI, PI]
+    pi = 3.14159265358979323846
+    tau = 6.28318530717958647692
+    x = x % tau
+    if (x > pi) { x = x - tau }
+    if (x < -pi) { x = x + tau }
+    
+    result = 0
+    term = 1
+    for n in range(0, 20) {
+        result = result + term
+        term = -term * x * x / ((2 * n + 1) * (2 * n + 2))
+    }
+    return result
+}
+
+// Tangent
+func tan(x) {
+    c = cos(x)
+    if (abs(c) < 0.0000001) {
+        return 99999999  // Infinity approximation
+    }
+    return sin(x) / c
+}
+
+// Cotangent
+func cot(x) {
+    s = sin(x)
+    if (abs(s) < 0.0000001) {
+        return 99999999
+    }
+    return cos(x) / s
+}
+
+// Secant
+func sec(x) {
+    c = cos(x)
+    if (abs(c) < 0.0000001) {
+        return 99999999
+    }
+    return 1 / c
+}
+
+// Cosecant
+func csc(x) {
+    s = sin(x)
+    if (abs(s) < 0.0000001) {
+        return 99999999
+    }
+    return 1 / s
+}
+
+// --- Inverse Trigonometric Functions ---
+
+// Arcsine using Newton's method
+func asin(x) {
+    if (x < -1 || x > 1) { return null }
+    if (x == 1) { return 3.14159265358979 / 2 }
+    if (x == -1) { return -3.14159265358979 / 2 }
+    
+    // Use atan for calculation
+    return atan(x / sqrt(1 - x * x))
+}
+
+// Arccosine
+func acos(x) {
+    if (x < -1 || x > 1) { return null }
+    return 3.14159265358979 / 2 - asin(x)
+}
+
+// Arctangent using Taylor series
+func atan(x) {
+    // For large x, use identity: atan(x) = PI/2 - atan(1/x)
+    if (x > 1) { return 3.14159265358979 / 2 - atan(1 / x) }
+    if (x < -1) { return -3.14159265358979 / 2 - atan(1 / x) }
+    
+    result = 0
+    term = x
+    for n in range(0, 50) {
+        result = result + term / (2 * n + 1)
+        term = -term * x * x
+    }
+    return result
+}
+
+// Arctangent2 (two argument)
+func atan2(y, x) {
+    if (x > 0) { return atan(y / x) }
+    if (x < 0 && y >= 0) { return atan(y / x) + 3.14159265358979 }
+    if (x < 0 && y < 0) { return atan(y / x) - 3.14159265358979 }
+    if (x == 0 && y > 0) { return 3.14159265358979 / 2 }
+    if (x == 0 && y < 0) { return -3.14159265358979 / 2 }
+    return 0  // x == 0 && y == 0
+}
+
+// --- Hyperbolic Functions ---
+
+// Hyperbolic sine
+func sinh(x) {
+    return (exp(x) - exp(-x)) / 2
+}
+
+// Hyperbolic cosine
+func cosh(x) {
+    return (exp(x) + exp(-x)) / 2
+}
+
+// Hyperbolic tangent
+func tanh(x) {
+    return sinh(x) / cosh(x)
+}
+
+// --- Exponential and Logarithmic ---
+
+// Exponential function e^x
+func exp(x) {
+    result = 0
+    term = 1
+    for n in range(0, 50) {
+        result = result + term
+        term = term * x / (n + 1)
+    }
+    return result
+}
+
+// Natural logarithm using series
+func ln(x) {
+    if (x <= 0) { return null }
+    if (x == 1) { return 0 }
+    
+    // Reduce to range [0.5, 1.5] for convergence
+    k = 0
+    while (x > 1.5) { x = x / 2.71828182845904523536; k = k + 1 }
+    while (x < 0.5) { x = x * 2.71828182845904523536; k = k - 1 }
+    
+    // Use series: ln(1+y) = y - y^2/2 + y^3/3 - ...
+    y = x - 1
+    result = 0
+    term = y
+    for n in range(1, 100) {
+        result = result + term / n
+        term = -term * y
+    }
+    return result + k
+}
+
+// Logarithm base 10
+func log10(x) {
+    return ln(x) / 2.30258509299404568402
+}
+
+// Logarithm base 2
+func log2(x) {
+    return ln(x) / 0.69314718055994530942
+}
+
+// Logarithm any base
+func logBase(x, base) {
+    return ln(x) / ln(base)
+}
+
+// --- Complex Numbers ---
+// Represented as {re: real, im: imaginary}
+
+// Create complex number
+func complex(re, im) {
+    return {re: re, im: im}
+}
+
+// Complex from polar form
+func complexPolar(r, theta) {
+    return {re: r * cos(theta), im: r * sin(theta)}
+}
+
+// Complex magnitude (absolute value)
+func cabs(z) {
+    return sqrt(z.re * z.re + z.im * z.im)
+}
+
+// Complex argument (angle)
+func carg(z) {
+    return atan2(z.im, z.re)
+}
+
+// Complex conjugate
+func conj(z) {
+    return {re: z.re, im: -z.im}
+}
+
+// Complex addition
+func cadd(a, b) {
+    return {re: a.re + b.re, im: a.im + b.im}
+}
+
+// Complex subtraction
+func csub(a, b) {
+    return {re: a.re - b.re, im: a.im - b.im}
+}
+
+// Complex multiplication
+func cmul(a, b) {
+    return {
+        re: a.re * b.re - a.im * b.im,
+        im: a.re * b.im + a.im * b.re
+    }
+}
+
+// Complex division
+func cdiv(a, b) {
+    denom = b.re * b.re + b.im * b.im
+    return {
+        re: (a.re * b.re + a.im * b.im) / denom,
+        im: (a.im * b.re - a.re * b.im) / denom
+    }
+}
+
+// Complex power (integer)
+func cpow(z, n) {
+    if (n == 0) { return {re: 1, im: 0} }
+    if (n < 0) { return cdiv({re: 1, im: 0}, cpow(z, -n)) }
+    
+    result = {re: 1, im: 0}
+    for i in range(n) {
+        result = cmul(result, z)
+    }
+    return result
+}
+
+// Complex square root
+func csqrt(z) {
+    r = cabs(z)
+    return {
+        re: sqrt((r + z.re) / 2),
+        im: (z.im >= 0 ? 1 : -1) * sqrt((r - z.re) / 2)
+    }
+}
+
+// Complex exponential
+func cexp(z) {
+    r = exp(z.re)
+    return {re: r * cos(z.im), im: r * sin(z.im)}
+}
+
+// Complex natural logarithm
+func cln(z) {
+    return {re: ln(cabs(z)), im: carg(z)}
+}
+
+// Format complex number as string
+func cstr(z) {
+    if (z.im >= 0) {
+        return str(z.re) + " + " + str(z.im) + "i"
+    }
+    return str(z.re) + " - " + str(-z.im) + "i"
+}
+
+// --- Vector Operations ---
+
+// Vector dot product
+func dot(a, b) {
+    if (a.len() != b.len()) { return null }
+    sum = 0
+    for i in range(a.len()) {
+        sum = sum + a[i] * b[i]
+    }
+    return sum
+}
+
+// Vector cross product (3D)
+func cross(a, b) {
+    if (a.len() != 3 || b.len() != 3) { return null }
+    return [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    ]
+}
+
+// Vector magnitude
+func magnitude(v) {
+    return sqrt(dot(v, v))
+}
+
+// Vector normalization
+func normalize(v) {
+    mag = magnitude(v)
+    if (mag == 0) { return v }
+    result = []
+    for x in v {
+        push(result, x / mag)
+    }
+    return result
+}
+
+// Vector addition
+func vadd(a, b) {
+    if (a.len() != b.len()) { return null }
+    result = []
+    for i in range(a.len()) {
+        push(result, a[i] + b[i])
+    }
+    return result
+}
+
+// Vector subtraction
+func vsub(a, b) {
+    if (a.len() != b.len()) { return null }
+    result = []
+    for i in range(a.len()) {
+        push(result, a[i] - b[i])
+    }
+    return result
+}
+
+// Vector scalar multiplication
+func vscale(v, s) {
+    result = []
+    for x in v {
+        push(result, x * s)
+    }
+    return result
+}
+
+// --- Matrix Operations ---
+// Matrices are 2D arrays: [[row1], [row2], ...]
+
+// Create identity matrix
+func identity(n) {
+    result = []
+    for i in range(n) {
+        row = []
+        for j in range(n) {
+            push(row, i == j ? 1 : 0)
+        }
+        push(result, row)
+    }
+    return result
+}
+
+// Create zero matrix
+func zeros(rows, cols) {
+    result = []
+    for i in range(rows) {
+        row = []
+        for j in range(cols) {
+            push(row, 0)
+        }
+        push(result, row)
+    }
+    return result
+}
+
+// Matrix addition
+func madd(a, b) {
+    rows = a.len()
+    cols = a[0].len()
+    result = []
+    for i in range(rows) {
+        row = []
+        for j in range(cols) {
+            push(row, a[i][j] + b[i][j])
+        }
+        push(result, row)
+    }
+    return result
+}
+
+// Matrix subtraction
+func msub(a, b) {
+    rows = a.len()
+    cols = a[0].len()
+    result = []
+    for i in range(rows) {
+        row = []
+        for j in range(cols) {
+            push(row, a[i][j] - b[i][j])
+        }
+        push(result, row)
+    }
+    return result
+}
+
+// Matrix multiplication
+func mmul(a, b) {
+    rowsA = a.len()
+    colsA = a[0].len()
+    colsB = b[0].len()
+    
+    result = zeros(rowsA, colsB)
+    for i in range(rowsA) {
+        for j in range(colsB) {
+            sum = 0
+            for k in range(colsA) {
+                sum = sum + a[i][k] * b[k][j]
+            }
+            result[i][j] = sum
+        }
+    }
+    return result
+}
+
+// Matrix transpose
+func transpose(m) {
+    rows = m.len()
+    cols = m[0].len()
+    result = []
+    for j in range(cols) {
+        row = []
+        for i in range(rows) {
+            push(row, m[i][j])
+        }
+        push(result, row)
+    }
+    return result
+}
+
+// Matrix scalar multiplication
+func mscale(m, s) {
+    result = []
+    for row in m {
+        newRow = []
+        for x in row {
+            push(newRow, x * s)
+        }
+        push(result, newRow)
+    }
+    return result
+}
+
+// Matrix determinant (2x2 and 3x3)
+func det(m) {
+    n = m.len()
+    if (n == 2) {
+        return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+    }
+    if (n == 3) {
+        return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+               m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+               m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+    }
+    return null
+}
+
+// Matrix trace
+func trace(m) {
+    sum = 0
+    for i in range(m.len()) {
+        sum = sum + m[i][i]
+    }
+    return sum
+}
+
+// --- Statistical Functions ---
+
+// Sum of array
+func sum(arr) {
+    return arr.reduce((a, b) => a + b, 0)
+}
+
+// Product of array
+func product(arr) {
+    return arr.reduce((a, b) => a * b, 1)
+}
+
+// Mean (average)
+func mean(arr) {
+    return sum(arr) / arr.len()
+}
+
+// Median
+func median(arr) {
+    sorted = clone(arr)
+    sort(sorted)
+    n = sorted.len()
+    if (n % 2 == 1) {
+        return sorted[floor(n / 2)]
+    }
+    return (sorted[n / 2 - 1] + sorted[n / 2]) / 2
+}
+
+// Mode (most frequent value)
+func mode(arr) {
+    counts = {}
+    for x in arr {
+        key = str(x)
+        if (hasKey(counts, key)) {
+            counts[key] = counts[key] + 1
+        } else {
+            counts[key] = 1
+        }
+    }
+    maxCount = 0
+    modeVal = arr[0]
+    for x in arr {
+        key = str(x)
+        if (counts[key] > maxCount) {
+            maxCount = counts[key]
+            modeVal = x
+        }
+    }
+    return modeVal
+}
+
+// Variance
+func variance(arr) {
+    m = mean(arr)
+    sumSq = 0
+    for x in arr {
+        sumSq = sumSq + (x - m) ** 2
+    }
+    return sumSq / arr.len()
+}
+
+// Standard deviation
+func stddev(arr) {
+    return sqrt(variance(arr))
+}
+
+// Covariance
+func covariance(x, y) {
+    if (x.len() != y.len()) { return null }
+    mx = mean(x)
+    my = mean(y)
+    sum = 0
+    for i in range(x.len()) {
+        sum = sum + (x[i] - mx) * (y[i] - my)
+    }
+    return sum / x.len()
+}
+
+// Correlation coefficient
+func correlation(x, y) {
+    return covariance(x, y) / (stddev(x) * stddev(y))
+}
+
+// --- Combinatorics ---
+
+// Factorial
+func factorial(n) {
+    if (n <= 1) { return 1 }
+    result = 1
+    for i in range(2, n + 1) {
+        result = result * i
+    }
+    return result
+}
+
+// Permutations P(n, r)
+func permutations(n, r) {
+    return factorial(n) / factorial(n - r)
+}
+
+// Combinations C(n, r)
+func combinations(n, r) {
+    return factorial(n) / (factorial(r) * factorial(n - r))
+}
+
+// --- Number Theory ---
+
+// Greatest common divisor
+func gcd(a, b) {
+    a = abs(int(a))
+    b = abs(int(b))
+    while (b != 0) {
+        temp = b
+        b = a % b
+        a = temp
+    }
+    return a
+}
+
+// Least common multiple
+func lcm(a, b) {
+    return abs(a * b) / gcd(a, b)
+}
+
+// Check if prime
+func isPrime(n) {
+    if (n < 2) { return false }
+    if (n == 2) { return true }
+    if (n % 2 == 0) { return false }
+    for i in range(3, int(sqrt(n)) + 1, 2) {
+        if (n % i == 0) { return false }
+    }
+    return true
+}
+
+// Prime factors
+func primeFactors(n) {
+    factors = []
+    d = 2
+    while (d * d <= n) {
+        while (n % d == 0) {
+            push(factors, d)
+            n = n / d
+        }
+        d = d + 1
+    }
+    if (n > 1) { push(factors, n) }
+    return factors
+}
+
+// Fibonacci number
+func fib(n) {
+    if (n <= 1) { return n }
+    a = 0
+    b = 1
+    for i in range(2, n + 1) {
+        temp = a + b
+        a = b
+        b = temp
+    }
+    return b
+}
+
+// --- Utility Functions ---
+
+// Clamp value to range
+func clamp(x, minVal, maxVal) {
+    if (x < minVal) { return minVal }
+    if (x > maxVal) { return maxVal }
+    return x
+}
+
+// Linear interpolation
+func lerp(a, b, t) {
+    return a + (b - a) * t
+}
+
+// Map value from one range to another
+func mapRange(x, inMin, inMax, outMin, outMax) {
+    return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+}
+
+// Degrees to radians
+func radians(deg) {
+    return deg * 3.14159265358979 / 180
+}
+
+// Radians to degrees
+func degrees(rad) {
+    return rad * 180 / 3.14159265358979
+}
+
+// Sign function
+func sign(x) {
+    if (x > 0) { return 1 }
+    if (x < 0) { return -1 }
+    return 0
+}
+
+// Hypot (safe sqrt(a^2 + b^2))
+func hypot(a, b) {
+    return sqrt(a * a + b * b)
+}
+
+// Nth root
+func nthRoot(x, n) {
+    if (x < 0 && n % 2 == 0) { return null }
+    sign = x < 0 ? -1 : 1
+    return sign * pow(abs(x), 1 / n)
+}
+
+// Cube root
+func cbrt(x) {
+    return nthRoot(x, 3)
+}

@@ -1,0 +1,26 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0d4d4d" rx="20"/>
+  
+  <!-- Outer circle -->
+  <circle cx="100" cy="85" r="45" fill="none" stroke="#c9a96e" stroke-width="3"/>
+
+  <g transform="translate(100, 85)">
+    <!-- Upper part of Jeem -->
+    <path d="M -25 -15 Q -25 -25, -15 -25 L 15 -25 Q 25 -25, 25 -15 L 25 10" 
+          fill="none" stroke="#c9a96e" stroke-width="6" stroke-linecap="round"/>
+    
+
+    
+    <!-- Lower part (tail) -->
+    <path d="M 25 10 Q 25 25, 10 25 L -5 25 Q -15 25, -15 15" 
+          fill="none" stroke="#c9a96e" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Language name in English -->
+  <text x="100" y="155" font-family="'Arial', sans-serif" font-size="28" font-weight="bold" 
+        fill="#c9a96e" text-anchor="middle" letter-spacing="2">JEEM</text>
+  
+  <!-- Decorative line under the name -->
+  <line x1="60" y1="165" x2="140" y2="165" stroke="#c9a96e" stroke-width="2"/>
+</svg>

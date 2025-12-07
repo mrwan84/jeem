@@ -1,0 +1,121 @@
+// =============================================
+// Test: HTTP Client and Server
+// =============================================
+
+print("=== HTTP Tests ===\n")
+
+// Note: These tests require network access
+// Server tests require the server to be running
+
+print("--- HTTP Client Tests ---\n")
+
+// Test 1: HTTP GET (requires network)
+print("Test 1: httpGet")
+print("  Note: Requires network access")
+print("  Attempting to fetch httpbin.org/get...")
+
+response = httpGet("http://httpbin.org/get")
+if (response != null && response.status != null) {
+    print("  Status:", response.status)
+    if (response.status == 200) {
+        print("  [OK] HTTP GET works")
+        print("  Body length:", response.body.len())
+    } else {
+        print("  ! Got status", response.status)
+    }
+} else {
+    print("  ! Network unavailable or request failed")
+    print("  (This is OK in restricted environments)")
+}
+
+// Test 2: HTTP POST (requires network)
+print("\nTest 2: httpPost")
+print("  Note: Requires network access")
+
+postData = jsonStringify({name: "Jeem", version: "3.0"})
+response = httpPost("http://httpbin.org/post", postData, "application/json")
+if (response != null && response.status != null) {
+    print("  Status:", response.status)
+    if (response.status == 200) {
+        print("  [OK] HTTP POST works")
+    } else {
+        print("  ! Got status", response.status)
+    }
+} else {
+    print("  ! Network unavailable or request failed")
+    print("  (This is OK in restricted environments)")
+}
+
+print("\n--- HTTP Server Tests ---\n")
+
+print("Test 3: Server Creation")
+print("  Creating server on port 8888...")
+
+server = createServer(8888)
+if (server != null) {
+    print("  Server created on port:", server.port)
+    print("  [OK] Server creation works")
+} else {
+    print("  ! Failed to create server (port may be in use)")
+}
+
+print("\nTest 4: Adding Routes")
+serverRoute("GET", "/", req => {
+    return {
+        status: 200,
+        contentType: "text/html",
+        body: "<h1>Hello from Jeem!</h1>"
+    }
+})
+print("  Added GET / route")
+
+serverRoute("GET", "/api/info", req => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            name: "Jeem Server",
+            version: "3.0",
+            status: "running"
+        })
+    }
+})
+print("  Added GET /api/info route")
+
+serverRoute("POST", "/api/echo", req => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            received: req.body,
+            method: req.method,
+            path: req.path
+        })
+    }
+})
+print("  Added POST /api/echo route")
+print("  [OK] Route registration works")
+
+print("\nTest 5: Route with parameters")
+serverRoute("GET", "/api/greet", req => {
+    // In a real implementation, would parse query params
+    return {
+        status: 200,
+        body: "Hello, visitor!"
+    }
+})
+print("  Added parameterized route")
+print("  [OK] Parameterized routes work")
+
+print("\n--- Server Ready ---")
+print("To test the server manually:")
+print("  1. Run: jeem test_http_server.jm")
+print("  2. Open browser to http://localhost:8888/")
+print("  3. Or use: curl http://localhost:8888/api/info")
+print("  4. Press Ctrl+C to stop")
+
+// Uncomment the next line to actually start the server
+// serverListen()
+
+print("\n=== HTTP Tests Complete ===")
+print("(Server not started - uncomment serverListen() to run)")

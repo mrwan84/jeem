@@ -1,0 +1,220 @@
+// ============================================
+// Jeem Test Suite - Arrays & Array Methods
+// ============================================
+
+print("=== ARRAYS TEST ===\n")
+
+// --- Array Creation ---
+print("--- Array Creation ---")
+empty = []
+numbers = [1, 2, 3, 4, 5]
+mixed = [1, "two", true, null, [1, 2]]
+print("empty:", empty)
+print("numbers:", numbers)
+print("mixed:", mixed)
+
+// --- Array Access ---
+print("\n--- Array Access ---")
+arr = ["a", "b", "c", "d", "e"]
+print("arr[0] =", arr[0])
+print("arr[2] =", arr[2])
+print("arr[-1] =", arr[-1])
+print("arr[-2] =", arr[-2])
+
+// --- Array Modification ---
+print("\n--- Array Modification ---")
+arr[1] = "B"
+print("arr[1] = 'B':", arr)
+
+// --- Array Length ---
+print("\n--- Array Length ---")
+print("arr.len() =", arr.len())
+print("arr.len() =", arr.len())
+
+// --- Push/Pop ---
+print("\n--- Push/Pop ---")
+stack = [1, 2, 3]
+print("original:", stack)
+push(stack, 4)
+print("push(4):", stack)
+push(stack, 5)
+print("push(5):", stack)
+popped = pop(stack)
+print("pop():", popped, "stack:", stack)
+
+// --- Array Methods ---
+print("\n--- .push() / .pop() ---")
+arr2 = [1, 2, 3]
+arr2.push(4)
+print("arr2.push(4):", arr2)
+val = arr2.pop()
+print("arr2.pop():", val, "arr2:", arr2)
+
+// --- Join ---
+print("\n--- Join ---")
+words = ["Hello", "World", "!"]
+print("join(words, ' '):", join(words, " "))
+print("words.join('-'):", words.join("-"))
+
+// --- Slice ---
+print("\n--- Slice ---")
+nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+print("original:", nums)
+print("slice(nums, 2, 5):", slice(nums, 2, 5))
+print("nums.slice(0, 3):", nums.slice(0, 3))
+print("nums.slice(-3):", nums.slice(-3))
+
+// --- IndexOf ---
+print("\n--- IndexOf ---")
+items = ["apple", "banana", "cherry", "banana"]
+print("indexOf(items, 'banana'):", indexOf(items, "banana"))
+print("items.indexOf('cherry'):", items.indexOf("cherry"))
+print("items.indexOf('grape'):", items.indexOf("grape"))
+
+// --- Reverse ---
+print("\n--- Reverse ---")
+arr3 = [1, 2, 3, 4, 5]
+print("original:", arr3)
+reverse(arr3)
+print("reverse():", arr3)
+
+// --- Sort ---
+print("\n--- Sort ---")
+unsorted = [3, 1, 4, 1, 5, 9, 2, 6]
+print("original:", unsorted)
+sort(unsorted)
+print("sort():", unsorted)
+
+// --- Map ---
+print("\n--- .map() ---")
+nums2 = [1, 2, 3, 4, 5]
+doubled = nums2.map(x => x * 2)
+print("nums:", nums2)
+print("nums.map(x => x * 2):", doubled)
+
+squared = nums2.map(x => x * x)
+print("nums.map(x => x * x):", squared)
+
+// Map with index
+indexed = nums2.map((x, i) => "item" + str(i) + "=" + str(x))
+print("with index:", indexed)
+
+// --- Filter ---
+print("\n--- .filter() ---")
+nums3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+evens = nums3.filter(x => x % 2 == 0)
+print("nums:", nums3)
+print("filter evens:", evens)
+
+odds = nums3.filter(x => x % 2 != 0)
+print("filter odds:", odds)
+
+greaterThan5 = nums3.filter(x => x > 5)
+print("filter > 5:", greaterThan5)
+
+// --- Reduce ---
+print("\n--- .reduce() ---")
+nums4 = [1, 2, 3, 4, 5]
+sum = nums4.reduce((acc, x) => acc + x, 0)
+print("nums:", nums4)
+print("sum (reduce):", sum)
+
+product = nums4.reduce((acc, x) => acc * x, 1)
+print("product (reduce):", product)
+
+max_val = nums4.reduce((acc, x) => x > acc ? x : acc, nums4[0])
+print("max (reduce):", max_val)
+
+// --- ForEach ---
+print("\n--- .forEach() ---")
+colors = ["red", "green", "blue"]
+print("forEach:")
+colors.forEach((color, i) => print("  " + str(i) + ": " + color))
+
+// --- Find ---
+print("\n--- .find() ---")
+nums5 = [1, 5, 10, 15, 20]
+found = nums5.find(x => x > 8)
+print("nums:", nums5)
+print("find(x > 8):", found)
+
+notFound = nums5.find(x => x > 100)
+print("find(x > 100):", notFound)
+
+// --- FindIndex ---
+print("\n--- .findIndex() ---")
+idx = nums5.findIndex(x => x > 8)
+print("findIndex(x > 8):", idx)
+
+idx2 = nums5.findIndex(x => x > 100)
+print("findIndex(x > 100):", idx2)
+
+// --- Every ---
+print("\n--- .every() ---")
+nums6 = [2, 4, 6, 8, 10]
+allEven = nums6.every(x => x % 2 == 0)
+print("nums:", nums6)
+print("every(x % 2 == 0):", allEven)
+
+nums7 = [2, 4, 5, 8, 10]
+allEven2 = nums7.every(x => x % 2 == 0)
+print("nums:", nums7)
+print("every(x % 2 == 0):", allEven2)
+
+// --- Some ---
+print("\n--- .some() ---")
+nums8 = [1, 3, 5, 7, 8]
+hasEven = nums8.some(x => x % 2 == 0)
+print("nums:", nums8)
+print("some(x % 2 == 0):", hasEven)
+
+nums9 = [1, 3, 5, 7, 9]
+hasEven2 = nums9.some(x => x % 2 == 0)
+print("nums:", nums9)
+print("some(x % 2 == 0):", hasEven2)
+
+// --- Includes ---
+print("\n--- .includes() ---")
+fruits = ["apple", "banana", "cherry"]
+print("fruits:", fruits)
+print("includes('banana'):", fruits.includes("banana"))
+print("includes('grape'):", fruits.includes("grape"))
+
+nums10 = [1, 2, 3, 4, 5]
+print("nums:", nums10)
+print("includes(3):", nums10.includes(3))
+print("includes(99):", nums10.includes(99))
+
+// --- Method Chaining ---
+print("\n--- Method Chaining ---")
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+result = data
+    .filter(x => x % 2 == 0)
+    .map(x => x * x)
+print("data:", data)
+print("filter(even).map(square):", result)
+
+// Complex chain
+people = [
+    {name: "Alice", age: 30},
+    {name: "Bob", age: 25},
+    {name: "Charlie", age: 35},
+    {name: "Diana", age: 28}
+]
+
+names = people
+    .filter(p => p.age >= 28)
+    .map(p => p.name)
+print("people over 28:", names)
+
+// --- Nested Arrays ---
+print("\n--- Nested Arrays ---")
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+print("matrix[0]:", matrix[0])
+print("matrix[1][1]:", matrix[1][1])
+
+print("\n=== ARRAYS TEST COMPLETE ===")

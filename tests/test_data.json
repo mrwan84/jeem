@@ -1,0 +1,12 @@
+{
+  "name": "Test Project",
+  "version": "1.0.0",
+  "dependencies": [
+    "lib1",
+    "lib2"
+  ],
+  "config": {
+    "debug": true,
+    "port": 8080
+  }
+}

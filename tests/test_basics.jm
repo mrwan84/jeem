@@ -1,0 +1,122 @@
+// ============================================
+// Jeem Test Suite - Basic Features
+// ============================================
+
+print("=== BASIC FEATURES TEST ===\n")
+
+// --- Variables and Constants ---
+print("--- Variables & Constants ---")
+x = 10
+y = 20
+const MY_MY_PI = 3.14159
+print("x =", x, ", y =", y, ", MY_PI =", PI)
+
+// --- Data Types ---
+print("\n--- Data Types ---")
+num_int = 42
+num_float = 3.14
+str = "Hello"
+bool_true = true
+bool_false = false
+null_val = null
+print("int:", num_int, "float:", num_float, "string:", str)
+print("bool:", bool_true, bool_false, "null:", null_val)
+
+// --- Type Checking ---
+print("\n--- Type Checking ---")
+print("typeof 42:", typeof(42))
+print("typeof 3.14:", typeof(3.14))
+print("typeof 'hello':", typeof("hello"))
+print("typeof true:", typeof(true))
+print("typeof null:", typeof(null))
+print("typeof []:", typeof([]))
+print("typeof {}:", typeof({}))
+
+print("isNumber(42):", isNumber(42))
+print("isString('a'):", isString("a"))
+print("typeof(true):", typeof(true))
+print("isArray([]):", isArray([]))
+print("isObject({}):", isObject({}))
+
+// --- Arithmetic Operators ---
+print("\n--- Arithmetic Operators ---")
+a = 10
+b = 3
+print("a =", a, ", b =", b)
+print("a + b =", a + b)
+print("a - b =", a - b)
+print("a * b =", a * b)
+print("a / b =", a / b)
+print("a % b =", a % b)
+print("a ** b =", a ** b)
+
+// --- Comparison Operators ---
+print("\n--- Comparison Operators ---")
+print("10 == 10:", 10 == 10)
+print("10 != 5:", 10 != 5)
+print("10 > 5:", 10 > 5)
+print("10 < 5:", 10 < 5)
+print("10 >= 10:", 10 >= 10)
+print("10 <= 10:", 10 <= 10)
+
+// --- Logical Operators ---
+print("\n--- Logical Operators ---")
+print("true && true:", true && true)
+print("true && false:", true && false)
+print("true || false:", true || false)
+print("false || false:", false || false)
+print("!true:", !true)
+print("!false:", !false)
+
+// --- String Operations ---
+print("\n--- String Operations ---")
+s1 = "Hello"
+s2 = "World"
+print("Concatenation:", s1 + " " + s2)
+print("Length:", s1.len())
+print("Upper:", s1.upper())
+print("Lower:", s1.upper().lower())
+print("Trim:", "  spaces  ".trim())
+print("Split:", split("a,b,c", ","))
+print("Join:", join(["x", "y", "z"], "-"))
+print("Replace:", replace("hello", "l", "L"))
+print("IndexOf:", indexOf("hello", "l"))
+print("Slice:", slice("hello", 1, 4))
+
+// --- Compound Assignment ---
+print("\n--- Compound Assignment ---")
+n = 10
+n += 5
+print("n += 5:", n)
+n -= 3
+print("n -= 3:", n)
+n *= 2
+print("n *= 2:", n)
+n /= 4
+print("n /= 4:", n)
+
+// --- Increment/Decrement ---
+print("\n--- Increment/Decrement ---")
+i = 5
+print("i =", i)
+i++
+print("i++:", i)
+i--
+print("i--:", i)
+print("++i:", ++i)
+print("--i:", --i)
+
+// --- Ternary Operator ---
+print("\n--- Ternary Operator ---")
+age = 20
+status = age >= 18 ? "adult" : "minor"
+print("age =", age, ", status =", status)
+
+// --- Template Strings ---
+print("\n--- Template Strings ---")
+name = "Jeem"
+version = 3
+print("Template: {{name}} v{{version}}")
+print("Expression: 2 + 2 = {{2 + 2}}")
+
+print("\n=== BASIC FEATURES TEST COMPLETE ===")

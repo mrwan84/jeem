@@ -1,0 +1,73 @@
+// ============================================
+// Jeem Test Suite - Import System
+// ============================================
+
+print("=== IMPORT TEST ===\n")
+
+// --- Import Math Module ---
+print("--- Import Math Module ---")
+import "modules/math_utils.jm" as math
+
+print("math.getPI():", math.getPI())
+print("math.getE():", math.getE())
+print("math.square(5):", math.square(5))
+print("math.cube(3):", math.cube(3))
+print("math.power(2, 10):", math.power(2, 10))
+print("math.factorial(5):", math.factorial(5))
+print("math.fibonacci(10):", math.fibonacci(10))
+print("math.circleArea(5):", math.circleArea(5))
+print("math.average([1,2,3,4,5]):", math.average([1, 2, 3, 4, 5]))
+print("math.clamp(15, 0, 10):", math.clamp(15, 0, 10))
+print("math.lerp(0, 100, 0.5):", math.lerp(0, 100, 0.5))
+
+// --- Import String Module ---
+print("\n--- Import String Module ---")
+import "modules/string_utils.jm" as str_utils
+
+print("capitalize('hello'):", str_utils.capitalize("hello"))
+print("titleCase('hello world'):", str_utils.titleCase("hello world"))
+print("camelCase('hello world'):", str_utils.camelCase("hello world"))
+print("snakeCase('Hello World'):", str_utils.snakeCase("Hello World"))
+print("kebabCase('Hello World'):", str_utils.kebabCase("Hello World"))
+print("repeat('ab', 3):", str_utils.repeat("ab", 3))
+print("padLeft('5', 3, '0'):", str_utils.padLeft("5", 3, "0"))
+print("padRight('Hi', 5, '.'):", str_utils.padRight("Hi", 5, "."))
+print("truncate('Hello World', 8, '...'):", str_utils.truncate("Hello World", 8, "..."))
+print("isBlank('   '):", str_utils.isBlank("   "))
+print("isBlank('hi'):", str_utils.isBlank("hi"))
+print("wordCount('Hello World!'):", str_utils.wordCount("Hello World!"))
+
+// --- Using Imported Functions ---
+print("\n--- Using Imported Functions ---")
+
+// Calculate circle properties
+radius = 10
+print("Circle with radius", radius)
+print("  Area:", math.circleArea(radius))
+print("  Circumference:", math.circleCircumference(radius))
+
+// Format numbers
+numbers = [1, 42, 100, 7, 999]
+print("\nFormatted numbers:")
+for n in numbers {
+    formatted = str_utils.padLeft(str(n), 4, " ")
+    print("  '" + formatted + "'")
+}
+
+// --- Module Re-use ---
+print("\n--- Module Re-use ---")
+// Importing same module again should use cached version
+import "modules/math_utils.jm" as math2
+print("math.getPI() == math2.getPI():", math.getPI() == math2.getPI())
+
+// --- Combined Usage ---
+print("\n--- Combined Usage ---")
+data = [10, 20, 30, 40, 50]
+avg = math.average(data)
+print("Data:", data)
+print("Average:", avg)
+
+title = str_utils.titleCase("jeem programming language")
+print("Title:", title)
+
+print("\n=== IMPORT TEST COMPLETE ===")

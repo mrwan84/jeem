@@ -1,0 +1,172 @@
+// ============================================
+// Jeem Test Suite - Main Runner
+// ============================================
+
+print("+========================================+")
+print("|     JEEM TEST SUITE v3.0               |")
+print("+========================================+")
+print("")
+
+print("Available test files:")
+print("")
+print("  1. test_basics.jm       - Variables, operators, types")
+print("  2. test_control_flow.jm - If/else, loops, break/continue")
+print("  3. test_functions.jm    - Functions, arrows, closures")
+print("  4. test_arrays.jm       - Arrays, array methods")
+print("  5. test_objects.jm      - Objects, object methods")
+print("  6. test_strings.jm      - String methods")
+print("  7. test_classes.jm      - Classes, inheritance")
+print("  8. test_files.jm        - File I/O")
+print("  9. test_imports.jm      - Import system")
+print(" 10. test_math_utils.jm   - Math & utility functions")
+print(" 11. test_timers.jm       - setTimeout, setInterval")
+print(" 12. test_case.jm         - Case/switch statement")
+print(" 13. test_math.jm         - Math library (trig, complex, vectors, matrices)")
+print(" 14. test_http_client.jm  - HTTP client (requires network)")
+print(" 15. test_http_server.jm  - HTTP server (starts server)")
+
+print("")
+print("--- Running Quick Tests ---")
+print("")
+
+// Quick sanity checks
+errors = 0
+
+// Test 1: Variables
+x = 42
+if (x != 42) {
+    print("FAIL: Variable assignment")
+    errors++
+} else {
+    print("PASS: Variable assignment")
+}
+
+// Test 2: Arithmetic
+if (2 + 2 != 4) {
+    print("FAIL: Arithmetic")
+    errors++
+} else {
+    print("PASS: Arithmetic")
+}
+
+// Test 3: Strings
+s = "hello"
+if (s.len() != 5) {
+    print("FAIL: String length")
+    errors++
+} else {
+    print("PASS: String length")
+}
+
+// Test 4: Arrays
+arr = [1, 2, 3]
+if (arr.len() != 3) {
+    print("FAIL: Array length")
+    errors++
+} else {
+    print("PASS: Array length")
+}
+
+// Test 5: Array methods
+doubled = arr.map(x => x * 2)
+if (doubled[0] != 2 || doubled[1] != 4) {
+    print("FAIL: Array.map")
+    errors++
+} else {
+    print("PASS: Array.map")
+}
+
+// Test 6: Objects
+obj = {a: 1, b: 2}
+if (obj.a != 1) {
+    print("FAIL: Object access")
+    errors++
+} else {
+    print("PASS: Object access")
+}
+
+// Test 7: Functions
+func add(a, b) { return a + b }
+if (add(3, 4) != 7) {
+    print("FAIL: Function call")
+    errors++
+} else {
+    print("PASS: Function call")
+}
+
+// Test 8: Arrow functions
+square = x => x * x
+if (square(5) != 25) {
+    print("FAIL: Arrow function")
+    errors++
+} else {
+    print("PASS: Arrow function")
+}
+
+// Test 9: Closures
+func makeAdder(n) { return x => x + n }
+add5 = makeAdder(5)
+if (add5(10) != 15) {
+    print("FAIL: Closure")
+    errors++
+} else {
+    print("PASS: Closure")
+}
+
+// Test 10: Filter
+evens = [1,2,3,4,5].filter(x => x % 2 == 0)
+if (evens.len() != 2) {
+    print("FAIL: Array.filter")
+    errors++
+} else {
+    print("PASS: Array.filter")
+}
+
+// Test 11: Reduce
+sum = [1,2,3,4,5].reduce((a,b) => a + b, 0)
+if (sum != 15) {
+    print("FAIL: Array.reduce")
+    errors++
+} else {
+    print("PASS: Array.reduce")
+}
+
+// Test 12: JSON
+data = {name: "test", value: 42}
+json = jsonStringify(data)
+parsed = jsonParse(json)
+if (parsed.name != "test" || parsed.value != 42) {
+    print("FAIL: JSON parse/stringify")
+    errors++
+} else {
+    print("PASS: JSON parse/stringify")
+}
+
+// Test 13: setTimeout
+timerWorked = false
+setTimeout(() => {
+    timerWorked = true
+}, 10)
+
+// Summary
+print("")
+print("----------------------------------------")
+total = 12
+passed = total - errors
+print("Results:", passed, "/", total, "tests passed")
+
+if (errors == 0) {
+    print("")
+    print("[OK] All quick tests passed!")
+} else {
+    print("")
+    print("[FAIL]", errors, "test(s) failed")
+}
+
+print("")
+print("--- To run individual tests: ---")
+print("  jeem test_basics.jm")
+print("  jeem test_arrays.jm")
+print("  jeem test_timers.jm")
+print("  etc.")
+print("")

@@ -1,0 +1,136 @@
+// ============================================
+// Jeem Test Suite - Control Flow
+// ============================================
+
+print("=== CONTROL FLOW TEST ===\n")
+
+// --- If/Else ---
+print("--- If/Else ---")
+x = 10
+
+if (x > 5) {
+    print("x > 5: true")
+}
+
+if (x > 20) {
+    print("x > 20: true")
+} else {
+    print("x > 20: false")
+}
+
+if (x < 5) {
+    print("x is small")
+} else if (x < 15) {
+    print("x is medium")
+} else {
+    print("x is large")
+}
+
+// --- Nested If ---
+print("\n--- Nested If ---")
+a = 10
+b = 20
+if (a > 5) {
+    if (b > 15) {
+        print("a > 5 AND b > 15")
+    }
+}
+
+// --- While Loop ---
+print("\n--- While Loop ---")
+i = 0
+while (i < 5) {
+    print("while i =", i)
+    i++
+}
+
+// --- While with Break ---
+print("\n--- While with Break ---")
+j = 0
+while (true) {
+    print("break at j =", j)
+    if (j >= 3) {
+        break
+    }
+    j++
+}
+
+// --- While with Continue ---
+print("\n--- While with Continue ---")
+k = 0
+while (k < 5) {
+    k++
+    if (k == 3) {
+        print("skipping k = 3")
+        continue
+    }
+    print("continue k =", k)
+}
+
+// --- For-In Loop (Array) ---
+print("\n--- For-In Loop (Array) ---")
+arr = ["apple", "banana", "cherry"]
+for item in arr {
+    print("item:", item)
+}
+
+// --- For-In Loop with Index ---
+print("\n--- For-In Loop with Index ---")
+for item, idx in arr {
+    print("arr[" + str(idx) + "] =", item)
+}
+
+// --- For-In Loop (Object) ---
+print("\n--- For-In Loop (Object) ---")
+obj = {name: "Alice", age: 30, city: "Berlin"}
+for key in obj {
+    print("key:", key)
+}
+
+// --- For-In Loop (String) ---
+print("\n--- For-In Loop (String) ---")
+for char in "ABC" {
+    print("char:", char)
+}
+
+// --- For-In Loop (Range) ---
+print("\n--- For-In Loop (Range) ---")
+for n in range(5) {
+    print("range n =", n)
+}
+
+for n in range(2, 6) {
+    print("range(2,6) n =", n)
+}
+
+for n in range(0, 10, 2) {
+    print("range(0,10,2) n =", n)
+}
+
+// --- C-style For Loop ---
+print("\n--- C-style For Loop ---")
+for i = 0; i < 5; i++ {
+    print("c-for i =", i)
+}
+
+// --- Nested Loops ---
+print("\n--- Nested Loops ---")
+for i in range(3) {
+    for j in range(3) {
+        print("i=" + str(i) + ", j=" + str(j))
+    }
+}
+
+// --- Break in Nested Loop ---
+print("\n--- Break in Nested Loop ---")
+for i in range(5) {
+    print("outer i =", i)
+    for j in range(5) {
+        if (j == 2) {
+            break
+        }
+        print("  inner j =", j)
+    }
+}
+
+print("\n=== CONTROL FLOW TEST COMPLETE ===")

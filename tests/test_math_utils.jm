@@ -1,0 +1,198 @@
+// ============================================
+// Jeem Test Suite - Math & Utilities
+// ============================================
+
+print("=== MATH & UTILITIES TEST ===\n")
+
+// --- Math Constants ---
+print("--- Math Constants ---")
+print("PI:", PI)
+print("E:", E)
+
+// --- Basic Math ---
+print("\n--- Basic Math Functions ---")
+print("abs(-5):", abs(-5))
+print("abs(5):", abs(5))
+print("min(3, 7, 1, 9):", min(3, 7, 1, 9))
+print("max(3, 7, 1, 9):", max(3, 7, 1, 9))
+print("min([5, 2, 8, 1]):", min([5, 2, 8, 1]))
+print("max([5, 2, 8, 1]):", max([5, 2, 8, 1]))
+
+// --- Rounding ---
+print("\n--- Rounding Functions ---")
+print("floor(3.7):", floor(3.7))
+print("floor(-3.7):", floor(-3.7))
+print("ceil(3.2):", ceil(3.2))
+print("ceil(-3.2):", ceil(-3.2))
+print("round(3.4):", round(3.4))
+print("round(3.5):", round(3.5))
+print("round(3.6):", round(3.6))
+
+// --- Power & Root ---
+print("\n--- Power & Root ---")
+print("pow(2, 10):", pow(2, 10))
+print("pow(3, 4):", pow(3, 4))
+print("sqrt(16):", sqrt(16))
+print("sqrt(2):", sqrt(2))
+
+// --- Random ---
+print("\n--- Random Numbers ---")
+print("random():", random())
+print("random():", random())
+print("random():", random())
+print("randomInt(10):", randomInt(10))
+print("randomInt(10):", randomInt(10))
+print("randomInt(1, 100):", randomInt(1, 100))
+print("randomInt(1, 100):", randomInt(1, 100))
+
+// Generate array of random numbers
+randoms = []
+for i in range(5) {
+    push(randoms, randomInt(1, 100))
+}
+print("5 random numbers:", randoms)
+
+// --- Time Functions ---
+print("\n--- Time Functions ---")
+print("time():", time())
+print("now():", now())
+
+start = now()
+sleep(100)
+end = now()
+print("sleep(100) took:", end - start, "ms")
+
+// --- Type Checking ---
+print("\n--- Type Checking ---")
+print("typeof(42):", typeof(42))
+print("typeof(3.14):", typeof(3.14))
+print("typeof('hello'):", typeof("hello"))
+print("typeof(true):", typeof(true))
+print("typeof(null):", typeof(null))
+print("typeof([1,2,3]):", typeof([1, 2, 3]))
+print("typeof({a:1}):", typeof({a: 1}))
+
+print("\nisNumber(42):", isNumber(42))
+print("isNumber(3.14):", isNumber(3.14))
+print("isNumber('42'):", isNumber("42"))
+
+print("isString('hello'):", isString("hello"))
+print("isString(42):", isString(42))
+
+print("typeof(true):", typeof(true))
+print("typeof(1):", typeof(1))
+
+print("isArray([1,2]):", isArray([1, 2]))
+print("isArray({}):", isArray({}))
+
+print("isObject({}):", isObject({}))
+print("isObject([]):", isObject([]))
+
+print("isFunc(x => x):", isFunc(x => x))
+print("isFunc(42):", isFunc(42))
+
+// --- Type Conversion ---
+print("\n--- Type Conversion ---")
+print("int(3.7):", int(3.7))
+print("int('42'):", int("42"))
+print("int(true):", int(true))
+
+print("float(42):", float(42))
+print("float('3.14'):", float("3.14"))
+
+print("str(42):", str(42))
+print("str(3.14):", str(3.14))
+print("str(true):", str(true))
+print("str([1,2,3]):", str([1, 2, 3]))
+
+// --- Range Function ---
+print("\n--- Range Function ---")
+print("range(5):", range(5))
+print("range(2, 7):", range(2, 7))
+print("range(0, 10, 2):", range(0, 10, 2))
+print("range(10, 0, -2):", range(10, 0, -2))
+
+// --- Length Method ---
+print("\n--- Length Method ---")
+print("'hello'.len():", "hello".len())
+print("[1, 2, 3, 4, 5].len():", [1, 2, 3, 4, 5].len())
+print("{a: 1, b: 2}.len():", {a: 1, b: 2}.len())
+
+// --- Clone Function ---
+print("\n--- Clone Function ---")
+original = {a: 1, b: [1, 2, 3]}
+cloned = clone(original)
+print("original:", original)
+print("cloned:", cloned)
+cloned.a = 999
+print("After modifying clone:")
+print("  original.a:", original.a)
+print("  cloned.a:", cloned.a)
+
+// --- JSON Functions ---
+print("\n--- JSON Functions ---")
+obj = {name: "Test", values: [1, 2, 3], nested: {x: 10}}
+json = jsonStringify(obj)
+print("jsonStringify:", json)
+
+json_pretty = jsonStringify(obj, 2)
+print("jsonStringify (pretty):")
+print(json_pretty)
+
+parsed = jsonParse(json)
+print("jsonParse result:", parsed)
+print("  parsed.name:", parsed.name)
+print("  parsed.values:", parsed.values)
+
+// --- ARGS Variable ---
+print("\n--- ARGS Variable ---")
+print("ARGS:", ARGS)
+
+// --- VERSION Variable ---
+print("\n--- VERSION Variable ---")
+print("VERSION:", VERSION)
+
+// --- Practical Examples ---
+print("\n--- Practical Examples ---")
+
+// Generate random array
+func randomArray(size, minVal, maxVal) {
+    result = []
+    for i in range(size) {
+        push(result, randomInt(minVal, maxVal))
+    }
+    return result
+}
+
+arr = randomArray(10, 1, 100)
+print("Random array:", arr)
+print("  Min:", min(arr))
+print("  Max:", max(arr))
+print("  Sum:", arr.reduce((a, b) => a + b, 0))
+
+// Statistics
+func average(arr) {
+    return arr.reduce((a, b) => a + b, 0) / arr.len()
+}
+
+print("  Average:", average(arr))
+
+// Timer example
+func benchmark(callback, iterations) {
+    start = now()
+    for i in range(iterations) {
+        callback()
+    }
+    end = now()
+    return end - start
+}
+
+elapsed = benchmark(() => {
+    x = 0
+    for i in range(100) {
+        x = x + i
+    }
+}, 100)
+print("\nBenchmark (100 iterations):", elapsed, "ms")
+
+print("\n=== MATH & UTILITIES TEST COMPLETE ===")

@@ -1,0 +1,233 @@
+// ============================================
+// Jeem Test Suite - Classes & OOP
+// ============================================
+
+print("=== CLASSES TEST ===\n")
+
+// --- Basic Class ---
+print("--- Basic Class ---")
+class Person {
+    init(name, age) {
+        this.name = name
+        this.age = age
+    }
+    
+    greet() {
+        return "Hello, I'm " + this.name
+    }
+    
+    getAge() {
+        return this.age
+    }
+    
+    haveBirthday() {
+        this.age = this.age + 1
+        return this.age
+    }
+}
+
+alice = new Person("Alice", 30)
+print("alice.name:", alice.name)
+print("alice.age:", alice.age)
+print("alice.greet():", alice.greet())
+
+// --- Method Calls ---
+print("\n--- Method Calls ---")
+print("alice.getAge():", alice.getAge())
+print("alice.haveBirthday():", alice.haveBirthday())
+print("alice.age after birthday:", alice.age)
+
+// --- Multiple Instances ---
+print("\n--- Multiple Instances ---")
+bob = new Person("Bob", 25)
+print("bob.name:", bob.name)
+print("bob.greet():", bob.greet())
+print("alice.name:", alice.name)
+
+// --- Class with More Methods ---
+print("\n--- Calculator Class ---")
+class Calculator {
+    init(value) {
+        this.value = value
+    }
+    
+    add(n) {
+        this.value = this.value + n
+        return this
+    }
+    
+    subtract(n) {
+        this.value = this.value - n
+        return this
+    }
+    
+    multiply(n) {
+        this.value = this.value * n
+        return this
+    }
+    
+    divide(n) {
+        this.value = this.value / n
+        return this
+    }
+    
+    getResult() {
+        return this.value
+    }
+}
+
+calc = new Calculator(10)
+print("Initial value:", calc.value)
+calc.add(5)
+print("After add(5):", calc.value)
+calc.multiply(2)
+print("After multiply(2):", calc.value)
+
+// --- Class Inheritance ---
+print("\n--- Class Inheritance ---")
+class Animal {
+    init(name) {
+        this.name = name
+    }
+    
+    speak() {
+        return this.name + " makes a sound"
+    }
+    
+    getName() {
+        return this.name
+    }
+}
+
+class Dog extends Animal {
+    init(name, breed) {
+        this.name = name
+        this.breed = breed
+    }
+    
+    speak() {
+        return this.name + " barks!"
+    }
+    
+    fetch() {
+        return this.name + " fetches the ball"
+    }
+}
+
+class Cat extends Animal {
+    init(name, color) {
+        this.name = name
+        this.color = color
+    }
+    
+    speak() {
+        return this.name + " meows!"
+    }
+    
+    purr() {
+        return this.name + " purrs..."
+    }
+}
+
+animal = new Animal("Generic")
+dog = new Dog("Buddy", "Golden Retriever")
+cat = new Cat("Whiskers", "Orange")
+
+print("animal.speak():", animal.speak())
+print("dog.speak():", dog.speak())
+print("dog.fetch():", dog.fetch())
+print("dog.breed:", dog.breed)
+print("cat.speak():", cat.speak())
+print("cat.purr():", cat.purr())
+print("cat.color:", cat.color)
+
+// --- Class with Private-like Properties ---
+print("\n--- Class with Complex State ---")
+class BankAccount {
+    init(owner, balance) {
+        this.owner = owner
+        this.balance = balance
+        this.transactions = []
+    }
+    
+    deposit(amount) {
+        if (amount > 0) {
+            this.balance = this.balance + amount
+            push(this.transactions, {type: "deposit", amount: amount})
+            return true
+        }
+        return false
+    }
+    
+    withdraw(amount) {
+        if (amount > 0 && amount <= this.balance) {
+            this.balance = this.balance - amount
+            push(this.transactions, {type: "withdraw", amount: amount})
+            return true
+        }
+        return false
+    }
+    
+    getBalance() {
+        return this.balance
+    }
+    
+    getTransactionCount() {
+        return this.transactions.len()
+    }
+}
+
+account = new BankAccount("Alice", 1000)
+print("Owner:", account.owner)
+print("Initial balance:", account.getBalance())
+
+account.deposit(500)
+print("After deposit 500:", account.getBalance())
+
+account.withdraw(200)
+print("After withdraw 200:", account.getBalance())
+
+print("Transaction count:", account.getTransactionCount())
+
+// --- Class with Array Property ---
+print("\n--- Class with Collections ---")
+class TodoList {
+    init(name) {
+        this.name = name
+        this.items = []
+    }
+    
+    addItem(text) {
+        push(this.items, {text: text, done: false})
+    }
+    
+    completeItem(index) {
+        if (index >= 0 && index < this.items.len()) {
+            this.items[index].done = true
+        }
+    }
+    
+    getItems() {
+        return this.items
+    }
+    
+    getPending() {
+        return this.items.filter(item => !item.done)
+    }
+    
+    getCompleted() {
+        return this.items.filter(item => item.done)
+    }
+}
+
+todos = new TodoList("My Tasks")
+todos.addItem("Learn Jeem")
+todos.addItem("Build a project")
+todos.addItem("Write tests")
+
+print("All items:", todos.getItems())
+todos.completeItem(0)
+print("Pending:", todos.getPending().map(i => i.text))
+print("Completed:", todos.getCompleted().map(i => i.text))
+
+print("\n=== CLASSES TEST COMPLETE ===")

@@ -1,0 +1,74 @@
+// ============================================
+// Math Module - for import testing
+// ============================================
+
+func getPI() {
+    return 3.14159265358979
+}
+
+func getE() {
+    return 2.71828182845904
+}
+
+func square(x) {
+    return x * x
+}
+
+func cube(x) {
+    return x * x * x
+}
+
+func power(base, exp) {
+    return base ** exp
+}
+
+func factorial(n) {
+    if (n <= 1) {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+func fibonacci(n) {
+    if (n <= 1) {
+        return n
+    }
+    a = 0
+    b = 1
+    for i in range(2, n + 1) {
+        temp = a + b
+        a = b
+        b = temp
+    }
+    return b
+}
+
+func circleArea(radius) {
+    return 3.14159265358979 * radius * radius
+}
+
+func circleCircumference(radius) {
+    return 2 * 3.14159265358979 * radius
+}
+
+func average(arr) {
+    if (arr.len() == 0) {
+        return 0
+    }
+    total = arr.reduce((sum, x) => sum + x, 0)
+    return total / arr.len()
+}
+
+func clamp(value, minVal, maxVal) {
+    if (value < minVal) {
+        return minVal
+    }
+    if (value > maxVal) {
+        return maxVal
+    }
+    return value
+}
+
+func lerp(a, b, t) {
+    return a + (b - a) * t
+}

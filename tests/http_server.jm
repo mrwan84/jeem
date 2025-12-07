@@ -1,0 +1,120 @@
+// =============================================
+// Example: HTTP Server
+// Run with: jeem http_server.jm
+// Then open http://localhost:8080 in browser
+// =============================================
+
+print("Starting Jeem HTTP Server...")
+print("Press Ctrl+C to stop\n")
+
+// Create server on port 8080
+server = createServer(8080)
+
+// Homepage
+serverRoute("GET", "/", req => {
+    html = "<!DOCTYPE html>
+<html>
+<head>
+    <title>Jeem Server</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        h1 { color: #333; }
+        .endpoint { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        code { background: #e0e0e0; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Welcome to Jeem HTTP Server!</h1>
+    <p>This server is running on <strong>Jeem v3.0</strong></p>
+    
+    <h2>Available Endpoints:</h2>
+    <div class='endpoint'>
+        <strong>GET /</strong> - This page
+    </div>
+    <div class='endpoint'>
+        <strong>GET /api/time</strong> - Current server time
+    </div>
+    <div class='endpoint'>
+        <strong>GET /api/info</strong> - Server information (JSON)
+    </div>
+    <div class='endpoint'>
+        <strong>POST /api/echo</strong> - Echo back your data
+    </div>
+    <div class='endpoint'>
+        <strong>GET /api/calc?a=5&b=3</strong> - Simple calculator
+    </div>
+</body>
+</html>"
+    return { status: 200, contentType: "text/html", body: html }
+})
+
+// API: Server time
+serverRoute("GET", "/api/time", req => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            timestamp: time(),
+            formatted: str(time())
+        })
+    }
+})
+
+// API: Server info
+serverRoute("GET", "/api/info", req => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            name: "Jeem HTTP Server",
+            version: "3.0",
+            language: "Jeem",
+            features: ["routing", "json", "templates"]
+        }, 2)
+    }
+})
+
+// API: Echo
+serverRoute("POST", "/api/echo", req => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            message: "Echo response",
+            received: req.body,
+            method: req.method,
+            path: req.path
+        }, 2)
+    }
+})
+
+// API: Simple calculator
+serverRoute("GET", "/api/calc", req => {
+    // Note: Query parsing would need to be added
+    // For now, return example
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            operation: "add",
+            a: 5,
+            b: 3,
+            result: 8
+        })
+    }
+})
+
+// Health check
+serverRoute("GET", "/health", req => {
+    return { status: 200, body: "OK" }
+})
+
+// Start listening
+print("Server endpoints:")
+print("  http://localhost:8080/")
+print("  http://localhost:8080/api/time")
+print("  http://localhost:8080/api/info")
+print("  http://localhost:8080/api/echo (POST)")
+print("")
+
+serverListen()

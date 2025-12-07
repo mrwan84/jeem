@@ -1,0 +1,162 @@
+// ============================================
+// Jeem Test Suite - Functions & Arrow Functions
+// ============================================
+
+print("=== FUNCTIONS TEST ===\n")
+
+// --- Basic Function ---
+print("--- Basic Function ---")
+func greet(name) {
+    return "Hello, " + name + "!"
+}
+print(greet("World"))
+
+// --- Function with Multiple Parameters ---
+print("\n--- Multiple Parameters ---")
+func add(a, b) {
+    return a + b
+}
+print("add(3, 4) =", add(3, 4))
+
+// --- Function with Default Behavior ---
+print("\n--- No Return Value ---")
+func sayHi(name) {
+    print("Hi, " + name + "!")
+}
+result = sayHi("Alice")
+print("Return value:", result)
+
+// --- Recursive Function ---
+print("\n--- Recursive Function ---")
+func factorial(n) {
+    if (n <= 1) {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+print("factorial(5) =", factorial(5))
+
+func fibonacci(n) {
+    if (n <= 1) {
+        return n
+    }
+    a = 0
+    b = 1
+    for i in range(2, n + 1) {
+        temp = a + b
+        a = b
+        b = temp
+    }
+    return b
+}
+print("fibonacci(10) =", fibonacci(10))
+
+// --- Arrow Functions ---
+print("\n--- Arrow Functions ---")
+
+// Single parameter
+double = x => x * 2
+print("double(5) =", double(5))
+
+// Multiple parameters
+multiply = (a, b) => a * b
+print("multiply(3, 4) =", multiply(3, 4))
+
+// No parameters
+getPI = () => 3.14159
+print("getPI() =", getPI())
+
+// Block body
+greetArrow = name => {
+    msg = "Hello, " + name + "!"
+    return msg
+}
+print("greetArrow('Arrow') =", greetArrow("Arrow"))
+
+// --- Closures ---
+print("\n--- Closures ---")
+
+func makeCounter(start) {
+    count = start
+    return () => {
+        count = count + 1
+        return count
+    }
+}
+
+// Note: Each call creates new closure with captured value
+func makeMultiplier(factor) {
+    return x => x * factor
+}
+
+triple = makeMultiplier(3)
+print("triple(7) =", triple(7))
+
+quadruple = makeMultiplier(4)
+print("quadruple(5) =", quadruple(5))
+
+// --- Higher-Order Functions ---
+print("\n--- Higher-Order Functions ---")
+
+func apply(callback, value) {
+    return callback(value)
+}
+
+square = x => x * x
+print("apply(square, 5) =", apply(square, 5))
+
+func compose(f, g) {
+    return x => f(g(x))
+}
+
+addOne = x => x + 1
+doubleIt = x => x * 2
+addOneThenDouble = compose(doubleIt, addOne)
+print("addOneThenDouble(5) =", addOneThenDouble(5))
+
+// --- Function Returning Function ---
+print("\n--- Function Returning Function ---")
+
+func createGreeter(greeting) {
+    return name => greeting + ", " + name + "!"
+}
+
+sayHello = createGreeter("Hello")
+sayHi2 = createGreeter("Hi")
+print(sayHello("Alice"))
+print(sayHi2("Bob"))
+
+// --- Immediately Invoked Function ---
+print("\n--- Immediately Invoked ---")
+result2 = (x => x * x)(7)
+print("(x => x * x)(7) =", result2)
+
+// --- Functions as Object Properties ---
+print("\n--- Functions in Objects ---")
+calculator = {
+    add: (a, b) => a + b,
+    sub: (a, b) => a - b,
+    mul: (a, b) => a * b,
+    div: (a, b) => a / b
+}
+print("calc.add(10, 5) =", calculator.add(10, 5))
+print("calc.sub(10, 5) =", calculator.sub(10, 5))
+print("calc.mul(10, 5) =", calculator.mul(10, 5))
+print("calc.div(10, 5) =", calculator.div(10, 5))
+
+// --- Callback Pattern ---
+print("\n--- Callback Pattern ---")
+func processData(data, callback) {
+    result = []
+    for item in data {
+        processed = callback(item)
+        push(result, processed)
+    }
+    return result
+}
+
+numbers = [1, 2, 3, 4, 5]
+squared = processData(numbers, x => x * x)
+print("squared:", squared)
+
+print("\n=== FUNCTIONS TEST COMPLETE ===")

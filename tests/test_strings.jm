@@ -1,0 +1,163 @@
+// ============================================
+// Jeem Test Suite - String Methods
+// ============================================
+
+print("=== STRING METHODS TEST ===\n")
+
+// --- String Length ---
+print("--- String Length ---")
+s = "Hello, World!"
+print("s:", s)
+print("s.len():", s.len())
+print("s.len():", s.len())
+
+// --- Case Conversion ---
+print("\n--- Case Conversion ---")
+text = "Hello World"
+print("original:", text)
+print("text.upper():", text.upper())
+print("text.lower():", text.lower())
+print("text.upper():", text.upper())
+print("text.lower():", text.lower())
+
+// --- Trim ---
+print("\n--- Trim ---")
+padded = "   Hello World   "
+print("original: '" + padded + "'")
+print(".trim(): '" + padded.trim() + "'")
+
+// --- Split ---
+print("\n--- Split ---")
+csv = "apple,banana,cherry,date"
+print("original:", csv)
+print("split(','):", split(csv, ","))
+print(".split(','):", csv.split(","))
+
+sentence = "Hello World from Jeem"
+print("sentence:", sentence)
+print(".split(' '):", sentence.split(" "))
+
+// Split each character
+word = "Hello"
+print("word:", word)
+print(".split(''):", word.split(""))
+
+// --- Join ---
+print("\n--- Join ---")
+parts = ["Hello", "World", "!"]
+print("parts:", parts)
+print("join(' '):", join(parts, " "))
+print(".join('-'):", parts.join("-"))
+print(".join(''):", parts.join(""))
+
+// --- Replace ---
+print("\n--- Replace ---")
+msg = "Hello World World"
+print("original:", msg)
+print("replace('World', 'Jeem'):", replace(msg, "World", "Jeem"))
+print(".replace('o', '0'):", msg.replace("o", "0"))
+
+// --- IndexOf ---
+print("\n--- IndexOf ---")
+str = "Hello World"
+print("str:", str)
+print("indexOf('World'):", indexOf(str, "World"))
+print(".indexOf('o'):", str.indexOf("o"))
+print(".indexOf('xyz'):", str.indexOf("xyz"))
+
+// --- Includes ---
+print("\n--- Includes ---")
+print("str.includes('World'):", str.includes("World"))
+print("str.includes('world'):", str.includes("world"))
+print("str.includes('xyz'):", str.includes("xyz"))
+
+// --- StartsWith / EndsWith ---
+print("\n--- StartsWith / EndsWith ---")
+url = "https://example.com/path"
+print("url:", url)
+print(".startsWith('https'):", url.startsWith("https"))
+print(".startsWith('http://'):", url.startsWith("http://"))
+print(".endsWith('.com'):", url.endsWith(".com"))
+print(".endsWith('/path'):", url.endsWith("/path"))
+
+// --- Slice / Substring ---
+print("\n--- Slice / Substring ---")
+text2 = "Hello, World!"
+print("text:", text2)
+print("slice(0, 5):", slice(text2, 0, 5))
+print(".slice(7, 12):", text2.slice(7, 12))
+print(".slice(-6):", text2.slice(-6))
+print(".substring(0, 5):", text2.substring(0, 5))
+
+// --- CharAt ---
+print("\n--- CharAt ---")
+word2 = "Hello"
+print("word:", word2)
+print(".charAt(0):", word2.charAt(0))
+print(".charAt(4):", word2.charAt(4))
+print(".charAt(10):", word2.charAt(10))
+
+// --- String Indexing ---
+print("\n--- String Indexing ---")
+str2 = "ABCDE"
+print("str:", str2)
+print("str[0]:", str2[0])
+print("str[2]:", str2[2])
+print("str[-1]:", str2[-1])
+
+// --- String Concatenation ---
+print("\n--- String Concatenation ---")
+first = "Hello"
+second = "World"
+print("first + ' ' + second:", first + " " + second)
+
+// --- Reverse ---
+print("\n--- Reverse ---")
+palindrome = "racecar"
+print("original:", palindrome)
+reversed = reverse(palindrome)
+print("reversed:", reversed)
+print("is palindrome:", palindrome == reversed)
+
+// --- String Comparison ---
+print("\n--- String Comparison ---")
+a = "apple"
+b = "apple"
+c = "Apple"
+print("'apple' == 'apple':", a == b)
+print("'apple' == 'Apple':", a == c)
+print("'apple' != 'Apple':", a != c)
+
+// --- Template Strings ---
+print("\n--- Template Strings ---")
+name = "Jeem"
+version = 3
+print("Hello, {{name}}!")
+print("Version: {{version}}")
+print("Sum: 2 + 2 = {{2 + 2}}")
+
+// Complex expressions
+items = ["a", "b", "c"]
+print("Items: {{join(items, ', ')}}")
+print("Length: {{items.len()}} items")
+
+// --- Method Chaining ---
+print("\n--- Method Chaining ---")
+messy = "   HELLO WORLD   "
+clean = messy.trim().lower()
+print("original: '" + messy + "'")
+print("trim().lower(): '" + clean + "'")
+
+// --- Multiline Strings ---
+print("\n--- Escape Sequences ---")
+escaped = "Line1\nLine2\tTabbed"
+print("escaped:", escaped)
+
+// --- String Type Conversion ---
+print("\n--- Type Conversion ---")
+print("str(123):", str(123))
+print("str(3.14):", str(3.14))
+print("str(true):", str(true))
+print("str([1,2,3]):", str([1, 2, 3]))
+
+print("\n=== STRING METHODS TEST COMPLETE ===")

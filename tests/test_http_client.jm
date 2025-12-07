@@ -1,0 +1,171 @@
+// ============================================
+// Jeem Test Suite - HTTP Client
+// ============================================
+
+print("=== HTTP CLIENT TEST ===\n")
+print("Note: These tests require network access.\n")
+
+// --- HTTP GET Request ---
+print("--- HTTP GET ---")
+print("Testing httpGet('http://httpbin.org/get')...")
+
+response = httpGet("http://httpbin.org/get")
+if (response != null && response.status == 200) {
+    print("Status:", response.status)
+    print("Body length:", response.body.len())
+    
+    // Parse JSON response
+    data = jsonParse(response.body)
+    if (data != null) {
+        print("URL:", data.url)
+    }
+} else {
+    print("Request failed or no network")
+}
+
+// --- HTTP GET with Path ---
+print("\n--- HTTP GET with Path ---")
+print("Testing httpGet('http://httpbin.org/ip')...")
+
+response2 = httpGet("http://httpbin.org/ip")
+if (response2 != null && response2.status == 200) {
+    print("Status:", response2.status)
+    data = jsonParse(response2.body)
+    if (data != null) {
+        print("Origin IP:", data.origin)
+    }
+} else {
+    print("Request failed or no network")
+}
+
+// --- HTTP GET with Headers in Response ---
+print("\n--- HTTP GET Headers ---")
+print("Testing httpGet('http://httpbin.org/headers')...")
+
+response3 = httpGet("http://httpbin.org/headers")
+if (response3 != null && response3.status == 200) {
+    print("Status:", response3.status)
+    data = jsonParse(response3.body)
+    if (data != null && data.headers != null) {
+        print("Host header:", data.headers.Host)
+    }
+} else {
+    print("Request failed or no network")
+}
+
+// --- HTTP POST Request ---
+print("\n--- HTTP POST ---")
+print("Testing httpPost('http://httpbin.org/post')...")
+
+postData = jsonStringify({
+    name: "Jeem",
+    version: "3.0",
+    features: ["arrow functions", "http client"]
+})
+
+response4 = httpPost("http://httpbin.org/post", postData, "application/json")
+if (response4 != null && response4.status == 200) {
+    print("Status:", response4.status)
+    data = jsonParse(response4.body)
+    if (data != null) {
+        print("Posted data received:", data.data)
+    }
+} else {
+    print("Request failed or no network")
+}
+
+// --- HTTP POST Form Data ---
+print("\n--- HTTP POST Form Data ---")
+print("Testing form POST...")
+
+formData = "username=testuser&password=secret"
+response5 = httpPost("http://httpbin.org/post", formData, "application/x-www-form-urlencoded")
+if (response5 != null && response5.status == 200) {
+    print("Status:", response5.status)
+    data = jsonParse(response5.body)
+    if (data != null && data.form != null) {
+        print("Form data:", data.form)
+    }
+} else {
+    print("Request failed or no network")
+}
+
+// --- Error Handling ---
+print("\n--- Error Handling ---")
+print("Testing invalid URL...")
+
+badResponse = httpGet("http://invalid.domain.test/path")
+if (badResponse == null) {
+    print("Correctly returned null for invalid domain")
+} else {
+    print("Got response (unexpected):", badResponse.status)
+}
+
+// --- Helper Functions ---
+print("\n--- HTTP Helper Functions ---")
+
+func fetchJson(url) {
+    response = httpGet(url)
+    if (response != null && response.status == 200) {
+        return jsonParse(response.body)
+    }
+    return null
+}
+
+func postJson(url, data) {
+    json = jsonStringify(data)
+    response = httpPost(url, json, "application/json")
+    if (response != null && response.status == 200) {
+        return jsonParse(response.body)
+    }
+    return null
+}
+
+// Using helper functions
+print("Using fetchJson helper...")
+result = fetchJson("http://httpbin.org/uuid")
+if (result != null) {
+    print("UUID:", result.uuid)
+} else {
+    print("Request failed")
+}
+
+// --- API Client Pattern ---
+print("\n--- API Client Pattern ---")
+
+apiClient = {
+    baseUrl: "http://httpbin.org",
+    
+    get: (path) => {
+        url = "http://httpbin.org" + path
+        response = httpGet(url)
+        if (response != null && response.status == 200) {
+            return {
+                ok: true,
+                data: jsonParse(response.body)
+            }
+        }
+        return {ok: false, data: null}
+    },
+    
+    post: (path, data) => {
+        url = "http://httpbin.org" + path
+        response = httpPost(url, jsonStringify(data), "application/json")
+        if (response != null && response.status == 200) {
+            return {
+                ok: true,
+                data: jsonParse(response.body)
+            }
+        }
+        return {ok: false, data: null}
+    }
+}
+
+print("Using API client pattern...")
+result2 = apiClient.get("/user-agent")
+if (result2.ok) {
+    print("User-Agent response:", result2.data)
+}
+
+print("\n=== HTTP CLIENT TEST COMPLETE ===")
+print("\nNote: If tests failed, check network connectivity.")

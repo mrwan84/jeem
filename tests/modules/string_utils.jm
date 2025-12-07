@@ -1,0 +1,81 @@
+// ============================================
+// String Utilities Module - for import testing
+// ============================================
+
+func capitalize(s) {
+    if (s.len() == 0) {
+        return s
+    }
+    first = s[0].upper()
+    rest = slice(s, 1)
+    return first + rest.lower()
+}
+
+func titleCase(s) {
+    words = split(s, " ")
+    result = []
+    for word in words {
+        push(result, capitalize(word))
+    }
+    return join(result, " ")
+}
+
+func camelCase(s) {
+    words = split(s, " ")
+    result = words[0].lower()
+    for i in range(1, words.len()) {
+        result = result + capitalize(words[i])
+    }
+    return result
+}
+
+func snakeCase(s) {
+    return replace(s.lower(), " ", "_")
+}
+
+func kebabCase(s) {
+    return replace(s.lower(), " ", "-")
+}
+
+func repeat(s, count) {
+    result = ""
+    for i in range(count) {
+        result = result + s
+    }
+    return result
+}
+
+func padLeft(s, length, char) {
+    padding = length - s.len()
+    if (padding <= 0) {
+        return s
+    }
+    return repeat(char, padding) + s
+}
+
+func padRight(s, length, char) {
+    padding = length - s.len()
+    if (padding <= 0) {
+        return s
+    }
+    return s + repeat(char, padding)
+}
+
+func truncate(s, maxLen, suffix) {
+    if (s.len() <= maxLen) {
+        return s
+    }
+    return slice(s, 0, maxLen - suffix.len()) + suffix
+}
+
+func isBlank(s) {
+    return s.trim().len() == 0
+}
+
+func wordCount(s) {
+    if (isBlank(s)) {
+        return 0
+    }
+    words = split(s.trim(), " ")
+    return words.len()
+}

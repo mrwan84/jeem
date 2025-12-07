@@ -1,0 +1,197 @@
+// ============================================
+// Case Statement Test
+// ============================================
+
+print("=== CASE STATEMENT TEST ===\n")
+
+// --- Single Value Matching ---
+print("--- Single Value Matching ---")
+
+x = 2
+result = ""
+case(x) {
+    1:
+        result = "one"
+        break
+    2:
+        result = "two"
+        break
+    3:
+        result = "three"
+        break
+}
+print("case(2) single value:", result)
+assert(result == "two", "single value failed")
+
+// --- Range Matching ---
+print("\n--- Range Matching ---")
+
+for i in range(1, 7) {
+    result = ""
+    case(i) {
+        1..2:
+            result = "low"
+            break
+        3..4:
+            result = "mid"
+            break
+        5..6:
+            result = "high"
+            break
+    }
+    print("case({{i}}) range:", result)
+}
+
+// --- Multiple Value Matching ---
+print("\n--- Multiple Value Matching ---")
+
+for val in [1, 3, 5, 7, 9, 2] {
+    result = ""
+    case(val) {
+        1, 3, 5:
+            result = "odd-low"
+            break
+        7, 9:
+            result = "odd-high"
+            break
+        2, 4, 6, 8:
+            result = "even"
+            break
+    }
+    print("case({{val}}) multiple:", result)
+}
+
+// --- Default Case ---
+print("\n--- Default Case ---")
+
+x = 100
+result = ""
+case(x) {
+    1:
+        result = "one"
+        break
+    2:
+        result = "two"
+        break
+    default:
+        result = "default"
+}
+print("case(100) with default:", result)
+assert(result == "default", "default case failed")
+
+// --- String Matching ---
+print("\n--- String Matching ---")
+
+days = ["Monday", "Saturday", "Wednesday", "Sunday"]
+for day in days {
+    result = ""
+    case(day) {
+        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday":
+            result = "weekday"
+            break
+        "Saturday", "Sunday":
+            result = "weekend"
+            break
+        default:
+            result = "unknown"
+    }
+    print("case('{{day}}'):", result)
+}
+
+// --- Fall-through (no break) ---
+print("\n--- Fall-through (no break) ---")
+
+x = 2
+result = ""
+case(x) {
+    1:
+        result = result + "one "
+    2:
+        result = result + "two "
+    3:
+        result = result + "three "
+        break
+    4:
+        result = result + "four "
+}
+print("case(2) fall-through:", result)
+assert(result == "two three ", "fall-through failed")
+
+// --- Combined Range and Values ---
+print("\n--- Combined Range and Values ---")
+
+grades = [95, 85, 75, 65, 55, 45]
+for grade in grades {
+    result = ""
+    case(grade) {
+        90..100:
+            result = "A"
+            break
+        80..89:
+            result = "B"
+            break
+        70..79:
+            result = "C"
+            break
+        60..69:
+            result = "D"
+            break
+        0..59:
+            result = "F"
+            break
+    }
+    print("Grade {{grade}}:", result)
+}
+
+// --- Nested Case ---
+print("\n--- Nested Case ---")
+
+category = "fruit"
+item = "apple"
+result = ""
+
+case(category) {
+    "fruit":
+        case(item) {
+            "apple", "pear":
+                result = "pome fruit"
+                break
+            "orange", "lemon":
+                result = "citrus"
+                break
+            default:
+                result = "other fruit"
+        }
+        break
+    "vegetable":
+        result = "veggie"
+        break
+}
+print("Nested case:", result)
+assert(result == "pome fruit", "nested case failed")
+
+// --- Menu Example ---
+print("\n--- Menu Example ---")
+
+func handleMenu(choice) {
+    case(choice) {
+        1:
+            return "New Game"
+        2:
+            return "Load Game"
+        3:
+            return "Settings"
+        4, 0:
+            return "Exit"
+        default:
+            return "Invalid"
+    }
+}
+
+print("Menu 1:", handleMenu(1))
+print("Menu 2:", handleMenu(2))
+print("Menu 4:", handleMenu(4))
+print("Menu 0:", handleMenu(0))
+print("Menu 9:", handleMenu(9))
+
+print("\n=== CASE STATEMENT TEST COMPLETE ===")

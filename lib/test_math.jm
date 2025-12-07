@@ -1,0 +1,160 @@
+// ============================================
+// Math Library Test
+// ============================================
+
+import "modules/math.jm" as math
+
+print("=== MATH LIBRARY TEST ===\n")
+
+// --- Constants ---
+print("--- Constants ---")
+print("PI():", math.PI())
+print("E():", math.E())
+print("TAU():", math.TAU())
+print("PHI() (Golden Ratio):", math.PHI())
+print("SQRT2():", math.SQRT2())
+
+// --- Trigonometric Functions ---
+print("\n--- Trigonometric Functions ---")
+print("sin(0):", math.sin(0))
+print("sin(PI/2):", math.sin(math.PI() / 2))
+print("cos(0):", math.cos(0))
+print("cos(PI):", math.cos(math.PI()))
+print("tan(PI/4):", math.tan(math.PI() / 4))
+
+// --- Inverse Trig ---
+print("\n--- Inverse Trigonometric ---")
+print("asin(1):", math.asin(1))
+print("acos(0):", math.acos(0))
+print("atan(1):", math.atan(1))
+print("atan2(1, 1):", math.atan2(1, 1))
+
+// --- Hyperbolic Functions ---
+print("\n--- Hyperbolic Functions ---")
+print("sinh(0):", math.sinh(0))
+print("cosh(0):", math.cosh(0))
+print("tanh(0):", math.tanh(0))
+
+// --- Exponential and Logarithmic ---
+print("\n--- Exponential & Logarithmic ---")
+print("exp(1):", math.exp(1))
+print("exp(0):", math.exp(0))
+print("ln(E):", math.ln(math.E()))
+print("ln(1):", math.ln(1))
+print("log10(100):", math.log10(100))
+print("log2(8):", math.log2(8))
+print("logBase(27, 3):", math.logBase(27, 3))
+
+// --- Complex Numbers ---
+print("\n--- Complex Numbers ---")
+z1 = math.complex(3, 4)
+z2 = math.complex(1, 2)
+print("z1 = ", math.cstr(z1))
+print("z2 = ", math.cstr(z2))
+print("|z1| =", math.cabs(z1))
+print("arg(z1) =", math.carg(z1))
+print("conj(z1) =", math.cstr(math.conj(z1)))
+print("z1 + z2 =", math.cstr(math.cadd(z1, z2)))
+print("z1 - z2 =", math.cstr(math.csub(z1, z2)))
+print("z1 * z2 =", math.cstr(math.cmul(z1, z2)))
+print("z1 / z2 =", math.cstr(math.cdiv(z1, z2)))
+print("z1^2 =", math.cstr(math.cpow(z1, 2)))
+print("sqrt(z1) =", math.cstr(math.csqrt(z1)))
+
+// Complex from polar
+zPolar = math.complexPolar(5, math.PI() / 4)
+print("Polar(5, PI/4) =", math.cstr(zPolar))
+
+// --- Vector Operations ---
+print("\n--- Vector Operations ---")
+v1 = [1, 2, 3]
+v2 = [4, 5, 6]
+print("v1 =", v1)
+print("v2 =", v2)
+print("dot(v1, v2) =", math.dot(v1, v2))
+print("cross(v1, v2) =", math.cross(v1, v2))
+print("|v1| =", math.magnitude(v1))
+print("normalize(v1) =", math.normalize(v1))
+print("v1 + v2 =", math.vadd(v1, v2))
+print("v1 - v2 =", math.vsub(v1, v2))
+print("v1 * 2 =", math.vscale(v1, 2))
+
+// --- Matrix Operations ---
+print("\n--- Matrix Operations ---")
+m1 = [[1, 2], [3, 4]]
+m2 = [[5, 6], [7, 8]]
+print("m1 =", m1)
+print("m2 =", m2)
+print("m1 + m2 =", math.madd(m1, m2))
+print("m1 * m2 =", math.mmul(m1, m2))
+print("transpose(m1) =", math.transpose(m1))
+print("det(m1) =", math.det(m1))
+print("trace(m1) =", math.trace(m1))
+print("identity(3) =", math.identity(3))
+
+// 3x3 determinant
+m3 = [[1, 2, 3], [4, 5, 6], [7, 8, 10]]
+print("det(3x3) =", math.det(m3))
+
+// --- Statistical Functions ---
+print("\n--- Statistical Functions ---")
+data = [2, 4, 4, 4, 5, 5, 7, 9]
+print("data =", data)
+print("sum =", math.sum(data))
+print("product =", math.product(data))
+print("mean =", math.mean(data))
+print("median =", math.median(data))
+print("mode =", math.mode(data))
+print("variance =", math.variance(data))
+print("stddev =", math.stddev(data))
+
+// Correlation
+x = [1, 2, 3, 4, 5]
+y = [2, 4, 5, 4, 5]
+print("correlation(x, y) =", math.correlation(x, y))
+
+// --- Combinatorics ---
+print("\n--- Combinatorics ---")
+print("factorial(5) =", math.factorial(5))
+print("factorial(10) =", math.factorial(10))
+print("P(5, 3) =", math.permutations(5, 3))
+print("C(5, 3) =", math.combinations(5, 3))
+print("C(10, 5) =", math.combinations(10, 5))
+
+// --- Number Theory ---
+print("\n--- Number Theory ---")
+print("gcd(48, 18) =", math.gcd(48, 18))
+print("lcm(4, 6) =", math.lcm(4, 6))
+print("isPrime(17) =", math.isPrime(17))
+print("isPrime(18) =", math.isPrime(18))
+print("primeFactors(60) =", math.primeFactors(60))
+print("fib(10) =", math.fib(10))
+print("fib(20) =", math.fib(20))
+
+// --- Utility Functions ---
+print("\n--- Utility Functions ---")
+print("clamp(15, 0, 10) =", math.clamp(15, 0, 10))
+print("lerp(0, 100, 0.5) =", math.lerp(0, 100, 0.5))
+print("mapRange(5, 0, 10, 0, 100) =", math.mapRange(5, 0, 10, 0, 100))
+print("radians(180) =", math.radians(180))
+print("degrees(PI) =", math.degrees(math.PI()))
+print("sign(-5) =", math.sign(-5))
+print("hypot(3, 4) =", math.hypot(3, 4))
+print("cbrt(27) =", math.cbrt(27))
+print("nthRoot(16, 4) =", math.nthRoot(16, 4))
+
+// --- Verification ---
+print("\n--- Verification ---")
+// Euler's identity: e^(i*PI) + 1 = 0
+iPi = math.complex(0, math.PI())
+eiPi = math.cexp(iPi)
+print("e^(i*PI) =", math.cstr(eiPi))
+print("e^(i*PI) + 1 ≈ 0:", abs(eiPi.re + 1) < 0.0001 && abs(eiPi.im) < 0.0001)
+
+// Pythagorean identity: sin^2 + cos^2 = 1
+angle = 0.7
+sinSq = math.sin(angle) ** 2
+cosSq = math.cos(angle) ** 2
+print("sin^2(0.7) + cos^2(0.7) =", sinSq + cosSq)
+
+print("\n=== MATH LIBRARY TEST COMPLETE ===")

@@ -1,0 +1,84 @@
+// ============================================
+// Jeem Test Suite - Timers (JavaScript-style)
+// ============================================
+
+print("=== TIMERS TEST ===\n")
+
+// --- setTimeout ---
+print("--- setTimeout ---")
+
+setTimeout(() => {
+    print("Timeout A: 200ms")
+}, 200)
+
+setTimeout(() => {
+    print("Timeout B: 100ms")
+}, 100)
+
+setTimeout(() => {
+    print("Timeout C: 300ms")
+}, 300)
+
+print("Timeouts scheduled (will run automatically)")
+
+// --- setInterval ---
+print("\n--- setInterval ---")
+
+ticks = 0
+intervalId = setInterval(() => {
+    ticks++
+    print("Tick", ticks)
+    if (ticks >= 5) {
+        clearInterval(intervalId)
+        print("Interval stopped after 5 ticks")
+    }
+}, 100)
+
+print("Interval scheduled")
+
+// --- clearTimeout ---
+print("\n--- clearTimeout ---")
+
+cancelledId = setTimeout(() => {
+    print("This should NOT print!")
+}, 500)
+
+clearTimeout(cancelledId)
+print("Cancelled timeout", cancelledId)
+
+// --- Nested Timers ---
+print("\n--- Nested Timers ---")
+
+setTimeout(() => {
+    print("Outer timer fired")
+    setTimeout(() => {
+        print("Inner timer fired")
+    }, 50)
+}, 150)
+
+// --- Closure in Timer ---
+print("\n--- Closure in Timer ---")
+
+func delayedGreet(name, delay) {
+    setTimeout(() => {
+        print("Hello,", name, "!")
+    }, delay)
+}
+
+delayedGreet("Alice", 250)
+delayedGreet("Bob", 350)
+
+// --- Order Test ---
+print("\n--- Execution Order ---")
+order = []
+
+setTimeout(() => push(order, "C-300"), 300)
+setTimeout(() => push(order, "A-100"), 100)
+setTimeout(() => push(order, "B-200"), 200)
+
+setTimeout(() => {
+    print("Final order:", order)
+}, 400)
+
+print("\nMain code finished - timers run automatically!")
+print("================================================\n")

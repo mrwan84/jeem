@@ -1,0 +1,191 @@
+// ============================================
+// Jeem Test Suite - HTTP Server
+// ============================================
+
+print("=== HTTP SERVER TEST ===\n")
+print("This will start a web server on port 8080")
+print("Press Ctrl+C to stop\n")
+
+// --- Create Server ---
+print("--- Creating Server ---")
+server = createServer(8080)
+if (server != null) {
+    print("Server created on port:", server.port)
+} else {
+    print("Failed to create server")
+}
+
+// --- Define Routes ---
+print("\n--- Defining Routes ---")
+
+// Home page
+serverRoute("GET", "/", (req) => {
+    return {
+        status: 200,
+        contentType: "text/html",
+        body: "<html><head><title>Jeem Server</title></head><body><h1>Welcome to Jeem HTTP Server!</h1><p>Routes:</p><ul><li><a href='/hello'>/hello</a></li><li><a href='/json'>/json</a></li><li><a href='/time'>/time</a></li><li><a href='/echo'>/echo</a> (POST)</li></ul></body></html>"
+    }
+})
+print("  GET / -> Home page")
+
+// Hello endpoint
+serverRoute("GET", "/hello", (req) => {
+    return {
+        status: 200,
+        contentType: "text/plain",
+        body: "Hello, World!"
+    }
+})
+print("  GET /hello -> Hello World")
+
+// JSON endpoint
+serverRoute("GET", "/json", (req) => {
+    data = {
+        message: "Hello from Jeem!",
+        version: "3.0",
+        features: ["arrow functions", "http server", "array methods"],
+        timestamp: time()
+    }
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify(data)
+    }
+})
+print("  GET /json -> JSON response")
+
+// Time endpoint
+serverRoute("GET", "/time", (req) => {
+    currentTime = time()
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({time: currentTime})
+    }
+})
+print("  GET /time -> Current time")
+
+// Echo POST endpoint
+serverRoute("POST", "/echo", (req) => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            method: req.method,
+            path: req.path,
+            received: req.body
+        })
+    }
+})
+print("  POST /echo -> Echo request body")
+
+// API endpoint
+serverRoute("GET", "/api/status", (req) => {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            status: "ok",
+            uptime: time(),
+            version: "3.0"
+        })
+    }
+})
+print("  GET /api/status -> API status")
+
+// Calculator API
+serverRoute("POST", "/api/calculate", (req) => {
+    data = jsonParse(req.body)
+    if (data == null) {
+        return {
+            status: 400,
+            contentType: "application/json",
+            body: jsonStringify({error: "Invalid JSON"})
+        }
+    }
+    
+    a = data.a
+    b = data.b
+    op = data.op
+    result = 0
+    
+    if (op == "add") {
+        result = a + b
+    } else if (op == "sub") {
+        result = a - b
+    } else if (op == "mul") {
+        result = a * b
+    } else if (op == "div") {
+        if (b != 0) {
+            result = a / b
+        } else {
+            return {
+                status: 400,
+                contentType: "application/json",
+                body: jsonStringify({error: "Division by zero"})
+            }
+        }
+    }
+    
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: jsonStringify({
+            a: a,
+            b: b,
+            op: op,
+            result: result
+        })
+    }
+})
+print("  POST /api/calculate -> Calculator API")
+
+// HTML page with styling
+serverRoute("GET", "/styled", (req) => {
+    html = "<!DOCTYPE html>
+<html>
+<head>
+    <title>Styled Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        code { background: #eee; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class='card'>
+        <h1>Jeem HTTP Server</h1>
+        <p>This page is served by the Jeem interpreter!</p>
+        <p>Features:</p>
+        <ul>
+            <li>Arrow functions: <code>x => x * 2</code></li>
+            <li>HTTP Client: <code>httpGet(url)</code></li>
+            <li>HTTP Server: <code>createServer(port)</code></li>
+            <li>Array methods: <code>.map(), .filter(), .reduce()</code></li>
+        </ul>
+    </div>
+</body>
+</html>"
+    return {
+        status: 200,
+        contentType: "text/html",
+        body: html
+    }
+})
+print("  GET /styled -> Styled HTML page")
+
+// --- Start Server ---
+print("\n--- Starting Server ---")
+print("Server listening on http://localhost:8080")
+print("Test with:")
+print("  curl http://localhost:8080/")
+print("  curl http://localhost:8080/hello")
+print("  curl http://localhost:8080/json")
+print("  curl -X POST -d '{\"a\":10,\"b\":5,\"op\":\"add\"}' http://localhost:8080/api/calculate")
+print("\nPress Ctrl+C to stop the server\n")
+
+// Start listening (blocking)
+serverListen()
+
+print("\nServer stopped.")

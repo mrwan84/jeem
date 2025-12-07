@@ -1,0 +1,166 @@
+// ============================================
+// Jeem Test Suite - File I/O
+// ============================================
+
+print("=== FILE I/O TEST ===\n")
+
+// --- Write File ---
+print("--- Write File ---")
+testFile = "test_output.txt"
+content = "Hello, World!\nThis is a test file.\nLine 3."
+
+success = writeFile(testFile, content)
+print("writeFile('" + testFile + "'):", success)
+
+// --- Read File ---
+print("\n--- Read File ---")
+readContent = readFile(testFile)
+print("readFile('" + testFile + "'):")
+print(readContent)
+
+// --- File Exists ---
+print("\n--- File Exists ---")
+print("fileExists('" + testFile + "'):", fileExists(testFile))
+print("fileExists('nonexistent.txt'):", fileExists("nonexistent.txt"))
+
+// --- Append File ---
+print("\n--- Append File ---")
+appendFile(testFile, "\nAppended line 1")
+appendFile(testFile, "\nAppended line 2")
+
+print("After appending:")
+print(readFile(testFile))
+
+// --- Write JSON ---
+print("\n--- Write JSON ---")
+jsonFile = "test_data.json"
+data = {
+    name: "Test Project",
+    version: "1.0.0",
+    dependencies: ["lib1", "lib2"],
+    config: {
+        debug: true,
+        port: 8080
+    }
+}
+
+jsonContent = jsonStringify(data, 2)
+writeFile(jsonFile, jsonContent)
+print("Wrote JSON to '" + jsonFile + "':")
+print(jsonContent)
+
+// --- Read JSON ---
+print("\n--- Read JSON ---")
+loadedJson = readFile(jsonFile)
+parsed = jsonParse(loadedJson)
+print("Parsed JSON:")
+print("  name:", parsed.name)
+print("  version:", parsed.version)
+print("  dependencies:", parsed.dependencies)
+print("  config.debug:", parsed.config.debug)
+
+// --- Write Multiple Files ---
+print("\n--- Write Multiple Files ---")
+files = ["file1.txt", "file2.txt", "file3.txt"]
+for file, i in files {
+    writeFile(file, "Content of file " + str(i + 1))
+    print("Created:", file)
+}
+
+// --- Read Multiple Files ---
+print("\n--- Read Multiple Files ---")
+for file in files {
+    if (fileExists(file)) {
+        print(file + ":", readFile(file))
+    }
+}
+
+// --- CSV File ---
+print("\n--- CSV File ---")
+csvFile = "test_data.csv"
+csvData = "name,age,city\nAlice,30,Berlin\nBob,25,Munich\nCharlie,35,Hamburg"
+writeFile(csvFile, csvData)
+print("Wrote CSV:", csvFile)
+
+// Read and parse CSV
+csvContent = readFile(csvFile)
+lines = split(csvContent, "\n")
+print("CSV rows:", lines.len())
+for line in lines {
+    print("  " + line)
+}
+
+// --- Data Storage ---
+print("\n--- Data Storage ---")
+storeFile = "store.json"
+store = {
+    users: [],
+    counter: 0
+}
+
+// Add users
+push(store.users, {id: 1, name: "Alice"})
+push(store.users, {id: 2, name: "Bob"})
+store.counter = store.users.len()
+
+writeFile(storeFile, jsonStringify(store, 2))
+print("Saved store with", store.counter, "users")
+
+// Reload
+loaded = jsonParse(readFile(storeFile))
+print("Loaded store:")
+print("  users:", loaded.users)
+print("  counter:", loaded.counter)
+
+// --- Log File ---
+print("\n--- Log File ---")
+logFile = "app.log"
+
+func log(level, message) {
+    timestamp = time()
+    entry = "[" + str(timestamp) + "] [" + level + "] " + message + "\n"
+    appendFile(logFile, entry)
+}
+
+writeFile(logFile, "=== Application Log ===\n")
+log("INFO", "Application started")
+log("DEBUG", "Loading configuration")
+log("INFO", "Server listening on port 8080")
+log("WARN", "High memory usage detected")
+log("ERROR", "Failed to connect to database")
+
+print("Log file contents:")
+print(readFile(logFile))
+
+// --- Config File ---
+print("\n--- Config File ---")
+configFile = "config.json"
+config = {
+    app: {
+        name: "MyApp",
+        version: "1.0.0"
+    },
+    server: {
+        host: "localhost",
+        port: 3000
+    },
+    database: {
+        host: "localhost",
+        port: 5432,
+        name: "mydb"
+    },
+    features: {
+        darkMode: true,
+        notifications: true
+    }
+}
+
+writeFile(configFile, jsonStringify(config, 2))
+print("Config saved to:", configFile)
+
+// Load and use config
+appConfig = jsonParse(readFile(configFile))
+print("App:", appConfig.app.name, "v" + appConfig.app.version)
+print("Server:", appConfig.server.host + ":" + str(appConfig.server.port))
+
+print("\n=== FILE I/O TEST COMPLETE ===")
