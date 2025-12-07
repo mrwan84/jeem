@@ -1,0 +1,615 @@
+// ============================================
+// Color Library for Jeem
+// ============================================
+// RGB, HSL, Hex conversion and manipulation
+// ============================================
+
+// ==========================================
+// COLOR CREATION
+// ==========================================
+
+// Create RGB color (0-255)
+func RGB(r, g, b) {
+    return {
+        _type: "Color",
+        r: clamp(r, 0, 255),
+        g: clamp(g, 0, 255),
+        b: clamp(b, 0, 255),
+        a: 255
+    }
+}
+
+// Create RGBA color (0-255, alpha 0-255)
+func RGBA(r, g, b, a) {
+    return {
+        _type: "Color",
+        r: clamp(r, 0, 255),
+        g: clamp(g, 0, 255),
+        b: clamp(b, 0, 255),
+        a: clamp(a, 0, 255)
+    }
+}
+
+// Create HSL color (h: 0-360, s: 0-100, l: 0-100)
+func HSL(h, s, l) {
+    return hslToRgb(h, s, l)
+}
+
+// Create HSLA color
+func HSLA(h, s, l, a) {
+    c = hslToRgb(h, s, l)
+    c.a = clamp(int(a * 255), 0, 255)
+    return c
+}
+
+// Create color from hex string
+func fromHex(hex) {
+    // Remove # if present
+    if (hex[0] == "#") {
+        hex = slice(hex, 1, hex.len())
+    }
+    
+    // Handle 3-char hex (#RGB)
+    if (hex.len() == 3) {
+        r = hexCharToInt(hex[0]) * 17
+        g = hexCharToInt(hex[1]) * 17
+        b = hexCharToInt(hex[2]) * 17
+        return RGB(r, g, b)
+    }
+    
+    // Handle 6-char hex (#RRGGBB)
+    if (hex.len() == 6) {
+        r = hexCharToInt(hex[0]) * 16 + hexCharToInt(hex[1])
+        g = hexCharToInt(hex[2]) * 16 + hexCharToInt(hex[3])
+        b = hexCharToInt(hex[4]) * 16 + hexCharToInt(hex[5])
+        return RGB(r, g, b)
+    }
+    
+    // Handle 8-char hex (#RRGGBBAA)
+    if (hex.len() == 8) {
+        r = hexCharToInt(hex[0]) * 16 + hexCharToInt(hex[1])
+        g = hexCharToInt(hex[2]) * 16 + hexCharToInt(hex[3])
+        b = hexCharToInt(hex[4]) * 16 + hexCharToInt(hex[5])
+        a = hexCharToInt(hex[6]) * 16 + hexCharToInt(hex[7])
+        return RGBA(r, g, b, a)
+    }
+    
+    return RGB(0, 0, 0)
+}
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
+func clamp(v, min, max) {
+    if (v < min) { return min }
+    if (v > max) { return max }
+    return v
+}
+
+func hexCharToInt(c) {
+    case (c) {
+        "0": return 0
+        "1": return 1
+        "2": return 2
+        "3": return 3
+        "4": return 4
+        "5": return 5
+        "6": return 6
+        "7": return 7
+        "8": return 8
+        "9": return 9
+        "a", "A": return 10
+        "b", "B": return 11
+        "c", "C": return 12
+        "d", "D": return 13
+        "e", "E": return 14
+        "f", "F": return 15
+        default: return 0
+    }
+}
+
+func intToHexChar(n) {
+    chars = "0123456789abcdef"
+    return chars[n]
+}
+
+func byteToHex(n) {
+    return intToHexChar(int(n / 16)) + intToHexChar(n % 16)
+}
+
+// ==========================================
+// COLOR CONVERSION
+// ==========================================
+
+// RGB to Hex string
+func toHex(c) {
+    return "#" + byteToHex(c.r) + byteToHex(c.g) + byteToHex(c.b)
+}
+
+// RGBA to Hex string (with alpha)
+func toHexA(c) {
+    return "#" + byteToHex(c.r) + byteToHex(c.g) + byteToHex(c.b) + byteToHex(c.a)
+}
+
+// RGB to HSL
+func toHsl(c) {
+    r = c.r / 255
+    g = c.g / 255
+    b = c.b / 255
+    
+    maxVal = r
+    if (g > maxVal) { maxVal = g }
+    if (b > maxVal) { maxVal = b }
+    
+    minVal = r
+    if (g < minVal) { minVal = g }
+    if (b < minVal) { minVal = b }
+    
+    l = (maxVal + minVal) / 2
+    
+    if (maxVal == minVal) {
+        return {h: 0, s: 0, l: l * 100}
+    }
+    
+    d = maxVal - minVal
+    s = l > 0.5 ? d / (2 - maxVal - minVal) : d / (maxVal + minVal)
+    
+    h = 0
+    if (maxVal == r) {
+        h = ((g - b) / d) + (g < b ? 6 : 0)
+    } else if (maxVal == g) {
+        h = ((b - r) / d) + 2
+    } else {
+        h = ((r - g) / d) + 4
+    }
+    h = h * 60
+    
+    return {h: h, s: s * 100, l: l * 100}
+}
+
+// HSL to RGB
+func hslToRgb(h, s, l) {
+    h = h / 360
+    s = s / 100
+    l = l / 100
+    
+    if (s == 0) {
+        v = int(l * 255)
+        return RGB(v, v, v)
+    }
+    
+    q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    p = 2 * l - q
+    
+    r = hueToRgb(p, q, h + 1/3)
+    g = hueToRgb(p, q, h)
+    b = hueToRgb(p, q, h - 1/3)
+    
+    return RGB(int(r * 255), int(g * 255), int(b * 255))
+}
+
+func hueToRgb(p, q, t) {
+    if (t < 0) { t = t + 1 }
+    if (t > 1) { t = t - 1 }
+    if (t < 1/6) { return p + (q - p) * 6 * t }
+    if (t < 1/2) { return q }
+    if (t < 2/3) { return p + (q - p) * (2/3 - t) * 6 }
+    return p
+}
+
+// RGB to HSV
+func toHsv(c) {
+    r = c.r / 255
+    g = c.g / 255
+    b = c.b / 255
+    
+    maxVal = r
+    if (g > maxVal) { maxVal = g }
+    if (b > maxVal) { maxVal = b }
+    
+    minVal = r
+    if (g < minVal) { minVal = g }
+    if (b < minVal) { minVal = b }
+    
+    v = maxVal
+    d = maxVal - minVal
+    s = maxVal == 0 ? 0 : d / maxVal
+    
+    if (maxVal == minVal) {
+        return {h: 0, s: 0, v: v * 100}
+    }
+    
+    h = 0
+    if (maxVal == r) {
+        h = ((g - b) / d) + (g < b ? 6 : 0)
+    } else if (maxVal == g) {
+        h = ((b - r) / d) + 2
+    } else {
+        h = ((r - g) / d) + 4
+    }
+    h = h * 60
+    
+    return {h: h, s: s * 100, v: v * 100}
+}
+
+// HSV to RGB
+func hsvToRgb(h, s, v) {
+    h = h / 360
+    s = s / 100
+    v = v / 100
+    
+    i = int(h * 6)
+    f = h * 6 - i
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+    
+    r = 0
+    g = 0
+    b = 0
+    
+    case (i % 6) {
+        0: r = v; g = t; b = p; break
+        1: r = q; g = v; b = p; break
+        2: r = p; g = v; b = t; break
+        3: r = p; g = q; b = v; break
+        4: r = t; g = p; b = v; break
+        5: r = v; g = p; b = q; break
+    }
+    
+    return RGB(int(r * 255), int(g * 255), int(b * 255))
+}
+
+// RGB to CMYK
+func toCmyk(c) {
+    r = c.r / 255
+    g = c.g / 255
+    b = c.b / 255
+    
+    k = 1 - r
+    if (1 - g < k) { k = 1 - g }
+    if (1 - b < k) { k = 1 - b }
+    
+    if (k == 1) {
+        return {c: 0, m: 0, y: 0, k: 100}
+    }
+    
+    cyan = (1 - r - k) / (1 - k)
+    magenta = (1 - g - k) / (1 - k)
+    yellow = (1 - b - k) / (1 - k)
+    
+    return {c: cyan * 100, m: magenta * 100, y: yellow * 100, k: k * 100}
+}
+
+// CMYK to RGB
+func cmykToRgb(c, m, y, k) {
+    c = c / 100
+    m = m / 100
+    y = y / 100
+    k = k / 100
+    
+    r = 255 * (1 - c) * (1 - k)
+    g = 255 * (1 - m) * (1 - k)
+    b = 255 * (1 - y) * (1 - k)
+    
+    return RGB(int(r), int(g), int(b))
+}
+
+// ==========================================
+// COLOR STRING FORMATS
+// ==========================================
+
+// To CSS rgb() string
+func toRgbStr(c) {
+    return "rgb(" + str(c.r) + ", " + str(c.g) + ", " + str(c.b) + ")"
+}
+
+// To CSS rgba() string
+func toRgbaStr(c) {
+    a = c.a / 255
+    return "rgba(" + str(c.r) + ", " + str(c.g) + ", " + str(c.b) + ", " + str(a) + ")"
+}
+
+// To CSS hsl() string
+func toHslStr(c) {
+    hsl = toHsl(c)
+    return "hsl(" + str(int(hsl.h)) + ", " + str(int(hsl.s)) + "%, " + str(int(hsl.l)) + "%)"
+}
+
+// ==========================================
+// COLOR MANIPULATION
+// ==========================================
+
+// Lighten color by percent (0-100)
+func lighten(c, percent) {
+    hsl = toHsl(c)
+    hsl.l = clamp(hsl.l + percent, 0, 100)
+    result = hslToRgb(hsl.h, hsl.s, hsl.l)
+    result.a = c.a
+    return result
+}
+
+// Darken color by percent (0-100)
+func darken(c, percent) {
+    return lighten(c, -percent)
+}
+
+// Saturate color by percent (0-100)
+func saturate(c, percent) {
+    hsl = toHsl(c)
+    hsl.s = clamp(hsl.s + percent, 0, 100)
+    result = hslToRgb(hsl.h, hsl.s, hsl.l)
+    result.a = c.a
+    return result
+}
+
+// Desaturate color by percent (0-100)
+func desaturate(c, percent) {
+    return saturate(c, -percent)
+}
+
+// Rotate hue by degrees
+func rotate(c, degrees) {
+    hsl = toHsl(c)
+    hsl.h = (hsl.h + degrees) % 360
+    if (hsl.h < 0) { hsl.h = hsl.h + 360 }
+    result = hslToRgb(hsl.h, hsl.s, hsl.l)
+    result.a = c.a
+    return result
+}
+
+// Invert color
+func invert(c) {
+    return RGBA(255 - c.r, 255 - c.g, 255 - c.b, c.a)
+}
+
+// Convert to grayscale
+func grayscale(c) {
+    // Using luminosity method
+    gray = int(0.299 * c.r + 0.587 * c.g + 0.114 * c.b)
+    return RGBA(gray, gray, gray, c.a)
+}
+
+// Set alpha (0-1)
+func setAlpha(c, alpha) {
+    return RGBA(c.r, c.g, c.b, int(alpha * 255))
+}
+
+// Complement (opposite on color wheel)
+func complement(c) {
+    return rotate(c, 180)
+}
+
+// ==========================================
+// COLOR MIXING
+// ==========================================
+
+// Mix two colors (ratio 0-1, 0 = all c1, 1 = all c2)
+func mix(c1, c2, ratio) {
+    if (ratio == null) { ratio = 0.5 }
+    r = int(c1.r * (1 - ratio) + c2.r * ratio)
+    g = int(c1.g * (1 - ratio) + c2.g * ratio)
+    b = int(c1.b * (1 - ratio) + c2.b * ratio)
+    a = int(c1.a * (1 - ratio) + c2.a * ratio)
+    return RGBA(r, g, b, a)
+}
+
+// Blend colors (alpha compositing)
+func blend(bg, fg) {
+    alpha = fg.a / 255
+    r = int(fg.r * alpha + bg.r * (1 - alpha))
+    g = int(fg.g * alpha + bg.g * (1 - alpha))
+    b = int(fg.b * alpha + bg.b * (1 - alpha))
+    return RGB(r, g, b)
+}
+
+// ==========================================
+// COLOR PALETTES
+// ==========================================
+
+// Generate complementary palette (2 colors)
+func complementary(c) {
+    return [c, complement(c)]
+}
+
+// Generate triadic palette (3 colors)
+func triadic(c) {
+    return [c, rotate(c, 120), rotate(c, 240)]
+}
+
+// Generate tetradic/square palette (4 colors)
+func tetradic(c) {
+    return [c, rotate(c, 90), rotate(c, 180), rotate(c, 270)]
+}
+
+// Generate analogous palette (3 colors)
+func analogous(c, angle) {
+    if (angle == null) { angle = 30 }
+    return [rotate(c, -angle), c, rotate(c, angle)]
+}
+
+// Generate split-complementary palette (3 colors)
+func splitComplementary(c, angle) {
+    if (angle == null) { angle = 30 }
+    comp = complement(c)
+    return [c, rotate(comp, -angle), rotate(comp, angle)]
+}
+
+// Generate monochromatic palette (shades of one color)
+func monochromatic(c, steps) {
+    if (steps == null) { steps = 5 }
+    palette = []
+    for i in range(steps) {
+        amt = (i / (steps - 1)) * 100 - 50
+        push(palette, lighten(c, amt))
+    }
+    return palette
+}
+
+// Generate gradient between two colors
+func gradient(c1, c2, steps) {
+    if (steps == null) { steps = 5 }
+    colors = []
+    for i in range(steps) {
+        ratio = i / (steps - 1)
+        push(colors, mix(c1, c2, ratio))
+    }
+    return colors
+}
+
+// ==========================================
+// COLOR ANALYSIS
+// ==========================================
+
+// Calculate luminance (0-1)
+func luminance(c) {
+    r = c.r / 255
+    g = c.g / 255
+    b = c.b / 255
+    
+    // Apply gamma correction
+    r = r <= 0.03928 ? r / 12.92 : pow((r + 0.055) / 1.055, 2.4)
+    g = g <= 0.03928 ? g / 12.92 : pow((g + 0.055) / 1.055, 2.4)
+    b = b <= 0.03928 ? b / 12.92 : pow((b + 0.055) / 1.055, 2.4)
+    
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+// Simple power function
+func pow(base, exp) {
+    result = 1
+    for i in range(int(exp)) {
+        result = result * base
+    }
+    // Handle fractional exponent approximately
+    if (exp != int(exp)) {
+        frac = exp - int(exp)
+        result = result * (1 + frac * (base - 1))
+    }
+    return result
+}
+
+// Calculate contrast ratio between two colors
+func contrastRatio(c1, c2) {
+    l1 = luminance(c1)
+    l2 = luminance(c2)
+    
+    lighter = l1 > l2 ? l1 : l2
+    darker = l1 > l2 ? l2 : l1
+    
+    return (lighter + 0.05) / (darker + 0.05)
+}
+
+// Check if color is light
+func isLight(c) {
+    return luminance(c) > 0.5
+}
+
+// Check if color is dark
+func isDark(c) {
+    return !isLight(c)
+}
+
+// Get best text color (black or white) for background
+func textColor(bg) {
+    return isLight(bg) ? RGB(0, 0, 0) : RGB(255, 255, 255)
+}
+
+// Calculate color distance (Euclidean in RGB space)
+func distance(c1, c2) {
+    dr = c1.r - c2.r
+    dg = c1.g - c2.g
+    db = c1.b - c2.b
+    return sqrt(dr * dr + dg * dg + db * db)
+}
+
+func sqrt(x) {
+    if (x <= 0) { return 0 }
+    guess = x / 2
+    for i in range(20) {
+        guess = (guess + x / guess) / 2
+    }
+    return guess
+}
+
+// ==========================================
+// PREDEFINED COLORS
+// ==========================================
+
+func black() { return RGB(0, 0, 0) }
+func white() { return RGB(255, 255, 255) }
+func red() { return RGB(255, 0, 0) }
+func green() { return RGB(0, 128, 0) }
+func blue() { return RGB(0, 0, 255) }
+func yellow() { return RGB(255, 255, 0) }
+func cyan() { return RGB(0, 255, 255) }
+func magenta() { return RGB(255, 0, 255) }
+func orange() { return RGB(255, 165, 0) }
+func purple() { return RGB(128, 0, 128) }
+func pink() { return RGB(255, 192, 203) }
+func brown() { return RGB(139, 69, 19) }
+func gray() { return RGB(128, 128, 128) }
+func lightGray() { return RGB(211, 211, 211) }
+func darkGray() { return RGB(64, 64, 64) }
+
+// Web colors
+func coral() { return RGB(255, 127, 80) }
+func salmon() { return RGB(250, 128, 114) }
+func tomato() { return RGB(255, 99, 71) }
+func gold() { return RGB(255, 215, 0) }
+func olive() { return RGB(128, 128, 0) }
+func teal() { return RGB(0, 128, 128) }
+func navy() { return RGB(0, 0, 128) }
+func maroon() { return RGB(128, 0, 0) }
+func lime() { return RGB(0, 255, 0) }
+func aqua() { return RGB(0, 255, 255) }
+func silver() { return RGB(192, 192, 192) }
+func indigo() { return RGB(75, 0, 130) }
+func violet() { return RGB(238, 130, 238) }
+func turquoise() { return RGB(64, 224, 208) }
+func skyBlue() { return RGB(135, 206, 235) }
+func steelBlue() { return RGB(70, 130, 180) }
+func forestGreen() { return RGB(34, 139, 34) }
+func seaGreen() { return RGB(46, 139, 87) }
+func chocolate() { return RGB(210, 105, 30) }
+func sienna() { return RGB(160, 82, 45) }
+
+// ==========================================
+// UTILITY
+// ==========================================
+
+// Clone color
+func clone(c) {
+    return RGBA(c.r, c.g, c.b, c.a)
+}
+
+// Check if two colors are equal
+func equals(c1, c2) {
+    return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b && c1.a == c2.a
+}
+
+// Color to string
+func colorStr(c) {
+    return "RGB(" + str(c.r) + ", " + str(c.g) + ", " + str(c.b) + ")"
+}
+
+// Print color
+func printColor(c) {
+    print(colorStr(c) + " = " + toHex(c))
+}
+
+// Random color
+func random() {
+    r = int(randomFloat() * 256)
+    g = int(randomFloat() * 256)
+    b = int(randomFloat() * 256)
+    return RGB(r, g, b)
+}
+
+// Simple random (0-1) - uses linear congruential generator
+randomSeed = 12345
+func randomFloat() {
+    randomSeed = (randomSeed * 1103515245 + 12345) % 2147483648
+    return (randomSeed % 10000) / 10000
+}

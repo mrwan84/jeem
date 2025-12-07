@@ -1,0 +1,694 @@
+// ============================================
+// CLI Library for Jeem
+// ============================================
+// Command line utilities, colors, progress bars
+// ============================================
+
+// ==========================================
+// ANSI COLOR CODES
+// ==========================================
+// Using chr(27) for escape character
+
+// Escape sequence prefix
+func ESC() { return chr(27) + "[" }
+
+// Reset
+func reset() { return ESC() + "0m" }
+
+// Text styles
+func bold() { return ESC() + "1m" }
+func dim() { return ESC() + "2m" }
+func italic() { return ESC() + "3m" }
+func underline() { return ESC() + "4m" }
+func blink() { return ESC() + "5m" }
+func reverse() { return ESC() + "7m" }
+func hidden() { return ESC() + "8m" }
+func strikethrough() { return ESC() + "9m" }
+
+// Foreground colors
+func fgBlack() { return ESC() + "30m" }
+func fgRed() { return ESC() + "31m" }
+func fgGreen() { return ESC() + "32m" }
+func fgYellow() { return ESC() + "33m" }
+func fgBlue() { return ESC() + "34m" }
+func fgMagenta() { return ESC() + "35m" }
+func fgCyan() { return ESC() + "36m" }
+func fgWhite() { return ESC() + "37m" }
+func fgDefault() { return ESC() + "39m" }
+
+// Bright foreground colors
+func fgBrightBlack() { return ESC() + "90m" }
+func fgBrightRed() { return ESC() + "91m" }
+func fgBrightGreen() { return ESC() + "92m" }
+func fgBrightYellow() { return ESC() + "93m" }
+func fgBrightBlue() { return ESC() + "94m" }
+func fgBrightMagenta() { return ESC() + "95m" }
+func fgBrightCyan() { return ESC() + "96m" }
+func fgBrightWhite() { return ESC() + "97m" }
+
+// Background colors
+func bgBlack() { return ESC() + "40m" }
+func bgRed() { return ESC() + "41m" }
+func bgGreen() { return ESC() + "42m" }
+func bgYellow() { return ESC() + "43m" }
+func bgBlue() { return ESC() + "44m" }
+func bgMagenta() { return ESC() + "45m" }
+func bgCyan() { return ESC() + "46m" }
+func bgWhite() { return ESC() + "47m" }
+func bgDefault() { return ESC() + "49m" }
+
+// Bright background colors
+func bgBrightBlack() { return ESC() + "100m" }
+func bgBrightRed() { return ESC() + "101m" }
+func bgBrightGreen() { return ESC() + "102m" }
+func bgBrightYellow() { return ESC() + "103m" }
+func bgBrightBlue() { return ESC() + "104m" }
+func bgBrightMagenta() { return ESC() + "105m" }
+func bgBrightCyan() { return ESC() + "106m" }
+func bgBrightWhite() { return ESC() + "107m" }
+
+// 256 color support
+func fg256(n) { return ESC() + "38;5;" + str(n) + "m" }
+func bg256(n) { return ESC() + "48;5;" + str(n) + "m" }
+
+// RGB color support (true color)
+func fgRgb(r, g, b) { return ESC() + "38;2;" + str(r) + ";" + str(g) + ";" + str(b) + "m" }
+func bgRgb(r, g, b) { return ESC() + "48;2;" + str(r) + ";" + str(g) + ";" + str(b) + "m" }
+
+// ==========================================
+// STYLED TEXT HELPERS
+// ==========================================
+
+// Apply style to text
+func style(text, codes) {
+    return codes + text + reset()
+}
+
+// Colored text shortcuts
+func black(text) { return style(text, fgBlack()) }
+func red(text) { return style(text, fgRed()) }
+func green(text) { return style(text, fgGreen()) }
+func yellow(text) { return style(text, fgYellow()) }
+func blue(text) { return style(text, fgBlue()) }
+func magenta(text) { return style(text, fgMagenta()) }
+func cyan(text) { return style(text, fgCyan()) }
+func white(text) { return style(text, fgWhite()) }
+func gray(text) { return style(text, fgBrightBlack()) }
+
+// Styled text shortcuts
+func boldText(text) { return style(text, bold()) }
+func dimText(text) { return style(text, dim()) }
+func italicText(text) { return style(text, italic()) }
+func underlineText(text) { return style(text, underline()) }
+func strikeText(text) { return style(text, strikethrough()) }
+
+// Combined styles
+func success(text) { return style(text, fgGreen() + bold()) }
+func error(text) { return style(text, fgRed() + bold()) }
+func warning(text) { return style(text, fgYellow() + bold()) }
+func info(text) { return style(text, fgCyan() + bold()) }
+func highlight(text) { return style(text, bgYellow() + fgBlack()) }
+
+// ==========================================
+// CURSOR CONTROL
+// ==========================================
+
+func cursorUp(n) { return ESC() + str(n) + "A" }
+func cursorDown(n) { return ESC() + str(n) + "B" }
+func cursorForward(n) { return ESC() + str(n) + "C" }
+func cursorBack(n) { return ESC() + str(n) + "D" }
+func cursorTo(row, col) { return ESC() + str(row) + ";" + str(col) + "H" }
+func cursorHome() { return ESC() + "H" }
+func cursorSave() { return ESC() + "s" }
+func cursorRestore() { return ESC() + "u" }
+func cursorHide() { return ESC() + "?25l" }
+func cursorShow() { return ESC() + "?25h" }
+
+// ==========================================
+// SCREEN CONTROL
+// ==========================================
+
+func clearScreen() { return ESC() + "2J" }
+func clearLine() { return ESC() + "2K" }
+func clearLineEnd() { return ESC() + "K" }
+func clearLineStart() { return ESC() + "1K" }
+func clearDown() { return ESC() + "J" }
+func clearUp() { return ESC() + "1J" }
+
+// ==========================================
+// PROGRESS BAR
+// ==========================================
+
+// Create a progress bar
+func ProgressBar(total, width, chars) {
+    if (width == null) { width = 40 }
+    if (chars == null) { chars = {filled: "#", empty: "-", left: "[", right: "]"} }
+    
+    return {
+        _type: "ProgressBar",
+        total: total,
+        current: 0,
+        width: width,
+        chars: chars,
+        startTime: 0,
+        label: ""
+    }
+}
+
+// Update progress bar
+func progressUpdate(pb, value) {
+    pb.current = value
+    return pb
+}
+
+// Increment progress bar
+func progressIncrement(pb, amount) {
+    if (amount == null) { amount = 1 }
+    pb.current = pb.current + amount
+    if (pb.current > pb.total) { pb.current = pb.total }
+    return pb
+}
+
+// Set progress label
+func progressLabel(pb, label) {
+    pb.label = label
+    return pb
+}
+
+// Render progress bar as string
+func progressRender(pb) {
+    percent = pb.current / pb.total
+    filled = int(percent * pb.width)
+    empty = pb.width - filled
+    
+    bar = pb.chars.left
+    for i in range(filled) {
+        bar = bar + pb.chars.filled
+    }
+    for i in range(empty) {
+        bar = bar + pb.chars.empty
+    }
+    bar = bar + pb.chars.right
+    
+    percentStr = str(int(percent * 100)) + "%"
+    while (percentStr.len() < 4) { percentStr = " " + percentStr }
+    
+    countStr = str(pb.current) + "/" + str(pb.total)
+    
+    result = bar + " " + percentStr + " " + countStr
+    if (pb.label != "") {
+        result = result + " " + pb.label
+    }
+    
+    return result
+}
+
+// Print progress bar (overwrites current line)
+func progressPrint(pb) {
+    print("\r" + clearLineEnd() + progressRender(pb))
+}
+
+// Complete progress bar
+func progressComplete(pb) {
+    pb.current = pb.total
+    print("\r" + clearLineEnd() + progressRender(pb))
+    print("")
+    return pb
+}
+
+// ==========================================
+// SPINNER
+// ==========================================
+
+func Spinner(style) {
+    frames = []
+    case (style) {
+        "dots":
+            frames = [".", "..", "...", ".."]
+        "line":
+            frames = ["-", "\\", "|", "/"]
+        "circle":
+            frames = ["o", "O", "0", "O"]
+        "square":
+            frames = ["[.]", "[o]", "[O]", "[o]"]
+        "arrow":
+            frames = ["<", "^", ">", "v"]
+        "bounce":
+            frames = [".", "o", "O", "o"]
+        "unicode-dots":
+            frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        "unicode-circle":
+            frames = ["◐", "◓", "◑", "◒"]
+        "unicode-arrow":
+            frames = ["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"]
+        default:
+            frames = ["-", "\\", "|", "/"]
+    }
+    
+    return {
+        _type: "Spinner",
+        frames: frames,
+        current: 0,
+        message: ""
+    }
+}
+
+func spinnerNext(s) {
+    s.current = (s.current + 1) % s.frames.len()
+    return s.frames[s.current]
+}
+
+func spinnerRender(s) {
+    frame = s.frames[s.current]
+    if (s.message != "") {
+        return frame + " " + s.message
+    }
+    return frame
+}
+
+func spinnerMessage(s, msg) {
+    s.message = msg
+    return s
+}
+
+// ==========================================
+// TABLES
+// ==========================================
+
+// Create a table
+func Table(headers) {
+    return {
+        _type: "Table",
+        headers: headers,
+        rows: [],
+        widths: []
+    }
+}
+
+// Add row to table
+func tableAddRow(t, row) {
+    push(t.rows, row)
+    return t
+}
+
+// Calculate column widths
+func tableCalcWidths(t) {
+    widths = []
+    
+    // Start with header widths
+    for h in t.headers {
+        push(widths, str(h).len())
+    }
+    
+    // Check all rows
+    for row in t.rows {
+        for i in range(row.len()) {
+            cellLen = str(row[i]).len()
+            if (i < widths.len()) {
+                if (cellLen > widths[i]) {
+                    widths[i] = cellLen
+                }
+            } else {
+                push(widths, cellLen)
+            }
+        }
+    }
+    
+    t.widths = widths
+    return widths
+}
+
+// Pad string to width
+func padStr(s, width, align) {
+    s = str(s)
+    if (align == null) { align = "left" }
+    
+    padding = width - s.len()
+    if (padding <= 0) { return s }
+    
+    if (align == "right") {
+        result = ""
+        for i in range(padding) { result = result + " " }
+        return result + s
+    } else if (align == "center") {
+        left = int(padding / 2)
+        right = padding - left
+        result = ""
+        for i in range(left) { result = result + " " }
+        result = result + s
+        for i in range(right) { result = result + " " }
+        return result
+    }
+    
+    result = s
+    for i in range(padding) { result = result + " " }
+    return result
+}
+
+// Render table as string
+func tableRender(t) {
+    tableCalcWidths(t)
+    lines = []
+    
+    // Build separator line
+    sep = "+"
+    for w in t.widths {
+        sep = sep + "-"
+        for i in range(w) { sep = sep + "-" }
+        sep = sep + "-+"
+    }
+    
+    // Header
+    push(lines, sep)
+    headerLine = "|"
+    for i in range(t.headers.len()) {
+        headerLine = headerLine + " " + padStr(t.headers[i], t.widths[i], "left") + " |"
+    }
+    push(lines, headerLine)
+    push(lines, sep)
+    
+    // Rows
+    for row in t.rows {
+        rowLine = "|"
+        for i in range(t.widths.len()) {
+            cell = i < row.len() ? row[i] : ""
+            rowLine = rowLine + " " + padStr(cell, t.widths[i], "left") + " |"
+        }
+        push(lines, rowLine)
+    }
+    push(lines, sep)
+    
+    return join(lines, "\n")
+}
+
+// Print table
+func tablePrint(t) {
+    print(tableRender(t))
+}
+
+// ==========================================
+// BOX DRAWING
+// ==========================================
+
+// Box styles
+func boxChars(style) {
+    case (style) {
+        "single":
+            return {tl: "+", tr: "+", bl: "+", br: "+", h: "-", v: "|"}
+        "double":
+            return {tl: "#", tr: "#", bl: "#", br: "#", h: "=", v: "#"}
+        "rounded":
+            return {tl: "/", tr: "\\", bl: "\\", br: "/", h: "-", v: "|"}
+        "heavy":
+            return {tl: "+", tr: "+", bl: "+", br: "+", h: "=", v: "|"}
+        "unicode-single":
+            return {tl: "┌", tr: "┐", bl: "└", br: "┘", h: "─", v: "│"}
+        "unicode-double":
+            return {tl: "╔", tr: "╗", bl: "╚", br: "╝", h: "═", v: "║"}
+        "unicode-rounded":
+            return {tl: "╭", tr: "╮", bl: "╰", br: "╯", h: "─", v: "│"}
+        "unicode-heavy":
+            return {tl: "┏", tr: "┓", bl: "┗", br: "┛", h: "━", v: "┃"}
+        default:
+            return {tl: "+", tr: "+", bl: "+", br: "+", h: "-", v: "|"}
+    }
+}
+
+// Draw a box around text
+func box(text, style, padding) {
+    if (style == null) { style = "single" }
+    if (padding == null) { padding = 1 }
+    
+    chars = boxChars(style)
+    lines = split(text, "\n")
+    
+    // Find max width
+    maxWidth = 0
+    for line in lines {
+        if (line.len() > maxWidth) { maxWidth = line.len() }
+    }
+    
+    innerWidth = maxWidth + padding * 2
+    
+    // Build box
+    result = []
+    
+    // Top border
+    top = chars.tl
+    for i in range(innerWidth) { top = top + chars.h }
+    top = top + chars.tr
+    push(result, top)
+    
+    // Padding lines (top)
+    for p in range(padding) {
+        padLine = chars.v
+        for i in range(innerWidth) { padLine = padLine + " " }
+        padLine = padLine + chars.v
+        push(result, padLine)
+    }
+    
+    // Content lines
+    for line in lines {
+        content = chars.v
+        for i in range(padding) { content = content + " " }
+        content = content + line
+        spacesNeeded = maxWidth - line.len()
+        for i in range(spacesNeeded) { content = content + " " }
+        for i in range(padding) { content = content + " " }
+        content = content + chars.v
+        push(result, content)
+    }
+    
+    // Padding lines (bottom)
+    for p in range(padding) {
+        padLine = chars.v
+        for i in range(innerWidth) { padLine = padLine + " " }
+        padLine = padLine + chars.v
+        push(result, padLine)
+    }
+    
+    // Bottom border
+    bottom = chars.bl
+    for i in range(innerWidth) { bottom = bottom + chars.h }
+    bottom = bottom + chars.br
+    push(result, bottom)
+    
+    return join(result, "\n")
+}
+
+// ==========================================
+// ARGUMENT PARSING
+// ==========================================
+
+// Parse command line arguments
+func parseArgs(args, options) {
+    result = {
+        _: [],           // Positional arguments
+        flags: {},       // Boolean flags
+        options: {}      // Key-value options
+    }
+    
+    i = 0
+    while (i < args.len()) {
+        arg = args[i]
+        
+        // Long option (--name or --name=value)
+        if (startsWith(arg, "--")) {
+            arg = slice(arg, 2, arg.len())
+            
+            eqIdx = indexOf(arg, "=")
+            if (eqIdx > 0) {
+                key = slice(arg, 0, eqIdx)
+                value = slice(arg, eqIdx + 1, arg.len())
+                result.options[key] = value
+            } else {
+                // Check if next arg is a value
+                if (i + 1 < args.len() && !startsWith(args[i + 1], "-")) {
+                    result.options[arg] = args[i + 1]
+                    i = i + 1
+                } else {
+                    result.flags[arg] = true
+                }
+            }
+        }
+        // Short option (-n or -n value)
+        else if (startsWith(arg, "-") && arg.len() > 1) {
+            key = slice(arg, 1, arg.len())
+            
+            // Multiple flags (-abc)
+            if (key.len() > 1 && indexOf(key, "=") < 0) {
+                for j in range(key.len()) {
+                    result.flags[key[j]] = true
+                }
+            } else {
+                eqIdx = indexOf(key, "=")
+                if (eqIdx > 0) {
+                    k = slice(key, 0, eqIdx)
+                    v = slice(key, eqIdx + 1, key.len())
+                    result.options[k] = v
+                } else if (i + 1 < args.len() && !startsWith(args[i + 1], "-")) {
+                    result.options[key] = args[i + 1]
+                    i = i + 1
+                } else {
+                    result.flags[key] = true
+                }
+            }
+        }
+        // Positional argument
+        else {
+            push(result._, arg)
+        }
+        
+        i = i + 1
+    }
+    
+    return result
+}
+
+// Check if flag is set
+func hasFlag(parsed, name) {
+    return hasKey(parsed.flags, name) && parsed.flags[name]
+}
+
+// Get option value
+func getOption(parsed, name, defaultVal) {
+    if (hasKey(parsed.options, name)) {
+        return parsed.options[name]
+    }
+    return defaultVal
+}
+
+// ==========================================
+// HELPERS
+// ==========================================
+
+func startsWith(str, prefix) {
+    if (prefix.len() > str.len()) { return false }
+    return slice(str, 0, prefix.len()) == prefix
+}
+
+func endsWith(str, suffix) {
+    if (suffix.len() > str.len()) { return false }
+    return slice(str, str.len() - suffix.len(), str.len()) == suffix
+}
+
+// ==========================================
+// PROMPTS (Basic - needs input support)
+// ==========================================
+
+// Format a prompt message
+func prompt(message) {
+    return fgCyan() + "? " + reset() + bold() + message + reset() + " "
+}
+
+// Format a confirm prompt
+func confirm(message) {
+    return prompt(message) + dim() + "(y/n)" + reset() + " "
+}
+
+// ==========================================
+// LISTS AND MENUS
+// ==========================================
+
+// Render a bulleted list
+func bulletList(items, bullet) {
+    if (bullet == null) { bullet = "*" }
+    lines = []
+    for item in items {
+        push(lines, "  " + bullet + " " + item)
+    }
+    return join(lines, "\n")
+}
+
+// Render a numbered list
+func numberedList(items, start) {
+    if (start == null) { start = 1 }
+    lines = []
+    for i in range(items.len()) {
+        num = str(start + i) + "."
+        while (num.len() < 4) { num = " " + num }
+        push(lines, num + " " + items[i])
+    }
+    return join(lines, "\n")
+}
+
+// Render a tree structure
+func tree(items, prefix) {
+    if (prefix == null) { prefix = "" }
+    lines = []
+    
+    for i in range(items.len()) {
+        item = items[i]
+        isLast = i == items.len() - 1
+        
+        connector = isLast ? "`-- " : "|-- "
+        
+        if (typeof(item) == "object" && hasKey(item, "name") && hasKey(item, "children")) {
+            push(lines, prefix + connector + item.name)
+            childPrefix = prefix + (isLast ? "    " : "|   ")
+            childLines = tree(item.children, childPrefix)
+            for line in split(childLines, "\n") {
+                push(lines, line)
+            }
+        } else {
+            push(lines, prefix + connector + str(item))
+        }
+    }
+    
+    return join(lines, "\n")
+}
+
+// ==========================================
+// LOGGING
+// ==========================================
+
+// Log levels - with colors
+func logDebug(msg) {
+    print(dim() + "[DEBUG] " + reset() + msg)
+}
+
+func logInfo(msg) {
+    print(fgCyan() + "[INFO] " + reset() + msg)
+}
+
+func logWarn(msg) {
+    print(fgYellow() + "[WARN] " + reset() + msg)
+}
+
+func logError(msg) {
+    print(fgRed() + "[ERROR] " + reset() + msg)
+}
+
+func logSuccess(msg) {
+    print(fgGreen() + "[OK] " + reset() + msg)
+}
+
+// ==========================================
+// STATUS MESSAGES
+// ==========================================
+
+func printSuccess(msg) { print(fgGreen() + "[OK] " + reset() + msg) }
+func printError(msg) { print(fgRed() + "[X] " + reset() + msg) }
+func printWarning(msg) { print(fgYellow() + "[!] " + reset() + msg) }
+func printInfo(msg) { print(fgCyan() + "[i] " + reset() + msg) }
+func printArrow(msg) { print(fgMagenta() + "-> " + reset() + msg) }
+func printStar(msg) { print(fgYellow() + "[*] " + reset() + msg) }
+
+// ==========================================
+// HORIZONTAL RULES
+// ==========================================
+
+func hr(width, char) {
+    if (width == null) { width = 40 }
+    if (char == null) { char = "-" }
+    
+    line = ""
+    for i in range(width) {
+        line = line + char
+    }
+    return line
+}
+
+func hrDouble(width) { return hr(width, "=") }
+func hrDashed(width) { return hr(width, "-") }
+func hrDotted(width) { return hr(width, ".") }

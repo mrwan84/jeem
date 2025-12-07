@@ -1,0 +1,1141 @@
+// ============================================
+// Collections Library for Jeem
+// ============================================
+// Stack, Queue, Set, LinkedList, PriorityQueue, etc.
+// ============================================
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
+// Remove and return first element (like JavaScript shift)
+func arrayShift(arr) {
+    if (arr.len() == 0) { return null }
+    first = arr[0]
+    newArr = []
+    for i in range(1, arr.len()) {
+        push(newArr, arr[i])
+    }
+    // Clear and refill original array
+    while (arr.len() > 0) { pop(arr) }
+    for item in newArr { push(arr, item) }
+    return first
+}
+
+// Add element to front (like JavaScript unshift)
+func arrayUnshift(arr, item) {
+    newArr = [item]
+    for i in range(arr.len()) {
+        push(newArr, arr[i])
+    }
+    // Clear and refill original array
+    while (arr.len() > 0) { pop(arr) }
+    for it in newArr { push(arr, it) }
+    return arr.len()
+}
+
+// ==========================================
+// STACK - Last In, First Out (LIFO)
+// ==========================================
+
+// Create a new Stack
+func Stack() {
+    return {
+        _type: "Stack",
+        items: []
+    }
+}
+
+// Push item onto stack
+func stackPush(s, item) {
+    push(s.items, item)
+    return s
+}
+
+// Pop item from stack
+func stackPop(s) {
+    if (s.items.len() == 0) { return null }
+    return pop(s.items)
+}
+
+// Peek at top item without removing
+func stackPeek(s) {
+    if (s.items.len() == 0) { return null }
+    return s.items[s.items.len() - 1]
+}
+
+// Check if stack is empty
+func stackEmpty(s) {
+    return s.items.len() == 0
+}
+
+// Get stack size
+func stackSize(s) {
+    return s.items.len()
+}
+
+// Clear stack
+func stackClear(s) {
+    s.items = []
+    return s
+}
+
+// Stack to array
+func stackToArray(s) {
+    result = []
+    for i in range(s.items.len() - 1, -1, -1) {
+        push(result, s.items[i])
+    }
+    return result
+}
+
+// ==========================================
+// QUEUE - First In, First Out (FIFO)
+// ==========================================
+
+// Create a new Queue
+func Queue() {
+    return {
+        _type: "Queue",
+        items: []
+    }
+}
+
+// Enqueue item (add to back)
+func enqueue(q, item) {
+    push(q.items, item)
+    return q
+}
+
+// Dequeue item (remove from front)
+func dequeue(q) {
+    if (q.items.len() == 0) { return null }
+    return arrayShift(q.items)
+}
+
+// Peek at front item without removing
+func queuePeek(q) {
+    if (q.items.len() == 0) { return null }
+    return q.items[0]
+}
+
+// Check if queue is empty
+func queueEmpty(q) {
+    return q.items.len() == 0
+}
+
+// Get queue size
+func queueSize(q) {
+    return q.items.len()
+}
+
+// Clear queue
+func queueClear(q) {
+    q.items = []
+    return q
+}
+
+// Queue to array
+func queueToArray(q) {
+    return clone(q.items)
+}
+
+// ==========================================
+// DEQUE - Double-Ended Queue
+// ==========================================
+
+// Create a new Deque
+func Deque() {
+    return {
+        _type: "Deque",
+        items: []
+    }
+}
+
+// Add to front
+func dequePushFront(d, item) {
+    arrayUnshift(d.items, item)
+    return d
+}
+
+// Add to back
+func dequePushBack(d, item) {
+    push(d.items, item)
+    return d
+}
+
+// Remove from front
+func dequePopFront(d) {
+    if (d.items.len() == 0) { return null }
+    return arrayShift(d.items)
+}
+
+// Remove from back
+func dequePopBack(d) {
+    if (d.items.len() == 0) { return null }
+    return pop(d.items)
+}
+
+// Peek front
+func dequePeekFront(d) {
+    if (d.items.len() == 0) { return null }
+    return d.items[0]
+}
+
+// Peek back
+func dequePeekBack(d) {
+    if (d.items.len() == 0) { return null }
+    return d.items[d.items.len() - 1]
+}
+
+// Check if empty
+func dequeEmpty(d) {
+    return d.items.len() == 0
+}
+
+// Get size
+func dequeSize(d) {
+    return d.items.len()
+}
+
+// ==========================================
+// SET - Unique values collection
+// ==========================================
+
+// Create a new Set
+func Set() {
+    return {
+        _type: "Set",
+        items: {}
+    }
+}
+
+// Create Set from array
+func SetFrom(arr) {
+    s = Set()
+    for item in arr {
+        setAdd(s, item)
+    }
+    return s
+}
+
+// Add item to set
+func setAdd(s, item) {
+    key = str(item)
+    s.items[key] = item
+    return s
+}
+
+// Remove item from set
+func setRemove(s, item) {
+    key = str(item)
+    if (hasKey(s.items, key)) {
+        delete(s.items, key)
+    }
+    return s
+}
+
+// Check if set contains item
+func setHas(s, item) {
+    key = str(item)
+    return hasKey(s.items, key)
+}
+
+// Get set size
+func setSize(s) {
+    return keys(s.items).len()
+}
+
+// Check if set is empty
+func setEmpty(s) {
+    return setSize(s) == 0
+}
+
+// Clear set
+func setClear(s) {
+    s.items = {}
+    return s
+}
+
+// Set to array
+func setToArray(s) {
+    result = []
+    for k in keys(s.items) {
+        push(result, s.items[k])
+    }
+    return result
+}
+
+// Set union (A ∪ B)
+func setUnion(s1, s2) {
+    result = Set()
+    for k in keys(s1.items) {
+        setAdd(result, s1.items[k])
+    }
+    for k in keys(s2.items) {
+        setAdd(result, s2.items[k])
+    }
+    return result
+}
+
+// Set intersection (A ∩ B)
+func setIntersection(s1, s2) {
+    result = Set()
+    for k in keys(s1.items) {
+        if (hasKey(s2.items, k)) {
+            setAdd(result, s1.items[k])
+        }
+    }
+    return result
+}
+
+// Set difference (A - B)
+func setDifference(s1, s2) {
+    result = Set()
+    for k in keys(s1.items) {
+        if (!hasKey(s2.items, k)) {
+            setAdd(result, s1.items[k])
+        }
+    }
+    return result
+}
+
+// Set symmetric difference (A △ B)
+func setSymmetricDiff(s1, s2) {
+    result = Set()
+    for k in keys(s1.items) {
+        if (!hasKey(s2.items, k)) {
+            setAdd(result, s1.items[k])
+        }
+    }
+    for k in keys(s2.items) {
+        if (!hasKey(s1.items, k)) {
+            setAdd(result, s2.items[k])
+        }
+    }
+    return result
+}
+
+// Check if subset (A ⊆ B)
+func setIsSubset(s1, s2) {
+    for k in keys(s1.items) {
+        if (!hasKey(s2.items, k)) {
+            return false
+        }
+    }
+    return true
+}
+
+// Check if superset (A ⊇ B)
+func setIsSuperset(s1, s2) {
+    return setIsSubset(s2, s1)
+}
+
+// Check if sets are equal
+func setEquals(s1, s2) {
+    return setSize(s1) == setSize(s2) && setIsSubset(s1, s2)
+}
+
+// ==========================================
+// MAP - Key-Value pairs with order
+// ==========================================
+
+// Create a new Map
+func Map() {
+    return {
+        _type: "Map",
+        items: {},
+        order: []
+    }
+}
+
+// Set key-value pair
+func mapSet(m, key, value) {
+    keyStr = str(key)
+    if (!hasKey(m.items, keyStr)) {
+        push(m.order, keyStr)
+    }
+    m.items[keyStr] = {key: key, value: value}
+    return m
+}
+
+// Get value by key
+func mapGet(m, key) {
+    keyStr = str(key)
+    if (hasKey(m.items, keyStr)) {
+        return m.items[keyStr].value
+    }
+    return null
+}
+
+// Check if key exists
+func mapHas(m, key) {
+    return hasKey(m.items, str(key))
+}
+
+// Delete key
+func mapDelete(m, key) {
+    keyStr = str(key)
+    if (hasKey(m.items, keyStr)) {
+        delete(m.items, keyStr)
+        // Remove from order
+        newOrder = []
+        for k in m.order {
+            if (k != keyStr) {
+                push(newOrder, k)
+            }
+        }
+        m.order = newOrder
+    }
+    return m
+}
+
+// Get map size
+func mapSize(m) {
+    return m.order.len()
+}
+
+// Get all keys
+func mapKeys(m) {
+    result = []
+    for k in m.order {
+        push(result, m.items[k].key)
+    }
+    return result
+}
+
+// Get all values
+func mapValues(m) {
+    result = []
+    for k in m.order {
+        push(result, m.items[k].value)
+    }
+    return result
+}
+
+// Get all entries as array of [key, value]
+func mapEntries(m) {
+    result = []
+    for k in m.order {
+        push(result, [m.items[k].key, m.items[k].value])
+    }
+    return result
+}
+
+// Clear map
+func mapClear(m) {
+    m.items = {}
+    m.order = []
+    return m
+}
+
+// ==========================================
+// LINKED LIST - Doubly linked
+// ==========================================
+
+// Create a linked list node
+func ListNode(value) {
+    return {
+        value: value,
+        prev: null,
+        next: null
+    }
+}
+
+// Create a new LinkedList
+func LinkedList() {
+    return {
+        _type: "LinkedList",
+        head: null,
+        tail: null,
+        size: 0
+    }
+}
+
+// Add to front
+func listPrepend(list, value) {
+    node = ListNode(value)
+    if (list.head == null) {
+        list.head = node
+        list.tail = node
+    } else {
+        node.next = list.head
+        list.head.prev = node
+        list.head = node
+    }
+    list.size = list.size + 1
+    return list
+}
+
+// Add to back
+func listAppend(list, value) {
+    node = ListNode(value)
+    if (list.tail == null) {
+        list.head = node
+        list.tail = node
+    } else {
+        node.prev = list.tail
+        list.tail.next = node
+        list.tail = node
+    }
+    list.size = list.size + 1
+    return list
+}
+
+// Remove from front
+func listShift(list) {
+    if (list.head == null) { return null }
+    value = list.head.value
+    if (list.head == list.tail) {
+        list.head = null
+        list.tail = null
+    } else {
+        list.head = list.head.next
+        list.head.prev = null
+    }
+    list.size = list.size - 1
+    return value
+}
+
+// Remove from back
+func listPop(list) {
+    if (list.tail == null) { return null }
+    value = list.tail.value
+    if (list.head == list.tail) {
+        list.head = null
+        list.tail = null
+    } else {
+        list.tail = list.tail.prev
+        list.tail.next = null
+    }
+    list.size = list.size - 1
+    return value
+}
+
+// Get first value
+func listFirst(list) {
+    if (list.head == null) { return null }
+    return list.head.value
+}
+
+// Get last value
+func listLast(list) {
+    if (list.tail == null) { return null }
+    return list.tail.value
+}
+
+// Get value at index
+func listGet(list, index) {
+    if (index < 0 || index >= list.size) { return null }
+    
+    node = null
+    
+    // Start from closer end
+    if (index < list.size / 2) {
+        node = list.head
+        for i in range(index) {
+            node = node.next
+        }
+    } else {
+        node = list.tail
+        for i in range(list.size - 1 - index) {
+            node = node.prev
+        }
+    }
+    return node.value
+}
+
+// Check if list contains value
+func listContains(list, value) {
+    node = list.head
+    while (node != null) {
+        if (node.value == value) { return true }
+        node = node.next
+    }
+    return false
+}
+
+// Get list size
+func listSize(list) {
+    return list.size
+}
+
+// Check if list is empty
+func listEmpty(list) {
+    return list.size == 0
+}
+
+// Convert list to array
+func listToArray(list) {
+    result = []
+    node = list.head
+    while (node != null) {
+        push(result, node.value)
+        node = node.next
+    }
+    return result
+}
+
+// Create list from array
+func ListFrom(arr) {
+    list = LinkedList()
+    for item in arr {
+        listAppend(list, item)
+    }
+    return list
+}
+
+// Reverse the list
+func listReverse(list) {
+    node = list.head
+    while (node != null) {
+        temp = node.next
+        node.next = node.prev
+        node.prev = temp
+        node = temp
+    }
+    temp = list.head
+    list.head = list.tail
+    list.tail = temp
+    return list
+}
+
+// ==========================================
+// PRIORITY QUEUE - Heap-based
+// ==========================================
+
+// Create a PriorityQueue (min-heap by default)
+func PriorityQueue(isMaxHeap) {
+    if (isMaxHeap == null) { isMaxHeap = false }
+    return {
+        _type: "PriorityQueue",
+        items: [],
+        isMax: isMaxHeap
+    }
+}
+
+// Helper: parent index
+func pqParent(i) { return int((i - 1) / 2) }
+
+// Helper: left child index
+func pqLeft(i) { return 2 * i + 1 }
+
+// Helper: right child index
+func pqRight(i) { return 2 * i + 2 }
+
+// Helper: compare based on heap type
+func pqCompare(pq, a, b) {
+    if (pq.isMax) {
+        return a.priority > b.priority
+    }
+    return a.priority < b.priority
+}
+
+// Helper: swap items
+func pqSwap(pq, i, j) {
+    temp = pq.items[i]
+    pq.items[i] = pq.items[j]
+    pq.items[j] = temp
+}
+
+// Helper: bubble up
+func pqBubbleUp(pq, i) {
+    while (i > 0) {
+        parent = pqParent(i)
+        if (pqCompare(pq, pq.items[i], pq.items[parent])) {
+            pqSwap(pq, i, parent)
+            i = parent
+        } else {
+            break
+        }
+    }
+}
+
+// Helper: bubble down
+func pqBubbleDown(pq, i) {
+    size = pq.items.len()
+    while (true) {
+        best = i
+        left = pqLeft(i)
+        right = pqRight(i)
+        
+        if (left < size && pqCompare(pq, pq.items[left], pq.items[best])) {
+            best = left
+        }
+        if (right < size && pqCompare(pq, pq.items[right], pq.items[best])) {
+            best = right
+        }
+        
+        if (best == i) { break }
+        pqSwap(pq, i, best)
+        i = best
+    }
+}
+
+// Enqueue with priority
+func pqEnqueue(pq, value, priority) {
+    push(pq.items, {value: value, priority: priority})
+    pqBubbleUp(pq, pq.items.len() - 1)
+    return pq
+}
+
+// Dequeue highest/lowest priority
+func pqDequeue(pq) {
+    if (pq.items.len() == 0) { return null }
+    
+    result = pq.items[0].value
+    last = pop(pq.items)
+    
+    if (pq.items.len() > 0) {
+        pq.items[0] = last
+        pqBubbleDown(pq, 0)
+    }
+    
+    return result
+}
+
+// Peek at highest/lowest priority
+func pqPeek(pq) {
+    if (pq.items.len() == 0) { return null }
+    return pq.items[0].value
+}
+
+// Get size
+func pqSize(pq) {
+    return pq.items.len()
+}
+
+// Check if empty
+func pqEmpty(pq) {
+    return pq.items.len() == 0
+}
+
+// ==========================================
+// RING BUFFER - Circular buffer
+// ==========================================
+
+// Create a RingBuffer with fixed capacity
+func RingBuffer(capacity) {
+    items = []
+    for i in range(capacity) {
+        push(items, null)
+    }
+    return {
+        _type: "RingBuffer",
+        items: items,
+        capacity: capacity,
+        head: 0,
+        tail: 0,
+        size: 0
+    }
+}
+
+// Write to buffer
+func rbWrite(rb, value) {
+    rb.items[rb.tail] = value
+    rb.tail = (rb.tail + 1) % rb.capacity
+    
+    if (rb.size < rb.capacity) {
+        rb.size = rb.size + 1
+    } else {
+        rb.head = (rb.head + 1) % rb.capacity
+    }
+    return rb
+}
+
+// Read from buffer
+func rbRead(rb) {
+    if (rb.size == 0) { return null }
+    
+    value = rb.items[rb.head]
+    rb.head = (rb.head + 1) % rb.capacity
+    rb.size = rb.size - 1
+    return value
+}
+
+// Peek at head
+func rbPeek(rb) {
+    if (rb.size == 0) { return null }
+    return rb.items[rb.head]
+}
+
+// Get size
+func rbSize(rb) {
+    return rb.size
+}
+
+// Check if empty
+func rbEmpty(rb) {
+    return rb.size == 0
+}
+
+// Check if full
+func rbFull(rb) {
+    return rb.size == rb.capacity
+}
+
+// Get all items as array
+func rbToArray(rb) {
+    result = []
+    for i in range(rb.size) {
+        idx = (rb.head + i) % rb.capacity
+        push(result, rb.items[idx])
+    }
+    return result
+}
+
+// ==========================================
+// TRIE - Prefix tree for strings
+// ==========================================
+
+// Create a Trie node
+func TrieNode() {
+    return {
+        children: {},
+        isEnd: false,
+        value: null
+    }
+}
+
+// Create a new Trie
+func Trie() {
+    return {
+        _type: "Trie",
+        root: TrieNode()
+    }
+}
+
+// Insert word into trie
+func trieInsert(trie, word, value) {
+    if (value == null) { value = true }
+    node = trie.root
+    
+    for i in range(word.len()) {
+        c = word[i]
+        if (!hasKey(node.children, c)) {
+            node.children[c] = TrieNode()
+        }
+        node = node.children[c]
+    }
+    
+    node.isEnd = true
+    node.value = value
+    return trie
+}
+
+// Search for exact word
+func trieSearch(trie, word) {
+    node = trie.root
+    
+    for i in range(word.len()) {
+        c = word[i]
+        if (!hasKey(node.children, c)) {
+            return null
+        }
+        node = node.children[c]
+    }
+    
+    if (node.isEnd) {
+        return node.value
+    }
+    return null
+}
+
+// Check if word exists
+func trieHas(trie, word) {
+    return trieSearch(trie, word) != null
+}
+
+// Check if prefix exists
+func trieHasPrefix(trie, prefix) {
+    node = trie.root
+    
+    for i in range(prefix.len()) {
+        c = prefix[i]
+        if (!hasKey(node.children, c)) {
+            return false
+        }
+        node = node.children[c]
+    }
+    
+    return true
+}
+
+// Get all words with prefix
+func trieWithPrefix(trie, prefix) {
+    results = []
+    node = trie.root
+    
+    // Navigate to prefix node
+    for i in range(prefix.len()) {
+        c = prefix[i]
+        if (!hasKey(node.children, c)) {
+            return results
+        }
+        node = node.children[c]
+    }
+    
+    // Collect all words from this node
+    trieCollect(node, prefix, results)
+    return results
+}
+
+// Helper: collect all words from node
+func trieCollect(node, prefix, results) {
+    if (node.isEnd) {
+        push(results, prefix)
+    }
+    for c in keys(node.children) {
+        trieCollect(node.children[c], prefix + c, results)
+    }
+}
+
+// ==========================================
+// COUNTER - Count occurrences
+// ==========================================
+
+// Create a Counter
+func Counter() {
+    return {
+        _type: "Counter",
+        counts: {}
+    }
+}
+
+// Create Counter from array
+func CounterFrom(arr) {
+    c = Counter()
+    for item in arr {
+        counterAdd(c, item)
+    }
+    return c
+}
+
+// Add item (increment count)
+func counterAdd(c, item, count) {
+    if (count == null) { count = 1 }
+    key = str(item)
+    if (hasKey(c.counts, key)) {
+        c.counts[key] = c.counts[key] + count
+    } else {
+        c.counts[key] = count
+    }
+    return c
+}
+
+// Get count for item
+func counterGet(c, item) {
+    key = str(item)
+    if (hasKey(c.counts, key)) {
+        return c.counts[key]
+    }
+    return 0
+}
+
+// Get most common items
+func counterMostCommon(c, n) {
+    if (n == null) { n = 10 }
+    
+    // Convert to array of [key, count]
+    pairs = []
+    for key in keys(c.counts) {
+        push(pairs, {key: key, count: c.counts[key]})
+    }
+    
+    // Sort by count descending (bubble sort)
+    for i in range(pairs.len()) {
+        for j in range(i + 1, pairs.len()) {
+            if (pairs[j].count > pairs[i].count) {
+                temp = pairs[i]
+                pairs[i] = pairs[j]
+                pairs[j] = temp
+            }
+        }
+    }
+    
+    // Return top n
+    result = []
+    limit = n < pairs.len() ? n : pairs.len()
+    for i in range(limit) {
+        push(result, [pairs[i].key, pairs[i].count])
+    }
+    return result
+}
+
+// Get total count
+func counterTotal(c) {
+    total = 0
+    for key in keys(c.counts) {
+        total = total + c.counts[key]
+    }
+    return total
+}
+
+// Get all items
+func counterItems(c) {
+    return keys(c.counts)
+}
+
+// ==========================================
+// DEFAULT DICT - Dict with default values
+// ==========================================
+
+// Create a DefaultDict
+func DefaultDict(defaultValue) {
+    return {
+        _type: "DefaultDict",
+        items: {},
+        defaultValue: defaultValue
+    }
+}
+
+// Get value (returns default if not exists)
+func ddGet(dd, key) {
+    keyStr = str(key)
+    if (hasKey(dd.items, keyStr)) {
+        return dd.items[keyStr]
+    }
+    // Clone default value if it's an array or object
+    if (typeof(dd.defaultValue) == "array") {
+        return clone(dd.defaultValue)
+    }
+    if (typeof(dd.defaultValue) == "object") {
+        return clone(dd.defaultValue)
+    }
+    return dd.defaultValue
+}
+
+// Set value
+func ddSet(dd, key, value) {
+    dd.items[str(key)] = value
+    return dd
+}
+
+// Get or create value
+func ddGetOrCreate(dd, key) {
+    keyStr = str(key)
+    if (!hasKey(dd.items, keyStr)) {
+        if (typeof(dd.defaultValue) == "array") {
+            dd.items[keyStr] = []
+        } else if (typeof(dd.defaultValue) == "object") {
+            dd.items[keyStr] = {}
+        } else {
+            dd.items[keyStr] = dd.defaultValue
+        }
+    }
+    return dd.items[keyStr]
+}
+
+// Check if key exists
+func ddHas(dd, key) {
+    return hasKey(dd.items, str(key))
+}
+
+// Get all keys
+func ddKeys(dd) {
+    return keys(dd.items)
+}
+
+// ==========================================
+// SORTED LIST - Maintains sorted order
+// ==========================================
+
+// Create a SortedList
+func SortedList(descending) {
+    if (descending == null) { descending = false }
+    return {
+        _type: "SortedList",
+        items: [],
+        desc: descending
+    }
+}
+
+// Insert item maintaining order
+func slInsert(sl, value) {
+    // Find insertion point (binary search would be better but this is simpler)
+    idx = 0
+    for i in range(sl.items.len()) {
+        if (sl.desc) {
+            if (value > sl.items[i]) { break }
+        } else {
+            if (value < sl.items[i]) { break }
+        }
+        idx = i + 1
+    }
+    
+    // Insert at position
+    newItems = []
+    for i in range(idx) {
+        push(newItems, sl.items[i])
+    }
+    push(newItems, value)
+    for i in range(idx, sl.items.len()) {
+        push(newItems, sl.items[i])
+    }
+    sl.items = newItems
+    return sl
+}
+
+// Remove first occurrence
+func slRemove(sl, value) {
+    newItems = []
+    removed = false
+    for item in sl.items {
+        if (!removed && item == value) {
+            removed = true
+        } else {
+            push(newItems, item)
+        }
+    }
+    sl.items = newItems
+    return sl
+}
+
+// Get item at index
+func slGet(sl, idx) {
+    return sl.items[idx]
+}
+
+// Get size
+func slSize(sl) {
+    return sl.items.len()
+}
+
+// Check if contains
+func slContains(sl, value) {
+    for item in sl.items {
+        if (item == value) { return true }
+    }
+    return false
+}
+
+// Get min (first in ascending, last in descending)
+func slMin(sl) {
+    if (sl.items.len() == 0) { return null }
+    return sl.desc ? sl.items[sl.items.len() - 1] : sl.items[0]
+}
+
+// Get max (last in ascending, first in descending)
+func slMax(sl) {
+    if (sl.items.len() == 0) { return null }
+    return sl.desc ? sl.items[0] : sl.items[sl.items.len() - 1]
+}
+
+// To array
+func slToArray(sl) {
+    return clone(sl.items)
+}
+
+// ==========================================
+// UTILITY FUNCTIONS
+// ==========================================
+
+// Check collection type
+func isStack(obj) { return typeof(obj) == "object" && obj._type == "Stack" }
+func isQueue(obj) { return typeof(obj) == "object" && obj._type == "Queue" }
+func isSet(obj) { return typeof(obj) == "object" && obj._type == "Set" }
+func isMap(obj) { return typeof(obj) == "object" && obj._type == "Map" }
+func isLinkedList(obj) { return typeof(obj) == "object" && obj._type == "LinkedList" }
+func isPriorityQueue(obj) { return typeof(obj) == "object" && obj._type == "PriorityQueue" }
+func isTrie(obj) { return typeof(obj) == "object" && obj._type == "Trie" }
+func isCounter(obj) { return typeof(obj) == "object" && obj._type == "Counter" }

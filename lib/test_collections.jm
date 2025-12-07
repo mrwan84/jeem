@@ -1,0 +1,219 @@
+// ============================================
+// Collections Library Test
+// ============================================
+
+import "modules/collections.jm" as col
+
+print("=== COLLECTIONS LIBRARY TEST ===\n")
+
+// --- Stack ---
+print("--- Stack (LIFO) ---")
+s = col.Stack()
+col.stackPush(s, "first")
+col.stackPush(s, "second")
+col.stackPush(s, "third")
+print("Stack after pushes:", col.stackToArray(s))
+print("Peek:", col.stackPeek(s))
+print("Pop:", col.stackPop(s))
+print("Pop:", col.stackPop(s))
+print("Stack now:", col.stackToArray(s))
+print("Size:", col.stackSize(s))
+print("Empty:", col.stackEmpty(s))
+
+// --- Queue ---
+print("\n--- Queue (FIFO) ---")
+q = col.Queue()
+col.enqueue(q, "first")
+col.enqueue(q, "second")
+col.enqueue(q, "third")
+print("Queue after enqueues:", col.queueToArray(q))
+print("Peek:", col.queuePeek(q))
+print("Dequeue:", col.dequeue(q))
+print("Dequeue:", col.dequeue(q))
+print("Queue now:", col.queueToArray(q))
+print("Size:", col.queueSize(q))
+
+// --- Deque ---
+print("\n--- Deque (Double-Ended Queue) ---")
+d = col.Deque()
+col.dequePushBack(d, 1)
+col.dequePushBack(d, 2)
+col.dequePushFront(d, 0)
+col.dequePushFront(d, -1)
+print("Deque:", d.items)
+print("Peek front:", col.dequePeekFront(d))
+print("Peek back:", col.dequePeekBack(d))
+print("Pop front:", col.dequePopFront(d))
+print("Pop back:", col.dequePopBack(d))
+print("Deque now:", d.items)
+
+// --- Set ---
+print("\n--- Set ---")
+set1 = col.Set()
+col.setAdd(set1, 1)
+col.setAdd(set1, 2)
+col.setAdd(set1, 3)
+col.setAdd(set1, 2)  // Duplicate
+print("Set:", col.setToArray(set1))
+print("Has 2:", col.setHas(set1, 2))
+print("Has 5:", col.setHas(set1, 5))
+print("Size:", col.setSize(set1))
+
+set2 = col.SetFrom([2, 3, 4, 5])
+print("\nSet1:", col.setToArray(set1))
+print("Set2:", col.setToArray(set2))
+print("Union:", col.setToArray(col.setUnion(set1, set2)))
+print("Intersection:", col.setToArray(col.setIntersection(set1, set2)))
+print("Difference (Set1 - Set2):", col.setToArray(col.setDifference(set1, set2)))
+print("Symmetric Diff:", col.setToArray(col.setSymmetricDiff(set1, set2)))
+
+subset = col.SetFrom([1, 2])
+print("Is [1,2] subset of Set1:", col.setIsSubset(subset, set1))
+print("Sets equal:", col.setEquals(set1, set2))
+
+// --- Map ---
+print("\n--- Map (Ordered) ---")
+m = col.Map()
+col.mapSet(m, "name", "Alice")
+col.mapSet(m, "age", 30)
+col.mapSet(m, "city", "Berlin")
+print("Get name:", col.mapGet(m, "name"))
+print("Get age:", col.mapGet(m, "age"))
+print("Has city:", col.mapHas(m, "city"))
+print("Has country:", col.mapHas(m, "country"))
+print("Keys:", col.mapKeys(m))
+print("Values:", col.mapValues(m))
+print("Entries:", col.mapEntries(m))
+print("Size:", col.mapSize(m))
+
+// --- LinkedList ---
+print("\n--- LinkedList ---")
+list = col.LinkedList()
+col.listAppend(list, 1)
+col.listAppend(list, 2)
+col.listAppend(list, 3)
+col.listPrepend(list, 0)
+print("List:", col.listToArray(list))
+print("First:", col.listFirst(list))
+print("Last:", col.listLast(list))
+print("Get(2):", col.listGet(list, 2))
+print("Contains 2:", col.listContains(list, 2))
+print("Contains 5:", col.listContains(list, 5))
+print("Size:", col.listSize(list))
+
+print("Shift:", col.listShift(list))
+print("Pop:", col.listPop(list))
+print("List now:", col.listToArray(list))
+
+list2 = col.ListFrom([5, 4, 3, 2, 1])
+print("From array:", col.listToArray(list2))
+col.listReverse(list2)
+print("Reversed:", col.listToArray(list2))
+
+// --- Priority Queue ---
+print("\n--- Priority Queue ---")
+pq = col.PriorityQueue(false)  // Min-heap
+col.pqEnqueue(pq, "low priority", 10)
+col.pqEnqueue(pq, "high priority", 1)
+col.pqEnqueue(pq, "medium priority", 5)
+col.pqEnqueue(pq, "urgent", 0)
+
+print("Min-heap dequeue order:")
+while (!col.pqEmpty(pq)) {
+    print("  ", col.pqDequeue(pq))
+}
+
+pqMax = col.PriorityQueue(true)  // Max-heap
+col.pqEnqueue(pqMax, "low", 1)
+col.pqEnqueue(pqMax, "high", 10)
+col.pqEnqueue(pqMax, "medium", 5)
+
+print("\nMax-heap dequeue order:")
+while (!col.pqEmpty(pqMax)) {
+    print("  ", col.pqDequeue(pqMax))
+}
+
+// --- Ring Buffer ---
+print("\n--- Ring Buffer ---")
+rb = col.RingBuffer(3)
+col.rbWrite(rb, "a")
+col.rbWrite(rb, "b")
+col.rbWrite(rb, "c")
+print("Buffer:", col.rbToArray(rb))
+print("Full:", col.rbFull(rb))
+
+col.rbWrite(rb, "d")  // Overwrites oldest
+print("After write 'd':", col.rbToArray(rb))
+
+print("Read:", col.rbRead(rb))
+print("Read:", col.rbRead(rb))
+print("Buffer now:", col.rbToArray(rb))
+
+// --- Trie ---
+print("\n--- Trie (Prefix Tree) ---")
+trie = col.Trie()
+col.trieInsert(trie, "hello", 1)
+col.trieInsert(trie, "help", 2)
+col.trieInsert(trie, "world", 3)
+col.trieInsert(trie, "word", 4)
+col.trieInsert(trie, "work", 5)
+
+print("Has 'hello':", col.trieHas(trie, "hello"))
+print("Has 'hel':", col.trieHas(trie, "hel"))
+print("HasPrefix 'hel':", col.trieHasPrefix(trie, "hel"))
+print("HasPrefix 'xyz':", col.trieHasPrefix(trie, "xyz"))
+print("Search 'help':", col.trieSearch(trie, "help"))
+print("Words with 'wo':", col.trieWithPrefix(trie, "wo"))
+print("Words with 'hel':", col.trieWithPrefix(trie, "hel"))
+
+// --- Counter ---
+print("\n--- Counter ---")
+c = col.CounterFrom(["apple", "banana", "apple", "cherry", "apple", "banana"])
+print("apple count:", col.counterGet(c, "apple"))
+print("banana count:", col.counterGet(c, "banana"))
+print("orange count:", col.counterGet(c, "orange"))
+print("Total:", col.counterTotal(c))
+print("Most common(2):", col.counterMostCommon(c, 2))
+
+// --- DefaultDict ---
+print("\n--- DefaultDict ---")
+dd = col.DefaultDict(0)
+col.ddSet(dd, "a", 1)
+print("Get 'a':", col.ddGet(dd, "a"))
+print("Get 'b' (default):", col.ddGet(dd, "b"))
+
+// DefaultDict with array default
+ddArr = col.DefaultDict([])
+arr = col.ddGetOrCreate(ddArr, "items")
+push(arr, "first")
+push(arr, "second")
+print("items:", col.ddGet(ddArr, "items"))
+
+// --- Sorted List ---
+print("\n--- Sorted List ---")
+sl = col.SortedList(false)  // Ascending
+col.slInsert(sl, 5)
+col.slInsert(sl, 2)
+col.slInsert(sl, 8)
+col.slInsert(sl, 1)
+col.slInsert(sl, 9)
+print("Sorted (asc):", col.slToArray(sl))
+print("Min:", col.slMin(sl))
+print("Max:", col.slMax(sl))
+print("Contains 5:", col.slContains(sl, 5))
+
+slDesc = col.SortedList(true)  // Descending
+col.slInsert(slDesc, 5)
+col.slInsert(slDesc, 2)
+col.slInsert(slDesc, 8)
+col.slInsert(slDesc, 1)
+print("Sorted (desc):", col.slToArray(slDesc))
+
+// --- Type Checking ---
+print("\n--- Type Checking ---")
+print("isStack(Stack()):", col.isStack(col.Stack()))
+print("isQueue(Queue()):", col.isQueue(col.Queue()))
+print("isSet(Set()):", col.isSet(col.Set()))
+print("isStack(Queue()):", col.isStack(col.Queue()))
+
+print("\n=== COLLECTIONS LIBRARY TEST COMPLETE ===")

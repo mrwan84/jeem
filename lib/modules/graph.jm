@@ -1,0 +1,879 @@
+// ============================================
+// Graph Library for Jeem
+// ============================================
+// Graph data structure, BFS, DFS, Dijkstra, etc.
+// ============================================
+
+// ==========================================
+// GRAPH CREATION
+// ==========================================
+
+// Create an undirected graph
+func Graph() {
+    return {
+        _type: "Graph",
+        directed: false,
+        weighted: false,
+        nodes: {},
+        edges: []
+    }
+}
+
+// Create a directed graph
+func DiGraph() {
+    g = Graph()
+    g.directed = true
+    return g
+}
+
+// Create a weighted graph
+func WeightedGraph() {
+    g = Graph()
+    g.weighted = true
+    return g
+}
+
+// Create a weighted directed graph
+func WeightedDiGraph() {
+    g = Graph()
+    g.directed = true
+    g.weighted = true
+    return g
+}
+
+// ==========================================
+// NODE OPERATIONS
+// ==========================================
+
+// Add a node
+func addNode(g, id, data) {
+    if (!hasKey(g.nodes, str(id))) {
+        g.nodes[str(id)] = {
+            id: id,
+            data: data,
+            neighbors: []
+        }
+    } else if (data != null) {
+        g.nodes[str(id)].data = data
+    }
+    return g
+}
+
+// Remove a node
+func removeNode(g, id) {
+    idStr = str(id)
+    if (!hasKey(g.nodes, idStr)) { return g }
+    
+    // Remove from neighbors lists
+    for key in keys(g.nodes) {
+        node = g.nodes[key]
+        newNeighbors = []
+        for n in node.neighbors {
+            if (str(n.id) != idStr) {
+                push(newNeighbors, n)
+            }
+        }
+        node.neighbors = newNeighbors
+    }
+    
+    // Remove edges
+    newEdges = []
+    for e in g.edges {
+        if (str(e.from) != idStr && str(e.to) != idStr) {
+            push(newEdges, e)
+        }
+    }
+    g.edges = newEdges
+    
+    // Remove node
+    delete(g.nodes, idStr)
+    return g
+}
+
+// Get node by id
+func getNode(g, id) {
+    idStr = str(id)
+    if (hasKey(g.nodes, idStr)) {
+        return g.nodes[idStr]
+    }
+    return null
+}
+
+// Check if node exists
+func hasNode(g, id) {
+    return hasKey(g.nodes, str(id))
+}
+
+// Get all node ids
+func getNodes(g) {
+    result = []
+    for key in keys(g.nodes) {
+        push(result, g.nodes[key].id)
+    }
+    return result
+}
+
+// Get node count
+func nodeCount(g) {
+    return keys(g.nodes).len()
+}
+
+// Set node data
+func setNodeData(g, id, data) {
+    idStr = str(id)
+    if (hasKey(g.nodes, idStr)) {
+        g.nodes[idStr].data = data
+    }
+    return g
+}
+
+// Get node data
+func getNodeData(g, id) {
+    node = getNode(g, id)
+    if (node != null) {
+        return node.data
+    }
+    return null
+}
+
+// ==========================================
+// EDGE OPERATIONS
+// ==========================================
+
+// Add an edge
+func addEdge(g, from, to, weight) {
+    if (weight == null) { weight = 1 }
+    
+    // Ensure nodes exist
+    addNode(g, from, null)
+    addNode(g, to, null)
+    
+    fromNode = g.nodes[str(from)]
+    toNode = g.nodes[str(to)]
+    
+    // Add to neighbors
+    push(fromNode.neighbors, {id: to, weight: weight})
+    
+    if (!g.directed) {
+        push(toNode.neighbors, {id: from, weight: weight})
+    }
+    
+    // Add to edges list
+    push(g.edges, {from: from, to: to, weight: weight})
+    
+    return g
+}
+
+// Remove an edge
+func removeEdge(g, from, to) {
+    fromStr = str(from)
+    toStr = str(to)
+    
+    // Remove from neighbors
+    if (hasKey(g.nodes, fromStr)) {
+        node = g.nodes[fromStr]
+        newNeighbors = []
+        for n in node.neighbors {
+            if (str(n.id) != toStr) {
+                push(newNeighbors, n)
+            }
+        }
+        node.neighbors = newNeighbors
+    }
+    
+    if (!g.directed && hasKey(g.nodes, toStr)) {
+        node = g.nodes[toStr]
+        newNeighbors = []
+        for n in node.neighbors {
+            if (str(n.id) != fromStr) {
+                push(newNeighbors, n)
+            }
+        }
+        node.neighbors = newNeighbors
+    }
+    
+    // Remove from edges list
+    newEdges = []
+    for e in g.edges {
+        keep = true
+        if (str(e.from) == fromStr && str(e.to) == toStr) {
+            keep = false
+        }
+        if (!g.directed && str(e.from) == toStr && str(e.to) == fromStr) {
+            keep = false
+        }
+        if (keep) {
+            push(newEdges, e)
+        }
+    }
+    g.edges = newEdges
+    
+    return g
+}
+
+// Check if edge exists
+func hasEdge(g, from, to) {
+    fromStr = str(from)
+    toStr = str(to)
+    
+    if (!hasKey(g.nodes, fromStr)) { return false }
+    
+    node = g.nodes[fromStr]
+    for n in node.neighbors {
+        if (str(n.id) == toStr) { return true }
+    }
+    return false
+}
+
+// Get edge weight
+func getWeight(g, from, to) {
+    fromStr = str(from)
+    if (!hasKey(g.nodes, fromStr)) { return null }
+    
+    node = g.nodes[fromStr]
+    for n in node.neighbors {
+        if (str(n.id) == str(to)) {
+            return n.weight
+        }
+    }
+    return null
+}
+
+// Set edge weight
+func setWeight(g, from, to, weight) {
+    fromStr = str(from)
+    toStr = str(to)
+    
+    if (hasKey(g.nodes, fromStr)) {
+        node = g.nodes[fromStr]
+        for n in node.neighbors {
+            if (str(n.id) == toStr) {
+                n.weight = weight
+            }
+        }
+    }
+    
+    if (!g.directed && hasKey(g.nodes, toStr)) {
+        node = g.nodes[toStr]
+        for n in node.neighbors {
+            if (str(n.id) == fromStr) {
+                n.weight = weight
+            }
+        }
+    }
+    
+    // Update edges list
+    for e in g.edges {
+        if (str(e.from) == fromStr && str(e.to) == toStr) {
+            e.weight = weight
+        }
+        if (!g.directed && str(e.from) == toStr && str(e.to) == fromStr) {
+            e.weight = weight
+        }
+    }
+    
+    return g
+}
+
+// Get all edges
+func getEdges(g) {
+    return g.edges
+}
+
+// Get edge count
+func edgeCount(g) {
+    return g.edges.len()
+}
+
+// Get neighbors of a node
+func neighbors(g, id) {
+    node = getNode(g, id)
+    if (node == null) { return [] }
+    
+    result = []
+    for n in node.neighbors {
+        push(result, n.id)
+    }
+    return result
+}
+
+// Get degree of a node (number of edges)
+func degree(g, id) {
+    node = getNode(g, id)
+    if (node == null) { return 0 }
+    return node.neighbors.len()
+}
+
+// Get in-degree (for directed graphs)
+func inDegree(g, id) {
+    if (!g.directed) { return degree(g, id) }
+    
+    count = 0
+    idStr = str(id)
+    for e in g.edges {
+        if (str(e.to) == idStr) {
+            count = count + 1
+        }
+    }
+    return count
+}
+
+// Get out-degree (for directed graphs)
+func outDegree(g, id) {
+    if (!g.directed) { return degree(g, id) }
+    return degree(g, id)
+}
+
+// ==========================================
+// GRAPH TRAVERSAL
+// ==========================================
+
+// Breadth-First Search
+func bfs(g, start, callback) {
+    visited = {}
+    queue = [start]
+    result = []
+    
+    while (queue.len() > 0) {
+        // Dequeue
+        current = queue[0]
+        newQueue = []
+        for i in range(1, queue.len()) {
+            push(newQueue, queue[i])
+        }
+        queue = newQueue
+        
+        currentStr = str(current)
+        if (hasKey(visited, currentStr)) { continue }
+        
+        visited[currentStr] = true
+        push(result, current)
+        
+        if (callback != null) {
+            callback(current, getNodeData(g, current))
+        }
+        
+        // Add neighbors to queue
+        for n in neighbors(g, current) {
+            if (!hasKey(visited, str(n))) {
+                push(queue, n)
+            }
+        }
+    }
+    
+    return result
+}
+
+// Depth-First Search
+func dfs(g, start, callback) {
+    visited = {}
+    result = []
+    
+    dfsRecursive(g, start, visited, result, callback)
+    
+    return result
+}
+
+func dfsRecursive(g, node, visited, result, callback) {
+    nodeStr = str(node)
+    if (hasKey(visited, nodeStr)) { return }
+    
+    visited[nodeStr] = true
+    push(result, node)
+    
+    if (callback != null) {
+        callback(node, getNodeData(g, node))
+    }
+    
+    for n in neighbors(g, node) {
+        dfsRecursive(g, n, visited, result, callback)
+    }
+}
+
+// Iterative DFS (non-recursive)
+func dfsIterative(g, start, callback) {
+    visited = {}
+    stack = [start]
+    result = []
+    
+    while (stack.len() > 0) {
+        current = pop(stack)
+        currentStr = str(current)
+        
+        if (hasKey(visited, currentStr)) { continue }
+        
+        visited[currentStr] = true
+        push(result, current)
+        
+        if (callback != null) {
+            callback(current, getNodeData(g, current))
+        }
+        
+        // Add neighbors to stack (reverse order for correct traversal)
+        neighs = neighbors(g, current)
+        for i in range(neighs.len() - 1, -1, -1) {
+            if (!hasKey(visited, str(neighs[i]))) {
+                push(stack, neighs[i])
+            }
+        }
+    }
+    
+    return result
+}
+
+// ==========================================
+// SHORTEST PATH ALGORITHMS
+// ==========================================
+
+// Dijkstra's algorithm
+func dijkstra(g, start, end) {
+    distances = {}
+    previous = {}
+    unvisited = {}
+    
+    // Initialize
+    for key in keys(g.nodes) {
+        id = g.nodes[key].id
+        distances[str(id)] = 999999999  // Infinity
+        previous[str(id)] = null
+        unvisited[str(id)] = true
+    }
+    distances[str(start)] = 0
+    
+    while (keys(unvisited).len() > 0) {
+        // Find minimum distance node
+        minDist = 999999999
+        minNode = null
+        for key in keys(unvisited) {
+            if (distances[key] < minDist) {
+                minDist = distances[key]
+                minNode = key
+            }
+        }
+        
+        if (minNode == null) { break }
+        
+        // Remove from unvisited
+        delete(unvisited, minNode)
+        
+        // Check if we reached the end
+        if (end != null && minNode == str(end)) { break }
+        
+        // Update neighbors
+        node = g.nodes[minNode]
+        for n in node.neighbors {
+            nStr = str(n.id)
+            alt = distances[minNode] + n.weight
+            if (alt < distances[nStr]) {
+                distances[nStr] = alt
+                previous[nStr] = minNode
+            }
+        }
+    }
+    
+    return {
+        distances: distances,
+        previous: previous
+    }
+}
+
+// Get shortest path using Dijkstra result
+func shortestPath(g, start, end) {
+    result = dijkstra(g, start, end)
+    
+    path = []
+    current = str(end)
+    
+    while (current != null) {
+        // Find the node id from string key
+        if (hasKey(g.nodes, current)) {
+            path = [g.nodes[current].id] + path
+        }
+        current = result.previous[current]
+    }
+    
+    // Check if path exists
+    if (path.len() == 0 || str(path[0]) != str(start)) {
+        return null
+    }
+    
+    return path
+}
+
+// Get shortest distance
+func shortestDistance(g, start, end) {
+    result = dijkstra(g, start, end)
+    dist = result.distances[str(end)]
+    if (dist == 999999999) { return null }
+    return dist
+}
+
+// Bellman-Ford algorithm (handles negative weights)
+func bellmanFord(g, start) {
+    distances = {}
+    previous = {}
+    
+    // Initialize
+    for key in keys(g.nodes) {
+        distances[key] = 999999999
+        previous[key] = null
+    }
+    distances[str(start)] = 0
+    
+    // Relax edges V-1 times
+    nodeCount = keys(g.nodes).len()
+    for i in range(nodeCount - 1) {
+        for e in g.edges {
+            fromStr = str(e.from)
+            toStr = str(e.to)
+            
+            if (distances[fromStr] + e.weight < distances[toStr]) {
+                distances[toStr] = distances[fromStr] + e.weight
+                previous[toStr] = fromStr
+            }
+            
+            // For undirected graphs
+            if (!g.directed) {
+                if (distances[toStr] + e.weight < distances[fromStr]) {
+                    distances[fromStr] = distances[toStr] + e.weight
+                    previous[fromStr] = toStr
+                }
+            }
+        }
+    }
+    
+    // Check for negative cycles
+    hasNegativeCycle = false
+    for e in g.edges {
+        fromStr = str(e.from)
+        toStr = str(e.to)
+        if (distances[fromStr] + e.weight < distances[toStr]) {
+            hasNegativeCycle = true
+            break
+        }
+    }
+    
+    return {
+        distances: distances,
+        previous: previous,
+        hasNegativeCycle: hasNegativeCycle
+    }
+}
+
+// ==========================================
+// CONNECTIVITY
+// ==========================================
+
+// Check if graph is connected
+func isConnected(g) {
+    nodes = getNodes(g)
+    if (nodes.len() == 0) { return true }
+    
+    visited = bfs(g, nodes[0], null)
+    return visited.len() == nodes.len()
+}
+
+// Find connected components
+func connectedComponents(g) {
+    visited = {}
+    components = []
+    
+    for key in keys(g.nodes) {
+        id = g.nodes[key].id
+        if (!hasKey(visited, str(id))) {
+            component = bfs(g, id, null)
+            push(components, component)
+            for node in component {
+                visited[str(node)] = true
+            }
+        }
+    }
+    
+    return components
+}
+
+// Check if path exists between two nodes
+func pathExists(g, from, to) {
+    visited = bfs(g, from, null)
+    for v in visited {
+        if (str(v) == str(to)) { return true }
+    }
+    return false
+}
+
+// ==========================================
+// CYCLE DETECTION
+// ==========================================
+
+// Check if graph has a cycle
+func hasCycle(g) {
+    if (g.directed) {
+        return hasCycleDirected(g)
+    }
+    return hasCycleUndirected(g)
+}
+
+func hasCycleDirected(g) {
+    white = {}  // Not visited
+    gray = {}   // In progress
+    black = {}  // Completed
+    
+    for key in keys(g.nodes) {
+        white[key] = true
+    }
+    
+    for key in keys(g.nodes) {
+        if (hasKey(white, key)) {
+            if (hasCycleDFS(g, key, white, gray, black)) {
+                return true
+            }
+        }
+    }
+    
+    return false
+}
+
+func hasCycleDFS(g, node, white, gray, black) {
+    delete(white, node)
+    gray[node] = true
+    
+    nodeObj = g.nodes[node]
+    for n in nodeObj.neighbors {
+        nStr = str(n.id)
+        if (hasKey(black, nStr)) { continue }
+        if (hasKey(gray, nStr)) { return true }
+        if (hasCycleDFS(g, nStr, white, gray, black)) { return true }
+    }
+    
+    delete(gray, node)
+    black[node] = true
+    return false
+}
+
+func hasCycleUndirected(g) {
+    visited = {}
+    
+    for key in keys(g.nodes) {
+        if (!hasKey(visited, key)) {
+            if (hasCycleUndirectedDFS(g, key, null, visited)) {
+                return true
+            }
+        }
+    }
+    
+    return false
+}
+
+func hasCycleUndirectedDFS(g, node, parent, visited) {
+    visited[node] = true
+    
+    nodeObj = g.nodes[node]
+    for n in nodeObj.neighbors {
+        nStr = str(n.id)
+        if (!hasKey(visited, nStr)) {
+            if (hasCycleUndirectedDFS(g, nStr, node, visited)) {
+                return true
+            }
+        } else if (nStr != parent) {
+            return true
+        }
+    }
+    
+    return false
+}
+
+// ==========================================
+// TOPOLOGICAL SORT
+// ==========================================
+
+// Topological sort (for DAGs)
+func topologicalSort(g) {
+    if (!g.directed) { return null }
+    if (hasCycle(g)) { return null }
+    
+    visited = {}
+    stack = []
+    
+    for key in keys(g.nodes) {
+        if (!hasKey(visited, key)) {
+            topoSortDFS(g, key, visited, stack)
+        }
+    }
+    
+    // Reverse the stack
+    result = []
+    for i in range(stack.len() - 1, -1, -1) {
+        push(result, stack[i])
+    }
+    return result
+}
+
+func topoSortDFS(g, node, visited, stack) {
+    visited[node] = true
+    
+    nodeObj = g.nodes[node]
+    for n in nodeObj.neighbors {
+        nStr = str(n.id)
+        if (!hasKey(visited, nStr)) {
+            topoSortDFS(g, nStr, visited, stack)
+        }
+    }
+    
+    push(stack, g.nodes[node].id)
+}
+
+// ==========================================
+// MINIMUM SPANNING TREE
+// ==========================================
+
+// Kruskal's algorithm for MST
+func kruskal(g) {
+    if (g.directed) { return null }
+    
+    // Sort edges by weight
+    sortedEdges = sortEdges(g.edges)
+    
+    // Union-Find structure
+    parent = {}
+    rank = {}
+    for key in keys(g.nodes) {
+        parent[key] = key
+        rank[key] = 0
+    }
+    
+    mst = []
+    totalWeight = 0
+    
+    for e in sortedEdges {
+        fromStr = str(e.from)
+        toStr = str(e.to)
+        
+        rootFrom = find(parent, fromStr)
+        rootTo = find(parent, toStr)
+        
+        if (rootFrom != rootTo) {
+            push(mst, e)
+            totalWeight = totalWeight + e.weight
+            union(parent, rank, rootFrom, rootTo)
+        }
+    }
+    
+    return {edges: mst, weight: totalWeight}
+}
+
+// Sort edges by weight (bubble sort)
+func sortEdges(edges) {
+    result = []
+    for e in edges {
+        push(result, e)
+    }
+    
+    for i in range(result.len()) {
+        for j in range(i + 1, result.len()) {
+            if (result[j].weight < result[i].weight) {
+                temp = result[i]
+                result[i] = result[j]
+                result[j] = temp
+            }
+        }
+    }
+    
+    return result
+}
+
+// Union-Find: Find with path compression
+func find(parent, x) {
+    if (parent[x] != x) {
+        parent[x] = find(parent, parent[x])
+    }
+    return parent[x]
+}
+
+// Union-Find: Union by rank
+func union(parent, rank, x, y) {
+    if (rank[x] < rank[y]) {
+        parent[x] = y
+    } else if (rank[x] > rank[y]) {
+        parent[y] = x
+    } else {
+        parent[y] = x
+        rank[x] = rank[x] + 1
+    }
+}
+
+// ==========================================
+// GRAPH CREATION HELPERS
+// ==========================================
+
+// Create graph from adjacency list
+func fromAdjacencyList(adjList) {
+    g = Graph()
+    
+    for key in keys(adjList) {
+        addNode(g, key, null)
+        for neighbor in adjList[key] {
+            addEdge(g, key, neighbor, 1)
+        }
+    }
+    
+    return g
+}
+
+// Create graph from edge list
+func fromEdgeList(edges, directed) {
+    g = directed ? DiGraph() : Graph()
+    
+    for e in edges {
+        weight = e.len() > 2 ? e[2] : 1
+        addEdge(g, e[0], e[1], weight)
+    }
+    
+    return g
+}
+
+// ==========================================
+// VISUALIZATION
+// ==========================================
+
+// Convert to DOT format (Graphviz)
+func toDot(g, name) {
+    if (name == null) { name = "G" }
+    
+    graphType = g.directed ? "digraph" : "graph"
+    edgeOp = g.directed ? " -> " : " -- "
+    
+    lines = [graphType + " " + name + " {"]
+    
+    // Add nodes
+    for key in keys(g.nodes) {
+        node = g.nodes[key]
+        label = node.data != null ? " [label=\"" + str(node.data) + "\"]" : ""
+        push(lines, "    " + str(node.id) + label + ";")
+    }
+    
+    // Add edges
+    edgeSet = {}  // To avoid duplicates in undirected
+    for e in g.edges {
+        edgeKey = str(e.from) + "-" + str(e.to)
+        reverseKey = str(e.to) + "-" + str(e.from)
+        
+        if (!g.directed && hasKey(edgeSet, reverseKey)) { continue }
+        edgeSet[edgeKey] = true
+        
+        label = g.weighted ? " [label=\"" + str(e.weight) + "\"]" : ""
+        push(lines, "    " + str(e.from) + edgeOp + str(e.to) + label + ";")
+    }
+    
+    push(lines, "}")
+    return join(lines, "\n")
+}
+
+// Print graph info
+func printGraph(g) {
+    print("Graph Info:")
+    print("  Type: " + (g.directed ? "Directed" : "Undirected") + (g.weighted ? ", Weighted" : ""))
+    print("  Nodes: " + str(nodeCount(g)))
+    print("  Edges: " + str(edgeCount(g)))
+    print("  Connected: " + str(isConnected(g)))
+    print("  Has Cycle: " + str(hasCycle(g)))
+}

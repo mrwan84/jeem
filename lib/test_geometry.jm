@@ -1,0 +1,161 @@
+// ============================================
+// Geometry Library Test
+// ============================================
+
+import "modules/geometry.jm" as geo
+
+print("=== GEOMETRY LIBRARY TEST ===\n")
+
+// --- Constants ---
+print("--- Constants ---")
+print("PI:", geo.PI())
+print("TAU:", geo.TAU())
+
+// --- Points ---
+print("\n--- 2D Points ---")
+p1 = geo.Point(0, 0)
+p2 = geo.Point(3, 4)
+
+print("p1:", geo.pointStr(p1))
+print("p2:", geo.pointStr(p2))
+print("Distance p1->p2:", geo.pointDistance(p1, p2))
+print("Midpoint:", geo.pointStr(geo.pointMidpoint(p1, p2)))
+
+p3 = geo.pointTranslate(p1, 5, 10)
+print("Translate (0,0) by (5,10):", geo.pointStr(p3))
+
+p4 = geo.pointRotate(geo.Point(1, 0), geo.PI() / 2)
+print("Rotate (1,0) by 90°:", "(" + str(p4.x) + ", " + str(p4.y) + ")")
+
+p5 = geo.pointLerp(p1, p2, 0.5)
+print("Lerp 50% p1->p2:", geo.pointStr(p5))
+
+// --- 3D Points ---
+print("\n--- 3D Points ---")
+p3d1 = geo.Point3D(0, 0, 0)
+p3d2 = geo.Point3D(1, 2, 2)
+print("3D Distance:", geo.point3DDistance(p3d1, p3d2))
+
+// --- Vectors ---
+print("\n--- 2D Vectors ---")
+v1 = geo.Vec2(3, 4)
+print("v1:", "(" + str(v1.x) + ", " + str(v1.y) + ")")
+print("Magnitude:", geo.vec2Magnitude(v1))
+
+v2 = geo.vec2Normalize(v1)
+print("Normalized:", "(" + str(v2.x) + ", " + str(v2.y) + ")")
+print("Normalized magnitude:", geo.vec2Magnitude(v2))
+
+v3 = geo.Vec2(1, 0)
+v4 = geo.Vec2(0, 1)
+print("Dot product (1,0)·(0,1):", geo.vec2Dot(v3, v4))
+print("Cross product:", geo.vec2Cross(v3, v4))
+
+perp = geo.vec2Perpendicular(v3)
+print("Perpendicular to (1,0):", "(" + str(perp.x) + ", " + str(perp.y) + ")")
+
+// --- Segments ---
+print("\n--- Line Segments ---")
+seg = geo.Segment(geo.Point(0, 0), geo.Point(10, 0))
+print("Segment length:", geo.segmentLength(seg))
+print("Segment midpoint:", geo.pointStr(geo.segmentMidpoint(seg)))
+print("Point at t=0.25:", geo.pointStr(geo.segmentPointAt(seg, 0.25)))
+
+seg2 = geo.Segment(geo.Point(5, -5), geo.Point(5, 5))
+inter = geo.segmentIntersection(seg, seg2)
+if (inter != null) {
+    print("Intersection:", geo.pointStr(inter))
+}
+
+// --- Lines ---
+print("\n--- Lines ---")
+line = geo.lineFromPoints(geo.Point(0, 0), geo.Point(10, 10))
+dist = geo.linePointDistance(line, geo.Point(0, 10))
+print("Distance from (0,10) to line y=x:", dist)
+
+// --- Circles ---
+print("\n--- Circles ---")
+c = geo.Circle(geo.Point(0, 0), 5)
+print("Circle area:", geo.circleArea(c))
+print("Circle circumference:", geo.circleCircumference(c))
+print("Contains (3, 3):", geo.circleContainsPoint(c, geo.Point(3, 3)))
+print("Contains (10, 0):", geo.circleContainsPoint(c, geo.Point(10, 0)))
+
+c2 = geo.Circle(geo.Point(8, 0), 5)
+intersections = geo.circleCircleIntersection(c, c2)
+print("Circle intersections:", intersections.len(), "points")
+
+// --- Rectangles ---
+print("\n--- Rectangles ---")
+r = geo.Rect(0, 0, 10, 5)
+print("Rect area:", geo.rectArea(r))
+print("Rect perimeter:", geo.rectPerimeter(r))
+print("Rect center:", geo.pointStr(geo.rectCenter(r)))
+print("Contains (5, 2):", geo.rectContainsPoint(r, geo.Point(5, 2)))
+print("Contains (15, 2):", geo.rectContainsPoint(r, geo.Point(15, 2)))
+
+r2 = geo.Rect(5, 2, 10, 5)
+print("Rectangles intersect:", geo.rectIntersects(r, r2))
+
+// --- Triangles ---
+print("\n--- Triangles ---")
+t = geo.Triangle(geo.Point(0, 0), geo.Point(4, 0), geo.Point(2, 3))
+print("Triangle area:", geo.triangleArea(t))
+print("Triangle perimeter:", geo.trianglePerimeter(t))
+print("Centroid:", geo.pointStr(geo.triangleCentroid(t)))
+print("Contains (2, 1):", geo.triangleContainsPoint(t, geo.Point(2, 1)))
+print("Contains (10, 10):", geo.triangleContainsPoint(t, geo.Point(10, 10)))
+
+// --- Polygons ---
+print("\n--- Polygons ---")
+poly = geo.Polygon([
+    geo.Point(0, 0),
+    geo.Point(4, 0),
+    geo.Point(4, 3),
+    geo.Point(0, 3)
+])
+print("Polygon area:", geo.polygonArea(poly))
+print("Polygon perimeter:", geo.polygonPerimeter(poly))
+print("Is convex:", geo.polygonIsConvex(poly))
+print("Contains (2, 1):", geo.polygonContainsPoint(poly, geo.Point(2, 1)))
+
+// --- Regular Polygon ---
+print("\n--- Regular Polygon ---")
+hex = geo.regularPolygon(geo.Point(0, 0), 10, 6)
+print("Hexagon vertices:", hex.points.len())
+print("Hexagon area:", geo.polygonArea(hex))
+print("Hexagon is convex:", geo.polygonIsConvex(hex))
+
+// --- Bounding Box ---
+print("\n--- Bounding Box ---")
+points = [geo.Point(1, 2), geo.Point(5, 1), geo.Point(3, 7), geo.Point(0, 4)]
+bbox = geo.boundingBox(points)
+print("Bounding box: x=" + str(bbox.x) + " y=" + str(bbox.y) + " w=" + str(bbox.width) + " h=" + str(bbox.height))
+
+// --- Trigonometry ---
+print("\n--- Trigonometry ---")
+print("sin(0):", geo.sin(0))
+print("sin(PI/2):", geo.sin(geo.PI() / 2))
+print("cos(0):", geo.cos(0))
+print("cos(PI):", geo.cos(geo.PI()))
+
+print("degToRad(180):", geo.degToRad(180))
+print("radToDeg(PI):", geo.radToDeg(geo.PI()))
+
+// --- Angle Between Vectors ---
+print("\n--- Angle Between Vectors ---")
+vA = geo.Vec2(1, 0)
+vB = geo.Vec2(0, 1)
+angle = geo.vec2AngleBetween(vA, vB)
+print("Angle between (1,0) and (0,1):", geo.radToDeg(angle), "degrees")
+
+// --- Collision Detection Example ---
+print("\n--- Collision Detection ---")
+player = geo.Circle(geo.Point(5, 5), 2)
+wall = geo.Rect(10, 0, 2, 20)
+print("Player-Wall collision:", geo.rectCircleIntersects(wall, player))
+
+player2 = geo.Circle(geo.Point(10, 5), 2)
+print("Player2-Wall collision:", geo.rectCircleIntersects(wall, player2))
+
+print("\n=== GEOMETRY LIBRARY TEST COMPLETE ===")

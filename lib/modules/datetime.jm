@@ -1,0 +1,887 @@
+// ============================================
+// DateTime Library for Jeem
+// ============================================
+// Date and time manipulation, parsing, formatting
+// ============================================
+
+// ==========================================
+// CONSTANTS
+// ==========================================
+
+func MONTHS() {
+    return ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"]
+}
+
+func MONTHS_SHORT() {
+    return ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+}
+
+func DAYS() {
+    return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+}
+
+func DAYS_SHORT() {
+    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+}
+
+func DAYS_IN_MONTH() {
+    return [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+}
+
+// ==========================================
+// DATE CREATION
+// ==========================================
+
+// Create a DateTime object
+func DateTime(year, month, day, hour, minute, second, ms) {
+    if (month == null) { month = 1 }
+    if (day == null) { day = 1 }
+    if (hour == null) { hour = 0 }
+    if (minute == null) { minute = 0 }
+    if (second == null) { second = 0 }
+    if (ms == null) { ms = 0 }
+    
+    return {
+        _type: "DateTime",
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        ms: ms
+    }
+}
+
+// Create date only (no time)
+func Date(year, month, day) {
+    return DateTime(year, month, day, 0, 0, 0, 0)
+}
+
+// Create time only (no date, uses epoch date)
+func Time(hour, minute, second, ms) {
+    if (ms == null) { ms = 0 }
+    return DateTime(1970, 1, 1, hour, minute, second, ms)
+}
+
+// Get current date/time (must be passed from system)
+func now(timestamp) {
+    // timestamp is Unix timestamp in seconds
+    return fromTimestamp(timestamp)
+}
+
+// Today's date at midnight
+func today(timestamp) {
+    dt = fromTimestamp(timestamp)
+    return Date(dt.year, dt.month, dt.day)
+}
+
+// ==========================================
+// PARSING
+// ==========================================
+
+// Parse ISO 8601 format: "2024-01-15T10:30:00"
+func parseISO(str) {
+    // Split date and time
+    parts = split(str, "T")
+    datePart = parts[0]
+    timePart = parts.len() > 1 ? parts[1] : "00:00:00"
+    
+    // Remove timezone info if present
+    timePart = split(timePart, "Z")[0]
+    timePart = split(timePart, "+")[0]
+    timePart = split(timePart, "-")[0]
+    
+    // Parse date
+    dateParts = split(datePart, "-")
+    year = int(dateParts[0])
+    month = int(dateParts[1])
+    day = int(dateParts[2])
+    
+    // Parse time
+    timeParts = split(timePart, ":")
+    hour = int(timeParts[0])
+    minute = timeParts.len() > 1 ? int(timeParts[1]) : 0
+    
+    // Handle seconds and milliseconds
+    second = 0
+    ms = 0
+    if (timeParts.len() > 2) {
+        secParts = split(timeParts[2], ".")
+        second = int(secParts[0])
+        if (secParts.len() > 1) {
+            msStr = secParts[1]
+            while (msStr.len() < 3) { msStr = msStr + "0" }
+            ms = int(slice(msStr, 0, 3))
+        }
+    }
+    
+    return DateTime(year, month, day, hour, minute, second, ms)
+}
+
+// Parse date string with format
+// Supported: %Y (year), %m (month), %d (day), %H (hour), %M (minute), %S (second)
+func parse(str, format) {
+    year = 1970
+    month = 1
+    day = 1
+    hour = 0
+    minute = 0
+    second = 0
+    
+    i = 0
+    j = 0
+    while (i < format.len() && j < str.len()) {
+        if (format[i] == "%") {
+            i = i + 1
+            spec = format[i]
+            
+            case(spec) {
+                "Y":
+                    year = int(slice(str, j, j + 4))
+                    j = j + 4
+                    break
+                "m":
+                    month = int(slice(str, j, j + 2))
+                    j = j + 2
+                    break
+                "d":
+                    day = int(slice(str, j, j + 2))
+                    j = j + 2
+                    break
+                "H":
+                    hour = int(slice(str, j, j + 2))
+                    j = j + 2
+                    break
+                "M":
+                    minute = int(slice(str, j, j + 2))
+                    j = j + 2
+                    break
+                "S":
+                    second = int(slice(str, j, j + 2))
+                    j = j + 2
+                    break
+                default:
+                    j = j + 1
+            }
+            i = i + 1
+        } else {
+            i = i + 1
+            j = j + 1
+        }
+    }
+    
+    return DateTime(year, month, day, hour, minute, second, 0)
+}
+
+// Parse common date formats automatically
+func parseAuto(str) {
+    str = str.trim()
+    
+    // ISO format
+    if (indexOf(str, "T") > 0) {
+        return parseISO(str)
+    }
+    
+    // YYYY-MM-DD
+    if (str.len() == 10 && str[4] == "-") {
+        return parse(str, "%Y-%m-%d")
+    }
+    
+    // DD/MM/YYYY or MM/DD/YYYY (assume DD/MM/YYYY)
+    if (str.len() == 10 && str[2] == "/") {
+        return parse(str, "%d/%m/%Y")
+    }
+    
+    // DD.MM.YYYY
+    if (str.len() == 10 && str[2] == ".") {
+        return parse(str, "%d.%m.%Y")
+    }
+    
+    // YYYY/MM/DD
+    if (str.len() == 10 && str[4] == "/") {
+        return parse(str, "%Y/%m/%d")
+    }
+    
+    return null
+}
+
+// ==========================================
+// FORMATTING
+// ==========================================
+
+// Pad number with zeros
+func padZero(n, width) {
+    s = str(n)
+    while (s.len() < width) {
+        s = "0" + s
+    }
+    return s
+}
+
+// Format to ISO 8601
+func toISO(dt) {
+    return padZero(dt.year, 4) + "-" + padZero(dt.month, 2) + "-" + padZero(dt.day, 2) +
+           "T" + padZero(dt.hour, 2) + ":" + padZero(dt.minute, 2) + ":" + padZero(dt.second, 2)
+}
+
+// Format to ISO date only
+func toISODate(dt) {
+    return padZero(dt.year, 4) + "-" + padZero(dt.month, 2) + "-" + padZero(dt.day, 2)
+}
+
+// Format to ISO time only
+func toISOTime(dt) {
+    return padZero(dt.hour, 2) + ":" + padZero(dt.minute, 2) + ":" + padZero(dt.second, 2)
+}
+
+// Format with custom format string
+func format(dt, fmt) {
+    result = ""
+    i = 0
+    while (i < fmt.len()) {
+        c = fmt[i]
+        if (c == "%") {
+            i = i + 1
+            if (i < fmt.len()) {
+                spec = fmt[i]
+                case(spec) {
+                    "Y":
+                        result = result + padZero(dt.year, 4)
+                        break
+                    "y":
+                        result = result + padZero(dt.year % 100, 2)
+                        break
+                    "m":
+                        result = result + padZero(dt.month, 2)
+                        break
+                    "d":
+                        result = result + padZero(dt.day, 2)
+                        break
+                    "H":
+                        result = result + padZero(dt.hour, 2)
+                        break
+                    "I":
+                        h = dt.hour % 12
+                        if (h == 0) { h = 12 }
+                        result = result + padZero(h, 2)
+                        break
+                    "M":
+                        result = result + padZero(dt.minute, 2)
+                        break
+                    "S":
+                        result = result + padZero(dt.second, 2)
+                        break
+                    "p":
+                        result = result + (dt.hour < 12 ? "AM" : "PM")
+                        break
+                    "B":
+                        result = result + MONTHS()[dt.month - 1]
+                        break
+                    "b":
+                        result = result + MONTHS_SHORT()[dt.month - 1]
+                        break
+                    "A":
+                        result = result + DAYS()[dayOfWeek(dt)]
+                        break
+                    "a":
+                        result = result + DAYS_SHORT()[dayOfWeek(dt)]
+                        break
+                    "j":
+                        result = result + padZero(dayOfYear(dt), 3)
+                        break
+                    "W":
+                        result = result + padZero(weekOfYear(dt), 2)
+                        break
+                    "%":
+                        result = result + "%"
+                        break
+                    default:
+                        result = result + "%" + spec
+                }
+            }
+        } else {
+            result = result + c
+        }
+        i = i + 1
+    }
+    return result
+}
+
+// Human-readable format
+func toHuman(dt) {
+    return DAYS()[dayOfWeek(dt)] + ", " + MONTHS()[dt.month - 1] + " " + 
+           str(dt.day) + ", " + str(dt.year)
+}
+
+// Relative time (e.g., "2 days ago", "in 3 hours")
+func toRelative(dt, now) {
+    diff = diffSeconds(now, dt)
+    
+    prefix = ""
+    suffix = ""
+    
+    if (diff < 0) {
+        // Future
+        diff = -diff
+        prefix = "in "
+        suffix = ""
+    } else {
+        // Past
+        prefix = ""
+        suffix = " ago"
+    }
+    
+    if (diff < 60) {
+        return prefix + str(int(diff)) + " second" + (diff == 1 ? "" : "s") + suffix
+    }
+    diff = diff / 60
+    if (diff < 60) {
+        return prefix + str(int(diff)) + " minute" + (int(diff) == 1 ? "" : "s") + suffix
+    }
+    diff = diff / 60
+    if (diff < 24) {
+        return prefix + str(int(diff)) + " hour" + (int(diff) == 1 ? "" : "s") + suffix
+    }
+    diff = diff / 24
+    if (diff < 30) {
+        return prefix + str(int(diff)) + " day" + (int(diff) == 1 ? "" : "s") + suffix
+    }
+    diff = diff / 30
+    if (diff < 12) {
+        return prefix + str(int(diff)) + " month" + (int(diff) == 1 ? "" : "s") + suffix
+    }
+    diff = diff / 12
+    return prefix + str(int(diff)) + " year" + (int(diff) == 1 ? "" : "s") + suffix
+}
+
+// ==========================================
+// TIMESTAMP CONVERSION
+// ==========================================
+
+// Check if leap year
+func isLeapYear(year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+}
+
+// Days in month
+func daysInMonth(year, month) {
+    days = DAYS_IN_MONTH()
+    if (month == 2 && isLeapYear(year)) {
+        return 29
+    }
+    return days[month - 1]
+}
+
+// Days in year
+func daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365
+}
+
+// Convert DateTime to Unix timestamp (seconds since 1970-01-01)
+func toTimestamp(dt) {
+    // Days from year
+    days = 0
+    for y in range(1970, dt.year) {
+        days = days + daysInYear(y)
+    }
+    
+    // Days from months
+    for m in range(1, dt.month) {
+        days = days + daysInMonth(dt.year, m)
+    }
+    
+    // Days
+    days = days + dt.day - 1
+    
+    // Convert to seconds
+    seconds = days * 86400
+    seconds = seconds + dt.hour * 3600
+    seconds = seconds + dt.minute * 60
+    seconds = seconds + dt.second
+    
+    return seconds
+}
+
+// Convert Unix timestamp to DateTime
+func fromTimestamp(ts) {
+    // Start from 1970
+    year = 1970
+    
+    // Find year
+    while (true) {
+        yearSecs = daysInYear(year) * 86400
+        if (ts < yearSecs) { break }
+        ts = ts - yearSecs
+        year = year + 1
+    }
+    
+    // Find month
+    month = 1
+    while (month <= 12) {
+        monthSecs = daysInMonth(year, month) * 86400
+        if (ts < monthSecs) { break }
+        ts = ts - monthSecs
+        month = month + 1
+    }
+    
+    // Find day
+    day = int(ts / 86400) + 1
+    ts = ts % 86400
+    
+    // Find hour
+    hour = int(ts / 3600)
+    ts = ts % 3600
+    
+    // Find minute
+    minute = int(ts / 60)
+    second = ts % 60
+    
+    return DateTime(year, month, day, hour, minute, int(second), 0)
+}
+
+// ==========================================
+// DATE COMPONENTS
+// ==========================================
+
+// Day of week (0 = Sunday, 6 = Saturday)
+func dayOfWeek(dt) {
+    // Zeller's formula (simplified)
+    ts = toTimestamp(dt)
+    days = int(ts / 86400)
+    // Jan 1, 1970 was Thursday (4)
+    return (days + 4) % 7
+}
+
+// Day of year (1-366)
+func dayOfYear(dt) {
+    day = 0
+    for m in range(1, dt.month) {
+        day = day + daysInMonth(dt.year, m)
+    }
+    return day + dt.day
+}
+
+// Week of year (1-53)
+func weekOfYear(dt) {
+    doy = dayOfYear(dt)
+    dow = dayOfWeek(DateTime(dt.year, 1, 1, 0, 0, 0, 0))
+    return int((doy + dow - 1) / 7) + 1
+}
+
+// Quarter (1-4)
+func quarter(dt) {
+    return int((dt.month - 1) / 3) + 1
+}
+
+// Is weekend
+func isWeekend(dt) {
+    dow = dayOfWeek(dt)
+    return dow == 0 || dow == 6
+}
+
+// Is weekday
+func isWeekday(dt) {
+    return !isWeekend(dt)
+}
+
+// ==========================================
+// DATE ARITHMETIC
+// ==========================================
+
+// Add years
+func addYears(dt, years) {
+    newYear = dt.year + years
+    // Handle Feb 29 -> Feb 28
+    newDay = dt.day
+    if (dt.month == 2 && dt.day == 29 && !isLeapYear(newYear)) {
+        newDay = 28
+    }
+    return DateTime(newYear, dt.month, newDay, dt.hour, dt.minute, dt.second, dt.ms)
+}
+
+// Add months
+func addMonths(dt, months) {
+    totalMonths = (dt.year * 12 + dt.month - 1) + months
+    newYear = int(totalMonths / 12)
+    newMonth = (totalMonths % 12) + 1
+    
+    // Adjust day if necessary
+    maxDay = daysInMonth(newYear, newMonth)
+    newDay = dt.day < maxDay ? dt.day : maxDay
+    
+    return DateTime(newYear, newMonth, newDay, dt.hour, dt.minute, dt.second, dt.ms)
+}
+
+// Add days
+func addDays(dt, days) {
+    ts = toTimestamp(dt)
+    ts = ts + days * 86400
+    result = fromTimestamp(ts)
+    result.ms = dt.ms
+    return result
+}
+
+// Add hours
+func addHours(dt, hours) {
+    ts = toTimestamp(dt)
+    ts = ts + hours * 3600
+    result = fromTimestamp(ts)
+    result.ms = dt.ms
+    return result
+}
+
+// Add minutes
+func addMinutes(dt, minutes) {
+    ts = toTimestamp(dt)
+    ts = ts + minutes * 60
+    result = fromTimestamp(ts)
+    result.ms = dt.ms
+    return result
+}
+
+// Add seconds
+func addSeconds(dt, seconds) {
+    ts = toTimestamp(dt)
+    ts = ts + seconds
+    result = fromTimestamp(ts)
+    result.ms = dt.ms
+    return result
+}
+
+// Subtract (all add functions work with negative values)
+func subYears(dt, years) { return addYears(dt, -years) }
+func subMonths(dt, months) { return addMonths(dt, -months) }
+func subDays(dt, days) { return addDays(dt, -days) }
+func subHours(dt, hours) { return addHours(dt, -hours) }
+func subMinutes(dt, minutes) { return addMinutes(dt, -minutes) }
+func subSeconds(dt, seconds) { return addSeconds(dt, -seconds) }
+
+// ==========================================
+// DATE COMPARISON
+// ==========================================
+
+// Compare two dates (-1, 0, 1)
+func compare(dt1, dt2) {
+    ts1 = toTimestamp(dt1)
+    ts2 = toTimestamp(dt2)
+    if (ts1 < ts2) { return -1 }
+    if (ts1 > ts2) { return 1 }
+    return 0
+}
+
+// Check if equal
+func isEqual(dt1, dt2) {
+    return compare(dt1, dt2) == 0
+}
+
+// Check if before
+func isBefore(dt1, dt2) {
+    return compare(dt1, dt2) < 0
+}
+
+// Check if after
+func isAfter(dt1, dt2) {
+    return compare(dt1, dt2) > 0
+}
+
+// Check if same day
+func isSameDay(dt1, dt2) {
+    return dt1.year == dt2.year && dt1.month == dt2.month && dt1.day == dt2.day
+}
+
+// Check if same month
+func isSameMonth(dt1, dt2) {
+    return dt1.year == dt2.year && dt1.month == dt2.month
+}
+
+// Check if same year
+func isSameYear(dt1, dt2) {
+    return dt1.year == dt2.year
+}
+
+// Check if between two dates
+func isBetween(dt, start, end) {
+    return !isBefore(dt, start) && !isAfter(dt, end)
+}
+
+// ==========================================
+// DATE DIFFERENCES
+// ==========================================
+
+// Difference in seconds
+func diffSeconds(dt1, dt2) {
+    return toTimestamp(dt1) - toTimestamp(dt2)
+}
+
+// Difference in minutes
+func diffMinutes(dt1, dt2) {
+    return diffSeconds(dt1, dt2) / 60
+}
+
+// Difference in hours
+func diffHours(dt1, dt2) {
+    return diffSeconds(dt1, dt2) / 3600
+}
+
+// Difference in days
+func diffDays(dt1, dt2) {
+    return diffSeconds(dt1, dt2) / 86400
+}
+
+// Difference in weeks
+func diffWeeks(dt1, dt2) {
+    return diffDays(dt1, dt2) / 7
+}
+
+// Difference in months (approximate)
+func diffMonths(dt1, dt2) {
+    return (dt1.year - dt2.year) * 12 + (dt1.month - dt2.month)
+}
+
+// Difference in years
+func diffYears(dt1, dt2) {
+    return dt1.year - dt2.year
+}
+
+// Detailed difference
+func diff(dt1, dt2) {
+    secs = abs(diffSeconds(dt1, dt2))
+    
+    years = int(secs / (365.25 * 86400))
+    secs = secs % (365.25 * 86400)
+    
+    months = int(secs / (30.44 * 86400))
+    secs = secs % (30.44 * 86400)
+    
+    days = int(secs / 86400)
+    secs = secs % 86400
+    
+    hours = int(secs / 3600)
+    secs = secs % 3600
+    
+    minutes = int(secs / 60)
+    seconds = secs % 60
+    
+    return {
+        years: years,
+        months: months,
+        days: days,
+        hours: hours,
+        minutes: minutes,
+        seconds: int(seconds)
+    }
+}
+
+// ==========================================
+// START/END OF PERIOD
+// ==========================================
+
+// Start of day (midnight)
+func startOfDay(dt) {
+    return DateTime(dt.year, dt.month, dt.day, 0, 0, 0, 0)
+}
+
+// End of day (23:59:59.999)
+func endOfDay(dt) {
+    return DateTime(dt.year, dt.month, dt.day, 23, 59, 59, 999)
+}
+
+// Start of month
+func startOfMonth(dt) {
+    return DateTime(dt.year, dt.month, 1, 0, 0, 0, 0)
+}
+
+// End of month
+func endOfMonth(dt) {
+    lastDay = daysInMonth(dt.year, dt.month)
+    return DateTime(dt.year, dt.month, lastDay, 23, 59, 59, 999)
+}
+
+// Start of year
+func startOfYear(dt) {
+    return DateTime(dt.year, 1, 1, 0, 0, 0, 0)
+}
+
+// End of year
+func endOfYear(dt) {
+    return DateTime(dt.year, 12, 31, 23, 59, 59, 999)
+}
+
+// Start of week (Sunday)
+func startOfWeek(dt) {
+    dow = dayOfWeek(dt)
+    return startOfDay(subDays(dt, dow))
+}
+
+// End of week (Saturday)
+func endOfWeek(dt) {
+    dow = dayOfWeek(dt)
+    return endOfDay(addDays(dt, 6 - dow))
+}
+
+// Start of quarter
+func startOfQuarter(dt) {
+    q = quarter(dt)
+    month = (q - 1) * 3 + 1
+    return DateTime(dt.year, month, 1, 0, 0, 0, 0)
+}
+
+// End of quarter
+func endOfQuarter(dt) {
+    q = quarter(dt)
+    month = q * 3
+    lastDay = daysInMonth(dt.year, month)
+    return DateTime(dt.year, month, lastDay, 23, 59, 59, 999)
+}
+
+// ==========================================
+// CALENDAR GENERATION
+// ==========================================
+
+// Generate calendar for month (array of weeks, each week is array of days)
+func calendar(year, month) {
+    firstDay = DateTime(year, month, 1, 0, 0, 0, 0)
+    lastDay = daysInMonth(year, month)
+    startDow = dayOfWeek(firstDay)
+    
+    weeks = []
+    week = []
+    
+    // Pad beginning
+    for i in range(startDow) {
+        push(week, null)
+    }
+    
+    // Fill days
+    for day in range(1, lastDay + 1) {
+        push(week, day)
+        if (week.len() == 7) {
+            push(weeks, week)
+            week = []
+        }
+    }
+    
+    // Pad end
+    while (week.len() > 0 && week.len() < 7) {
+        push(week, null)
+    }
+    if (week.len() > 0) {
+        push(weeks, week)
+    }
+    
+    return weeks
+}
+
+// Print calendar
+func printCalendar(year, month) {
+    months = MONTHS()
+    days = DAYS_SHORT()
+    
+    print("    " + months[month - 1] + " " + str(year))
+    print(" " + join(days, " "))
+    
+    cal = calendar(year, month)
+    for week in cal {
+        line = ""
+        for day in week {
+            if (day == null) {
+                line = line + "    "
+            } else {
+                if (day < 10) {
+                    line = line + "  " + str(day) + " "
+                } else {
+                    line = line + " " + str(day) + " "
+                }
+            }
+        }
+        print(line)
+    }
+}
+
+// ==========================================
+// DURATION
+// ==========================================
+
+// Create duration object
+func Duration(days, hours, minutes, seconds) {
+    if (days == null) { days = 0 }
+    if (hours == null) { hours = 0 }
+    if (minutes == null) { minutes = 0 }
+    if (seconds == null) { seconds = 0 }
+    
+    return {
+        _type: "Duration",
+        days: days,
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds
+    }
+}
+
+// Duration to total seconds
+func durationToSeconds(dur) {
+    return dur.days * 86400 + dur.hours * 3600 + dur.minutes * 60 + dur.seconds
+}
+
+// Duration from seconds
+func durationFromSeconds(secs) {
+    days = int(secs / 86400)
+    secs = secs % 86400
+    hours = int(secs / 3600)
+    secs = secs % 3600
+    minutes = int(secs / 60)
+    seconds = secs % 60
+    return Duration(days, hours, minutes, int(seconds))
+}
+
+// Add duration to date
+func addDuration(dt, dur) {
+    secs = durationToSeconds(dur)
+    return addSeconds(dt, secs)
+}
+
+// Format duration
+func formatDuration(dur) {
+    parts = []
+    if (dur.days > 0) { push(parts, str(dur.days) + "d") }
+    if (dur.hours > 0) { push(parts, str(dur.hours) + "h") }
+    if (dur.minutes > 0) { push(parts, str(dur.minutes) + "m") }
+    if (dur.seconds > 0 || parts.len() == 0) { push(parts, str(dur.seconds) + "s") }
+    return join(parts, " ")
+}
+
+// ==========================================
+// VALIDATION
+// ==========================================
+
+// Check if valid date
+func isValid(dt) {
+    if (dt.month < 1 || dt.month > 12) { return false }
+    if (dt.day < 1 || dt.day > daysInMonth(dt.year, dt.month)) { return false }
+    if (dt.hour < 0 || dt.hour > 23) { return false }
+    if (dt.minute < 0 || dt.minute > 59) { return false }
+    if (dt.second < 0 || dt.second > 59) { return false }
+    return true
+}
+
+// ==========================================
+// UTILITY
+// ==========================================
+
+// Clone a DateTime
+func clone(dt) {
+    return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.ms)
+}
+
+// DateTime to string
+func dtStr(dt) {
+    return toISO(dt)
+}
+
+// Print DateTime
+func printDT(dt) {
+    print(toHuman(dt) + " " + toISOTime(dt))
+}

@@ -1,0 +1,168 @@
+// ============================================
+// DateTime Library Test
+// ============================================
+
+import "modules/datetime.jm" as dt
+
+print("=== DATETIME LIBRARY TEST ===\n")
+
+// --- Creation ---
+print("--- DateTime Creation ---")
+d1 = dt.DateTime(2024, 12, 25, 10, 30, 45, 0)
+print("DateTime(2024, 12, 25, 10, 30, 45):", dt.toISO(d1))
+
+d2 = dt.Date(2024, 1, 15)
+print("Date(2024, 1, 15):", dt.toISODate(d2))
+
+t1 = dt.Time(14, 30, 0, 0)
+print("Time(14, 30, 0):", dt.toISOTime(t1))
+
+// --- Parsing ---
+print("\n--- Parsing ---")
+iso = dt.parseISO("2024-06-15T14:30:00")
+print("parseISO('2024-06-15T14:30:00'):", dt.toISO(iso))
+
+parsed = dt.parse("25/12/2024", "%d/%m/%Y")
+print("parse('25/12/2024', '%d/%m/%Y'):", dt.toISODate(parsed))
+
+auto1 = dt.parseAuto("2024-03-20")
+print("parseAuto('2024-03-20'):", dt.toISODate(auto1))
+
+auto2 = dt.parseAuto("15.07.2024")
+print("parseAuto('15.07.2024'):", dt.toISODate(auto2))
+
+// --- Formatting ---
+print("\n--- Formatting ---")
+d = dt.DateTime(2024, 7, 4, 15, 30, 0, 0)
+print("toISO:", dt.toISO(d))
+print("toISODate:", dt.toISODate(d))
+print("toISOTime:", dt.toISOTime(d))
+print("toHuman:", dt.toHuman(d))
+print("format('%Y-%m-%d %H:%M'):", dt.format(d, "%Y-%m-%d %H:%M"))
+print("format('%d.%m.%Y'):", dt.format(d, "%d.%m.%Y"))
+print("format('%B %d, %Y'):", dt.format(d, "%B %d, %Y"))
+print("format('%A'):", dt.format(d, "%A"))
+print("format('%I:%M %p'):", dt.format(d, "%I:%M %p"))
+
+// --- Timestamp Conversion ---
+print("\n--- Timestamp Conversion ---")
+ts = dt.toTimestamp(dt.DateTime(2024, 1, 1, 0, 0, 0, 0))
+print("toTimestamp(2024-01-01):", ts)
+
+fromTs = dt.fromTimestamp(1704067200)  // 2024-01-01 00:00:00 UTC
+print("fromTimestamp(1704067200):", dt.toISO(fromTs))
+
+// --- Date Components ---
+print("\n--- Date Components ---")
+d = dt.DateTime(2024, 7, 4, 15, 30, 0, 0)
+print("Date:", dt.toISODate(d))
+print("dayOfWeek:", dt.dayOfWeek(d), "(0=Sun, 4=Thu)")
+print("dayOfYear:", dt.dayOfYear(d))
+print("weekOfYear:", dt.weekOfYear(d))
+print("quarter:", dt.quarter(d))
+print("isWeekend:", dt.isWeekend(d))
+print("isWeekday:", dt.isWeekday(d))
+print("isLeapYear(2024):", dt.isLeapYear(2024))
+print("isLeapYear(2023):", dt.isLeapYear(2023))
+print("daysInMonth(2024, 2):", dt.daysInMonth(2024, 2))
+print("daysInMonth(2023, 2):", dt.daysInMonth(2023, 2))
+
+// --- Date Arithmetic ---
+print("\n--- Date Arithmetic ---")
+base = dt.DateTime(2024, 1, 15, 12, 0, 0, 0)
+print("Base date:", dt.toISO(base))
+print("addDays(10):", dt.toISO(dt.addDays(base, 10)))
+print("addMonths(2):", dt.toISO(dt.addMonths(base, 2)))
+print("addYears(1):", dt.toISO(dt.addYears(base, 1)))
+print("addHours(5):", dt.toISO(dt.addHours(base, 5)))
+print("addMinutes(45):", dt.toISO(dt.addMinutes(base, 45)))
+print("subDays(5):", dt.toISO(dt.subDays(base, 5)))
+print("subMonths(1):", dt.toISO(dt.subMonths(base, 1)))
+
+// End of month edge case
+jan31 = dt.Date(2024, 1, 31)
+print("\nJan 31 + 1 month:", dt.toISODate(dt.addMonths(jan31, 1)))
+
+// --- Comparison ---
+print("\n--- Comparison ---")
+d1 = dt.DateTime(2024, 1, 15, 10, 0, 0, 0)
+d2 = dt.DateTime(2024, 1, 20, 10, 0, 0, 0)
+d3 = dt.DateTime(2024, 1, 15, 10, 0, 0, 0)
+
+print("d1:", dt.toISO(d1))
+print("d2:", dt.toISO(d2))
+print("compare(d1, d2):", dt.compare(d1, d2))
+print("isEqual(d1, d3):", dt.isEqual(d1, d3))
+print("isBefore(d1, d2):", dt.isBefore(d1, d2))
+print("isAfter(d1, d2):", dt.isAfter(d1, d2))
+print("isSameDay(d1, d3):", dt.isSameDay(d1, d3))
+print("isSameMonth(d1, d2):", dt.isSameMonth(d1, d2))
+
+mid = dt.DateTime(2024, 1, 17, 0, 0, 0, 0)
+print("isBetween(mid, d1, d2):", dt.isBetween(mid, d1, d2))
+
+// --- Differences ---
+print("\n--- Differences ---")
+start = dt.DateTime(2024, 1, 1, 0, 0, 0, 0)
+end = dt.DateTime(2024, 1, 15, 12, 30, 0, 0)
+print("Start:", dt.toISO(start))
+print("End:", dt.toISO(end))
+print("diffDays:", dt.diffDays(end, start))
+print("diffHours:", dt.diffHours(end, start))
+print("diffMinutes:", dt.diffMinutes(end, start))
+
+detailed = dt.diff(end, start)
+print("Detailed diff:", detailed)
+
+// --- Start/End of Period ---
+print("\n--- Start/End of Period ---")
+d = dt.DateTime(2024, 6, 15, 14, 30, 0, 0)
+print("Date:", dt.toISO(d))
+print("startOfDay:", dt.toISO(dt.startOfDay(d)))
+print("endOfDay:", dt.toISO(dt.endOfDay(d)))
+print("startOfMonth:", dt.toISO(dt.startOfMonth(d)))
+print("endOfMonth:", dt.toISO(dt.endOfMonth(d)))
+print("startOfYear:", dt.toISO(dt.startOfYear(d)))
+print("endOfYear:", dt.toISO(dt.endOfYear(d)))
+print("startOfWeek:", dt.toISO(dt.startOfWeek(d)))
+print("endOfWeek:", dt.toISO(dt.endOfWeek(d)))
+print("startOfQuarter:", dt.toISO(dt.startOfQuarter(d)))
+print("endOfQuarter:", dt.toISO(dt.endOfQuarter(d)))
+
+// --- Duration ---
+print("\n--- Duration ---")
+dur = dt.Duration(2, 5, 30, 15)
+print("Duration(2d, 5h, 30m, 15s):", dt.formatDuration(dur))
+print("To seconds:", dt.durationToSeconds(dur))
+
+dur2 = dt.durationFromSeconds(90061)
+print("durationFromSeconds(90061):", dt.formatDuration(dur2))
+
+base = dt.DateTime(2024, 1, 1, 0, 0, 0, 0)
+print("Base + duration:", dt.toISO(dt.addDuration(base, dur)))
+
+// --- Calendar ---
+print("\n--- Calendar ---")
+dt.printCalendar(2024, 12)
+
+// --- Relative Time ---
+print("\n--- Relative Time ---")
+now = dt.DateTime(2024, 6, 15, 12, 0, 0, 0)
+past1 = dt.subMinutes(now, 30)
+past2 = dt.subHours(now, 5)
+past3 = dt.subDays(now, 3)
+future = dt.addDays(now, 7)
+
+print("30 minutes ago:", dt.toRelative(past1, now))
+print("5 hours ago:", dt.toRelative(past2, now))
+print("3 days ago:", dt.toRelative(past3, now))
+print("7 days from now:", dt.toRelative(future, now))
+
+// --- Validation ---
+print("\n--- Validation ---")
+valid = dt.DateTime(2024, 2, 29, 12, 0, 0, 0)  // Leap year
+invalid = dt.DateTime(2023, 2, 29, 12, 0, 0, 0)  // Not leap year
+print("isValid(2024-02-29):", dt.isValid(valid))
+print("isValid(2023-02-29):", dt.isValid(invalid))
+
+print("\n=== DATETIME LIBRARY TEST COMPLETE ===")

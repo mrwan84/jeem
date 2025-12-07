@@ -1,0 +1,113 @@
+// ============================================
+// Color Library Test
+// ============================================
+
+import "modules/color.jm" as color
+
+print("=== COLOR LIBRARY TEST ===\n")
+
+// --- RGB Creation ---
+print("--- RGB Creation ---")
+c = color.RGB(255, 128, 0)
+print("RGB(255, 128, 0):", color.colorStr(c))
+print("Hex:", color.toHex(c))
+
+c2 = color.RGBA(100, 150, 200, 128)
+print("RGBA(100, 150, 200, 128):", color.colorStr(c2))
+
+// --- Hex Parsing ---
+print("\n--- Hex Parsing ---")
+c = color.fromHex("#ff8000")
+print("fromHex('#ff8000'):", color.colorStr(c))
+
+c = color.fromHex("abc")
+print("fromHex('abc'):", color.colorStr(c))
+
+// --- HSL ---
+print("\n--- HSL Conversion ---")
+c = color.RGB(255, 128, 0)
+hsl = color.toHsl(c)
+print("Orange to HSL:", "h=" + str(int(hsl.h)) + " s=" + str(int(hsl.s)) + " l=" + str(int(hsl.l)))
+
+c2 = color.HSL(30, 100, 50)
+print("HSL(30, 100, 50):", color.colorStr(c2))
+
+// --- HSV ---
+print("\n--- HSV Conversion ---")
+c = color.RGB(255, 128, 0)
+hsv = color.toHsv(c)
+print("Orange to HSV:", "h=" + str(int(hsv.h)) + " s=" + str(int(hsv.s)) + " v=" + str(int(hsv.v)))
+
+// --- CMYK ---
+print("\n--- CMYK Conversion ---")
+c = color.RGB(255, 128, 0)
+cmyk = color.toCmyk(c)
+print("Orange to CMYK:", "c=" + str(int(cmyk.c)) + " m=" + str(int(cmyk.m)) + " y=" + str(int(cmyk.y)) + " k=" + str(int(cmyk.k)))
+
+// --- CSS Strings ---
+print("\n--- CSS Strings ---")
+c = color.RGB(255, 128, 0)
+print("toRgbStr:", color.toRgbStr(c))
+print("toHslStr:", color.toHslStr(c))
+
+// --- Manipulation ---
+print("\n--- Manipulation ---")
+c = color.RGB(100, 100, 100)
+print("Base gray:", color.colorStr(c))
+print("Lighten 20%:", color.colorStr(color.lighten(c, 20)))
+print("Darken 20%:", color.colorStr(color.darken(c, 20)))
+
+c = color.RGB(255, 0, 0)
+print("\nRed:", color.colorStr(c))
+print("Rotate 120°:", color.colorStr(color.rotate(c, 120)))
+print("Complement:", color.colorStr(color.complement(c)))
+print("Invert:", color.colorStr(color.invert(c)))
+print("Grayscale:", color.colorStr(color.grayscale(c)))
+
+// --- Mixing ---
+print("\n--- Mixing ---")
+red = color.RGB(255, 0, 0)
+blue = color.RGB(0, 0, 255)
+mixed = color.mix(red, blue, 0.5)
+print("Red + Blue mix:", color.colorStr(mixed))
+
+// --- Palettes ---
+print("\n--- Palettes ---")
+base = color.RGB(255, 128, 0)
+print("Base:", color.toHex(base))
+
+triadic = color.triadic(base)
+print("Triadic:")
+for c in triadic {
+    print("  ", color.toHex(c))
+}
+
+// --- Analysis ---
+print("\n--- Analysis ---")
+white = color.white()
+black = color.black()
+print("White luminance:", color.luminance(white))
+print("Black luminance:", color.luminance(black))
+print("Contrast ratio:", color.contrastRatio(white, black))
+
+orange = color.RGB(255, 128, 0)
+print("Orange isLight:", color.isLight(orange))
+print("Text color for orange bg:", color.colorStr(color.textColor(orange)))
+
+// --- Predefined ---
+print("\n--- Predefined Colors ---")
+print("red:", color.toHex(color.red()))
+print("green:", color.toHex(color.green()))
+print("blue:", color.toHex(color.blue()))
+print("coral:", color.toHex(color.coral()))
+print("teal:", color.toHex(color.teal()))
+
+// --- Gradient ---
+print("\n--- Gradient ---")
+grad = color.gradient(color.red(), color.blue(), 5)
+print("Red to Blue gradient:")
+for c in grad {
+    print("  ", color.toHex(c))
+}
+
+print("\n=== COLOR LIBRARY TEST COMPLETE ===")

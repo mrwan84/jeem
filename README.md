@@ -546,11 +546,13 @@ print(math.cube(3))    // 27
 
 ### Conversion Functions
 
-| Function   | Description        |
-| ---------- | ------------------ |
-| `int(x)`   | Convert to integer |
-| `float(x)` | Convert to float   |
-| `str(x)`   | Convert to string  |
+| Function   | Description                                         |
+| ---------- | --------------------------------------------------- |
+| `int(x)`   | Convert to integer                                  |
+| `float(x)` | Convert to float                                    |
+| `str(x)`   | Convert to string                                   |
+| `chr(n)`   | Character from code point (e.g., `chr(65)` → `"A"`) |
+| `ord(s)`   | Code point from character (e.g., `ord("A")` → `65`) |
 
 ### Math Functions
 

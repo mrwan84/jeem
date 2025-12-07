@@ -1,0 +1,119 @@
+// ============================================
+// CLI Library Test
+// ============================================
+
+import "modules/cli.jm" as cli
+
+print("=== CLI LIBRARY TEST ===\n")
+
+// --- Colors ---
+print("--- ANSI Colors ---")
+print(cli.fgRed() + "This is red text" + cli.reset())
+print(cli.fgGreen() + "This is green text" + cli.reset())
+print(cli.fgBlue() + "This is blue text" + cli.reset())
+print(cli.fgYellow() + "This is yellow text" + cli.reset())
+print(cli.fgCyan() + "This is cyan text" + cli.reset())
+
+// --- Styles ---
+print("\n--- Text Styles ---")
+print(cli.bold() + "Bold text" + cli.reset())
+print(cli.dim() + "Dim text" + cli.reset())
+print(cli.underline() + "Underlined text" + cli.reset())
+
+// --- Status Messages ---
+print("\n--- Status Messages ---")
+cli.printSuccess("Operation completed")
+cli.printError("Something went wrong")
+cli.printWarning("Be careful")
+cli.printInfo("Did you know?")
+cli.printArrow("Next step")
+cli.printStar("Featured")
+
+// --- Table ---
+print("\n--- Table ---")
+t = cli.Table(["Name", "Age", "City"])
+cli.tableAddRow(t, ["Alice", 30, "Berlin"])
+cli.tableAddRow(t, ["Bob", 25, "Munich"])
+cli.tableAddRow(t, ["Charlie", 35, "Hamburg"])
+cli.tablePrint(t)
+
+// --- Box ---
+print("\n--- Box Drawing ---")
+print(cli.box("Hello World!", "single", 1))
+print("")
+print(cli.box("Double border", "double", 0))
+print("")
+print(cli.box("Rounded corners", "rounded", 1))
+
+// --- Lists ---
+print("\n--- Lists ---")
+items = ["First item", "Second item", "Third item"]
+print("Bullet list:")
+print(cli.bulletList(items))
+print("\nNumbered list:")
+print(cli.numberedList(items))
+
+// --- Tree ---
+print("\n--- Tree ---")
+tree = [
+    {name: "src", children: [
+        {name: "main.jm", children: []},
+        {name: "utils.jm", children: []}
+    ]},
+    {name: "README.md", children: []}
+]
+print(cli.tree(tree))
+
+// --- Argument Parsing ---
+print("\n--- Argument Parsing ---")
+args = ["--output", "file.txt", "-v", "--count=5", "input.txt"]
+parsed = cli.parseArgs(args, null)
+print("Positional args:", parsed._)
+print("Flags:", parsed.flags)
+print("Options:", parsed.options)
+print("hasFlag 'v':", cli.hasFlag(parsed, "v"))
+print("getOption 'output':", cli.getOption(parsed, "output", "default"))
+print("getOption 'missing':", cli.getOption(parsed, "missing", "default"))
+
+// --- Progress Bar ---
+print("\n--- Progress Bar ---")
+pb = cli.ProgressBar(100, 30, null)
+cli.progressUpdate(pb, 0)
+print(cli.progressRender(pb))
+cli.progressUpdate(pb, 50)
+print(cli.progressRender(pb))
+cli.progressUpdate(pb, 100)
+print(cli.progressRender(pb))
+
+// --- Custom Progress Bar ---
+print("\n--- Custom Progress Bar ---")
+pb2 = cli.ProgressBar(10, 20, {filled: "#", empty: ".", left: "|", right: "|"})
+cli.progressLabel(pb2, "Loading")
+cli.progressUpdate(pb2, 7)
+print(cli.progressRender(pb2))
+
+// --- Spinner ---
+print("\n--- Spinner ---")
+s = cli.Spinner("line")
+cli.spinnerMessage(s, "Loading...")
+print("Frame 1:", cli.spinnerRender(s))
+cli.spinnerNext(s)
+print("Frame 2:", cli.spinnerRender(s))
+cli.spinnerNext(s)
+print("Frame 3:", cli.spinnerRender(s))
+
+// --- Horizontal Rules ---
+print("\n--- Horizontal Rules ---")
+print(cli.hr(30))
+print(cli.hrDouble(30))
+print(cli.hrDashed(30))
+
+// --- Logging ---
+print("\n--- Logging ---")
+cli.logDebug("Debug message")
+cli.logInfo("Info message")
+cli.logWarn("Warning message")
+cli.logError("Error message")
+cli.logSuccess("Success message")
+
+print("\n=== CLI LIBRARY TEST COMPLETE ===")

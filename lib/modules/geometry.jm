@@ -1,0 +1,812 @@
+// ============================================
+// Geometry Library for Jeem
+// ============================================
+// 2D/3D geometry, points, lines, shapes, collision
+// ============================================
+
+// ==========================================
+// CONSTANTS
+// ==========================================
+
+func PI() { return 3.14159265358979323846 }
+func TAU() { return 6.28318530717958647692 }
+func EPSILON() { return 0.000001 }
+
+// ==========================================
+// 2D POINTS
+// ==========================================
+
+// Create a 2D point
+func Point(x, y) {
+    return {_type: "Point", x: x, y: y}
+}
+
+// Point from angle and distance
+func pointFromPolar(angle, distance) {
+    return Point(distance * cos(angle), distance * sin(angle))
+}
+
+// Distance between two points
+func pointDistance(p1, p2) {
+    dx = p2.x - p1.x
+    dy = p2.y - p1.y
+    return sqrt(dx * dx + dy * dy)
+}
+
+// Midpoint between two points
+func pointMidpoint(p1, p2) {
+    return Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
+}
+
+// Angle from p1 to p2
+func pointAngle(p1, p2) {
+    return atan2(p2.y - p1.y, p2.x - p1.x)
+}
+
+// Move point by offset
+func pointTranslate(p, dx, dy) {
+    return Point(p.x + dx, p.y + dy)
+}
+
+// Rotate point around origin
+func pointRotate(p, angle) {
+    c = cos(angle)
+    s = sin(angle)
+    return Point(p.x * c - p.y * s, p.x * s + p.y * c)
+}
+
+// Rotate point around another point
+func pointRotateAround(p, center, angle) {
+    translated = pointTranslate(p, -center.x, -center.y)
+    rotated = pointRotate(translated, angle)
+    return pointTranslate(rotated, center.x, center.y)
+}
+
+// Scale point from origin
+func pointScale(p, sx, sy) {
+    if (sy == null) { sy = sx }
+    return Point(p.x * sx, p.y * sy)
+}
+
+// Lerp between two points
+func pointLerp(p1, p2, t) {
+    return Point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
+}
+
+// Check if two points are equal (within epsilon)
+func pointEquals(p1, p2) {
+    return abs(p1.x - p2.x) < EPSILON() && abs(p1.y - p2.y) < EPSILON()
+}
+
+// ==========================================
+// 3D POINTS (VECTORS)
+// ==========================================
+
+// Create a 3D point
+func Point3D(x, y, z) {
+    return {_type: "Point3D", x: x, y: y, z: z}
+}
+
+// Distance between 3D points
+func point3DDistance(p1, p2) {
+    dx = p2.x - p1.x
+    dy = p2.y - p1.y
+    dz = p2.z - p1.z
+    return sqrt(dx * dx + dy * dy + dz * dz)
+}
+
+// Midpoint between 3D points
+func point3DMidpoint(p1, p2) {
+    return Point3D((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2)
+}
+
+// Translate 3D point
+func point3DTranslate(p, dx, dy, dz) {
+    return Point3D(p.x + dx, p.y + dy, p.z + dz)
+}
+
+// Scale 3D point
+func point3DScale(p, sx, sy, sz) {
+    if (sy == null) { sy = sx; sz = sx }
+    return Point3D(p.x * sx, p.y * sy, p.z * sz)
+}
+
+// ==========================================
+// 2D VECTORS
+// ==========================================
+
+// Create a 2D vector
+func Vec2(x, y) {
+    return {_type: "Vec2", x: x, y: y}
+}
+
+// Vector from two points
+func vec2FromPoints(p1, p2) {
+    return Vec2(p2.x - p1.x, p2.y - p1.y)
+}
+
+// Vector magnitude (length)
+func vec2Magnitude(v) {
+    return sqrt(v.x * v.x + v.y * v.y)
+}
+
+// Vector magnitude squared
+func vec2MagnitudeSq(v) {
+    return v.x * v.x + v.y * v.y
+}
+
+// Normalize vector
+func vec2Normalize(v) {
+    mag = vec2Magnitude(v)
+    if (mag < EPSILON()) { return Vec2(0, 0) }
+    return Vec2(v.x / mag, v.y / mag)
+}
+
+// Add vectors
+func vec2Add(v1, v2) {
+    return Vec2(v1.x + v2.x, v1.y + v2.y)
+}
+
+// Subtract vectors
+func vec2Sub(v1, v2) {
+    return Vec2(v1.x - v2.x, v1.y - v2.y)
+}
+
+// Scale vector
+func vec2Scale(v, s) {
+    return Vec2(v.x * s, v.y * s)
+}
+
+// Dot product
+func vec2Dot(v1, v2) {
+    return v1.x * v2.x + v1.y * v2.y
+}
+
+// Cross product (returns scalar in 2D)
+func vec2Cross(v1, v2) {
+    return v1.x * v2.y - v1.y * v2.x
+}
+
+// Perpendicular vector (90 degrees counterclockwise)
+func vec2Perpendicular(v) {
+    return Vec2(-v.y, v.x)
+}
+
+// Rotate vector
+func vec2Rotate(v, angle) {
+    c = cos(angle)
+    s = sin(angle)
+    return Vec2(v.x * c - v.y * s, v.x * s + v.y * c)
+}
+
+// Angle of vector
+func vec2Angle(v) {
+    return atan2(v.y, v.x)
+}
+
+// Angle between two vectors
+func vec2AngleBetween(v1, v2) {
+    dot = vec2Dot(v1, v2)
+    mag1 = vec2Magnitude(v1)
+    mag2 = vec2Magnitude(v2)
+    if (mag1 < EPSILON() || mag2 < EPSILON()) { return 0 }
+    return acos(clamp(dot / (mag1 * mag2), -1, 1))
+}
+
+// Reflect vector off surface with normal
+func vec2Reflect(v, normal) {
+    d = 2 * vec2Dot(v, normal)
+    return Vec2(v.x - d * normal.x, v.y - d * normal.y)
+}
+
+// Project v1 onto v2
+func vec2Project(v1, v2) {
+    dot = vec2Dot(v1, v2)
+    magSq = vec2MagnitudeSq(v2)
+    if (magSq < EPSILON()) { return Vec2(0, 0) }
+    return vec2Scale(v2, dot / magSq)
+}
+
+// ==========================================
+// LINES AND SEGMENTS
+// ==========================================
+
+// Create a line segment
+func Segment(p1, p2) {
+    return {_type: "Segment", p1: p1, p2: p2}
+}
+
+// Segment length
+func segmentLength(seg) {
+    return pointDistance(seg.p1, seg.p2)
+}
+
+// Point on segment at t (0-1)
+func segmentPointAt(seg, t) {
+    return pointLerp(seg.p1, seg.p2, t)
+}
+
+// Midpoint of segment
+func segmentMidpoint(seg) {
+    return pointMidpoint(seg.p1, seg.p2)
+}
+
+// Create a line (ax + by + c = 0)
+func Line(a, b, c) {
+    return {_type: "Line", a: a, b: b, c: c}
+}
+
+// Line from two points
+func lineFromPoints(p1, p2) {
+    a = p2.y - p1.y
+    b = p1.x - p2.x
+    c = -a * p1.x - b * p1.y
+    return Line(a, b, c)
+}
+
+// Line from point and direction
+func lineFromPointDir(p, dir) {
+    return lineFromPoints(p, Point(p.x + dir.x, p.y + dir.y))
+}
+
+// Distance from point to line
+func linePointDistance(line, p) {
+    return abs(line.a * p.x + line.b * p.y + line.c) / sqrt(line.a * line.a + line.b * line.b)
+}
+
+// Closest point on line to given point
+func lineClosestPoint(line, p) {
+    denom = line.a * line.a + line.b * line.b
+    x = (line.b * (line.b * p.x - line.a * p.y) - line.a * line.c) / denom
+    y = (line.a * (line.a * p.y - line.b * p.x) - line.b * line.c) / denom
+    return Point(x, y)
+}
+
+// Line intersection
+func lineIntersection(l1, l2) {
+    denom = l1.a * l2.b - l2.a * l1.b
+    if (abs(denom) < EPSILON()) { return null }  // Parallel
+    
+    x = (l1.b * l2.c - l2.b * l1.c) / denom
+    y = (l2.a * l1.c - l1.a * l2.c) / denom
+    return Point(x, y)
+}
+
+// Segment intersection
+func segmentIntersection(s1, s2) {
+    x1 = s1.p1.x; y1 = s1.p1.y
+    x2 = s1.p2.x; y2 = s1.p2.y
+    x3 = s2.p1.x; y3 = s2.p1.y
+    x4 = s2.p2.x; y4 = s2.p2.y
+    
+    denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if (abs(denom) < EPSILON()) { return null }
+    
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
+    u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom
+    
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+        return Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1))
+    }
+    return null
+}
+
+// Distance from point to segment
+func segmentPointDistance(seg, p) {
+    v = vec2FromPoints(seg.p1, seg.p2)
+    w = vec2FromPoints(seg.p1, p)
+    
+    c1 = vec2Dot(w, v)
+    if (c1 <= 0) { return pointDistance(p, seg.p1) }
+    
+    c2 = vec2Dot(v, v)
+    if (c2 <= c1) { return pointDistance(p, seg.p2) }
+    
+    t = c1 / c2
+    proj = Point(seg.p1.x + t * v.x, seg.p1.y + t * v.y)
+    return pointDistance(p, proj)
+}
+
+// ==========================================
+// CIRCLES
+// ==========================================
+
+// Create a circle
+func Circle(center, radius) {
+    return {_type: "Circle", center: center, radius: radius}
+}
+
+// Circle area
+func circleArea(c) {
+    return PI() * c.radius * c.radius
+}
+
+// Circle circumference
+func circleCircumference(c) {
+    return 2 * PI() * c.radius
+}
+
+// Point on circle at angle
+func circlePointAt(c, angle) {
+    return Point(c.center.x + c.radius * cos(angle), c.center.y + c.radius * sin(angle))
+}
+
+// Check if point is inside circle
+func circleContainsPoint(c, p) {
+    return pointDistance(c.center, p) <= c.radius
+}
+
+// Circle-circle intersection
+func circleCircleIntersection(c1, c2) {
+    d = pointDistance(c1.center, c2.center)
+    
+    // No intersection
+    if (d > c1.radius + c2.radius) { return [] }
+    // One contains the other
+    if (d < abs(c1.radius - c2.radius)) { return [] }
+    // Same circle
+    if (d < EPSILON() && abs(c1.radius - c2.radius) < EPSILON()) { return [] }
+    
+    a = (c1.radius * c1.radius - c2.radius * c2.radius + d * d) / (2 * d)
+    h = sqrt(c1.radius * c1.radius - a * a)
+    
+    px = c1.center.x + a * (c2.center.x - c1.center.x) / d
+    py = c1.center.y + a * (c2.center.y - c1.center.y) / d
+    
+    p1 = Point(px + h * (c2.center.y - c1.center.y) / d, py - h * (c2.center.x - c1.center.x) / d)
+    p2 = Point(px - h * (c2.center.y - c1.center.y) / d, py + h * (c2.center.x - c1.center.x) / d)
+    
+    if (pointEquals(p1, p2)) { return [p1] }
+    return [p1, p2]
+}
+
+// Line-circle intersection
+func lineCircleIntersection(line, circle) {
+    // Closest point on line to center
+    closest = lineClosestPoint(line, circle.center)
+    dist = pointDistance(closest, circle.center)
+    
+    if (dist > circle.radius) { return [] }
+    if (abs(dist - circle.radius) < EPSILON()) { return [closest] }
+    
+    // Two intersection points
+    offset = sqrt(circle.radius * circle.radius - dist * dist)
+    dir = vec2Normalize(Vec2(line.b, -line.a))
+    
+    p1 = Point(closest.x + dir.x * offset, closest.y + dir.y * offset)
+    p2 = Point(closest.x - dir.x * offset, closest.y - dir.y * offset)
+    return [p1, p2]
+}
+
+// ==========================================
+// RECTANGLES
+// ==========================================
+
+// Create a rectangle (from top-left corner)
+func Rect(x, y, width, height) {
+    return {_type: "Rect", x: x, y: y, width: width, height: height}
+}
+
+// Rectangle from center
+func rectFromCenter(cx, cy, width, height) {
+    return Rect(cx - width / 2, cy - height / 2, width, height)
+}
+
+// Rectangle from two corners
+func rectFromCorners(p1, p2) {
+    minX = p1.x < p2.x ? p1.x : p2.x
+    minY = p1.y < p2.y ? p1.y : p2.y
+    maxX = p1.x > p2.x ? p1.x : p2.x
+    maxY = p1.y > p2.y ? p1.y : p2.y
+    return Rect(minX, minY, maxX - minX, maxY - minY)
+}
+
+// Rectangle area
+func rectArea(r) {
+    return r.width * r.height
+}
+
+// Rectangle perimeter
+func rectPerimeter(r) {
+    return 2 * (r.width + r.height)
+}
+
+// Rectangle center
+func rectCenter(r) {
+    return Point(r.x + r.width / 2, r.y + r.height / 2)
+}
+
+// Rectangle corners
+func rectCorners(r) {
+    return [
+        Point(r.x, r.y),                          // top-left
+        Point(r.x + r.width, r.y),                // top-right
+        Point(r.x + r.width, r.y + r.height),     // bottom-right
+        Point(r.x, r.y + r.height)                // bottom-left
+    ]
+}
+
+// Check if point is inside rectangle
+func rectContainsPoint(r, p) {
+    return p.x >= r.x && p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height
+}
+
+// Rectangle-rectangle intersection test
+func rectIntersects(r1, r2) {
+    return r1.x < r2.x + r2.width && r1.x + r1.width > r2.x && r1.y < r2.y + r2.height && r1.y + r1.height > r2.y
+}
+
+// Get intersection rectangle
+func rectIntersection(r1, r2) {
+    if (!rectIntersects(r1, r2)) { return null }
+    
+    x = r1.x > r2.x ? r1.x : r2.x
+    y = r1.y > r2.y ? r1.y : r2.y
+    right1 = r1.x + r1.width
+    right2 = r2.x + r2.width
+    bottom1 = r1.y + r1.height
+    bottom2 = r2.y + r2.height
+    
+    return Rect(x, y, (right1 < right2 ? right1 : right2) - x, (bottom1 < bottom2 ? bottom1 : bottom2) - y)
+}
+
+// Rectangle-circle collision
+func rectCircleIntersects(r, c) {
+    // Find closest point on rectangle to circle center
+    closestX = clamp(c.center.x, r.x, r.x + r.width)
+    closestY = clamp(c.center.y, r.y, r.y + r.height)
+    
+    dx = c.center.x - closestX
+    dy = c.center.y - closestY
+    
+    return (dx * dx + dy * dy) <= c.radius * c.radius
+}
+
+// ==========================================
+// TRIANGLES
+// ==========================================
+
+// Create a triangle
+func Triangle(p1, p2, p3) {
+    return {_type: "Triangle", p1: p1, p2: p2, p3: p3}
+}
+
+// Triangle area (using cross product)
+func triangleArea(t) {
+    return abs((t.p2.x - t.p1.x) * (t.p3.y - t.p1.y) - (t.p3.x - t.p1.x) * (t.p2.y - t.p1.y)) / 2
+}
+
+// Triangle perimeter
+func trianglePerimeter(t) {
+    return pointDistance(t.p1, t.p2) + pointDistance(t.p2, t.p3) + pointDistance(t.p3, t.p1)
+}
+
+// Triangle centroid
+func triangleCentroid(t) {
+    return Point((t.p1.x + t.p2.x + t.p3.x) / 3, (t.p1.y + t.p2.y + t.p3.y) / 3)
+}
+
+// Check if point is inside triangle (barycentric coordinates)
+func triangleContainsPoint(t, p) {
+    d1 = sign(p, t.p1, t.p2)
+    d2 = sign(p, t.p2, t.p3)
+    d3 = sign(p, t.p3, t.p1)
+    
+    hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0)
+    hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0)
+    
+    return !(hasNeg && hasPos)
+}
+
+func sign(p1, p2, p3) {
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
+}
+
+// Triangle circumcircle
+func triangleCircumcircle(t) {
+    ax = t.p1.x; ay = t.p1.y
+    bx = t.p2.x; by = t.p2.y
+    cx = t.p3.x; cy = t.p3.y
+    
+    d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+    if (abs(d) < EPSILON()) { return null }
+    
+    ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d
+    uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
+    
+    center = Point(ux, uy)
+    radius = pointDistance(center, t.p1)
+    
+    return Circle(center, radius)
+}
+
+// Triangle incircle
+func triangleIncircle(t) {
+    a = pointDistance(t.p2, t.p3)
+    b = pointDistance(t.p1, t.p3)
+    c = pointDistance(t.p1, t.p2)
+    
+    s = a + b + c
+    
+    cx = (a * t.p1.x + b * t.p2.x + c * t.p3.x) / s
+    cy = (a * t.p1.y + b * t.p2.y + c * t.p3.y) / s
+    
+    center = Point(cx, cy)
+    radius = 2 * triangleArea(t) / s
+    
+    return Circle(center, radius)
+}
+
+// ==========================================
+// POLYGONS
+// ==========================================
+
+// Create a polygon from points
+func Polygon(points) {
+    return {_type: "Polygon", points: points}
+}
+
+// Regular polygon
+func regularPolygon(center, radius, sides) {
+    points = []
+    angleStep = TAU() / sides
+    
+    for i in range(sides) {
+        angle = i * angleStep - PI() / 2
+        push(points, Point(center.x + radius * cos(angle), center.y + radius * sin(angle)))
+    }
+    
+    return Polygon(points)
+}
+
+// Polygon area (shoelace formula)
+func polygonArea(poly) {
+    area = 0
+    n = poly.points.len()
+    
+    for i in range(n) {
+        j = (i + 1) % n
+        area = area + poly.points[i].x * poly.points[j].y
+        area = area - poly.points[j].x * poly.points[i].y
+    }
+    
+    return abs(area) / 2
+}
+
+// Polygon perimeter
+func polygonPerimeter(poly) {
+    perimeter = 0
+    n = poly.points.len()
+    
+    for i in range(n) {
+        j = (i + 1) % n
+        perimeter = perimeter + pointDistance(poly.points[i], poly.points[j])
+    }
+    
+    return perimeter
+}
+
+// Polygon centroid
+func polygonCentroid(poly) {
+    cx = 0
+    cy = 0
+    area = 0
+    n = poly.points.len()
+    
+    for i in range(n) {
+        j = (i + 1) % n
+        cross = poly.points[i].x * poly.points[j].y - poly.points[j].x * poly.points[i].y
+        cx = cx + (poly.points[i].x + poly.points[j].x) * cross
+        cy = cy + (poly.points[i].y + poly.points[j].y) * cross
+        area = area + cross
+    }
+    
+    area = area / 2
+    cx = cx / (6 * area)
+    cy = cy / (6 * area)
+    
+    return Point(cx, cy)
+}
+
+// Check if point is inside polygon (ray casting)
+func polygonContainsPoint(poly, p) {
+    inside = false
+    n = poly.points.len()
+    j = n - 1
+    
+    for i in range(n) {
+        xi = poly.points[i].x
+        yi = poly.points[i].y
+        xj = poly.points[j].x
+        yj = poly.points[j].y
+        
+        if (((yi > p.y) != (yj > p.y)) && (p.x < (xj - xi) * (p.y - yi) / (yj - yi) + xi)) {
+            inside = !inside
+        }
+        j = i
+    }
+    
+    return inside
+}
+
+// Check if polygon is convex
+func polygonIsConvex(poly) {
+    n = poly.points.len()
+    if (n < 3) { return false }
+    
+    sign = 0
+    
+    for i in range(n) {
+        p1 = poly.points[i]
+        p2 = poly.points[(i + 1) % n]
+        p3 = poly.points[(i + 2) % n]
+        
+        cross = (p2.x - p1.x) * (p3.y - p2.y) - (p2.y - p1.y) * (p3.x - p2.x)
+        
+        if (sign == 0) {
+            sign = cross > 0 ? 1 : -1
+        } else {
+            if ((cross > 0 && sign < 0) || (cross < 0 && sign > 0)) {
+                return false
+            }
+        }
+    }
+    
+    return true
+}
+
+// ==========================================
+// BOUNDING BOX
+// ==========================================
+
+// Get bounding box of points
+func boundingBox(points) {
+    if (points.len() == 0) { return null }
+    
+    minX = points[0].x
+    minY = points[0].y
+    maxX = points[0].x
+    maxY = points[0].y
+    
+    for p in points {
+        if (p.x < minX) { minX = p.x }
+        if (p.y < minY) { minY = p.y }
+        if (p.x > maxX) { maxX = p.x }
+        if (p.y > maxY) { maxY = p.y }
+    }
+    
+    return Rect(minX, minY, maxX - minX, maxY - minY)
+}
+
+// Get bounding box of polygon
+func polygonBoundingBox(poly) {
+    return boundingBox(poly.points)
+}
+
+// ==========================================
+// MATH HELPERS
+// ==========================================
+
+func sqrt(x) {
+    if (x <= 0) { return 0 }
+    guess = x / 2
+    for i in range(20) {
+        guess = (guess + x / guess) / 2
+    }
+    return guess
+}
+
+func abs(x) {
+    return x < 0 ? -x : x
+}
+
+func clamp(v, min, max) {
+    if (v < min) { return min }
+    if (v > max) { return max }
+    return v
+}
+
+// Trigonometric functions (Taylor series)
+func sin(x) {
+    // Normalize to [-PI, PI]
+    while (x > PI()) { x = x - TAU() }
+    while (x < -PI()) { x = x + TAU() }
+    
+    result = 0
+    term = x
+    for n in range(1, 15) {
+        result = result + term
+        term = term * (-x * x) / ((2 * n) * (2 * n + 1))
+    }
+    return result
+}
+
+func cos(x) {
+    return sin(x + PI() / 2)
+}
+
+func tan(x) {
+    c = cos(x)
+    if (abs(c) < EPSILON()) { return 999999999 }
+    return sin(x) / c
+}
+
+func atan2(y, x) {
+    if (x > 0) {
+        return atan(y / x)
+    } else if (x < 0 && y >= 0) {
+        return atan(y / x) + PI()
+    } else if (x < 0 && y < 0) {
+        return atan(y / x) - PI()
+    } else if (x == 0 && y > 0) {
+        return PI() / 2
+    } else if (x == 0 && y < 0) {
+        return -PI() / 2
+    }
+    return 0
+}
+
+func atan(x) {
+    // Taylor series for atan
+    if (abs(x) > 1) {
+        if (x > 0) { return PI() / 2 - atan(1 / x) }
+        return -PI() / 2 - atan(1 / x)
+    }
+    
+    result = 0
+    term = x
+    for n in range(1, 30) {
+        result = result + term / (2 * n - 1)
+        term = term * (-x * x)
+    }
+    return result
+}
+
+func acos(x) {
+    return PI() / 2 - asin(x)
+}
+
+func asin(x) {
+    if (x >= 1) { return PI() / 2 }
+    if (x <= -1) { return -PI() / 2 }
+    return atan(x / sqrt(1 - x * x))
+}
+
+// Degrees/Radians conversion
+func degToRad(deg) {
+    return deg * PI() / 180
+}
+
+func radToDeg(rad) {
+    return rad * 180 / PI()
+}
+
+// ==========================================
+// UTILITY
+// ==========================================
+
+// Clone a geometry object
+func clone(obj) {
+    if (obj._type == "Point") { return Point(obj.x, obj.y) }
+    if (obj._type == "Point3D") { return Point3D(obj.x, obj.y, obj.z) }
+    if (obj._type == "Vec2") { return Vec2(obj.x, obj.y) }
+    if (obj._type == "Circle") { return Circle(clone(obj.center), obj.radius) }
+    if (obj._type == "Rect") { return Rect(obj.x, obj.y, obj.width, obj.height) }
+    if (obj._type == "Triangle") { return Triangle(clone(obj.p1), clone(obj.p2), clone(obj.p3)) }
+    if (obj._type == "Segment") { return Segment(clone(obj.p1), clone(obj.p2)) }
+    if (obj._type == "Polygon") {
+        points = []
+        for p in obj.points { push(points, clone(p)) }
+        return Polygon(points)
+    }
+    return obj
+}
+
+// Print point
+func pointStr(p) {
+    return "(" + str(p.x) + ", " + str(p.y) + ")"
+}
+
+func printPoint(p) {
+    print(pointStr(p))
+}

@@ -149,7 +149,7 @@ print("\n--- Verification ---")
 iPi = math.complex(0, math.PI())
 eiPi = math.cexp(iPi)
 print("e^(i*PI) =", math.cstr(eiPi))
-print("e^(i*PI) + 1 ≈ 0:", abs(eiPi.re + 1) < 0.0001 && abs(eiPi.im) < 0.0001)
+print("e^(i*PI) + 1 ~= 0:", abs(eiPi.re + 1) < 0.0001 && abs(eiPi.im) < 0.0001)
 
 // Pythagorean identity: sin^2 + cos^2 = 1
 angle = 0.7

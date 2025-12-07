@@ -21,16 +21,16 @@ print(math.sqrt(2))           // 1.41421
 
 Constants are implemented as functions to ensure proper module export.
 
-| Function  | Value         | Description       |
-| --------- | ------------- | ----------------- |
-| `PI()`    | 3.14159265... | Pi                |
-| `E()`     | 2.71828182... | Euler's number    |
-| `TAU()`   | 6.28318530... | Tau (2π)          |
-| `PHI()`   | 1.61803398... | Golden ratio      |
-| `LN2()`   | 0.69314718... | Natural log of 2  |
-| `LN10()`  | 2.30258509... | Natural log of 10 |
-| `SQRT2()` | 1.41421356... | Square root of 2  |
-| `SQRT3()` | 1.73205080... | Square root of 3  |
+| Function | Value | Description |
+|----------|-------|-------------|
+| `PI()` | 3.14159265... | Pi |
+| `E()` | 2.71828182... | Euler's number |
+| `TAU()` | 6.28318530... | Tau (2π) |
+| `PHI()` | 1.61803398... | Golden ratio |
+| `LN2()` | 0.69314718... | Natural log of 2 |
+| `LN10()` | 2.30258509... | Natural log of 10 |
+| `SQRT2()` | 1.41421356... | Square root of 2 |
+| `SQRT3()` | 1.73205080... | Square root of 3 |
 
 ```javascript
 import "modules/math.jm" as m
@@ -44,13 +44,13 @@ print(m.PHI())   // 1.61803
 ## Trigonometric Functions
 
 | Function | Description |
-| -------- | ----------- |
-| `sin(x)` | Sine        |
-| `cos(x)` | Cosine      |
-| `tan(x)` | Tangent     |
-| `cot(x)` | Cotangent   |
-| `sec(x)` | Secant      |
-| `csc(x)` | Cosecant    |
+|----------|-------------|
+| `sin(x)` | Sine |
+| `cos(x)` | Cosine |
+| `tan(x)` | Tangent |
+| `cot(x)` | Cotangent |
+| `sec(x)` | Secant |
+| `csc(x)` | Cosecant |
 
 ```javascript
 import "modules/math.jm" as m
@@ -64,12 +64,12 @@ print(m.tan(m.PI() / 4))     // 1
 
 ## Inverse Trigonometric Functions
 
-| Function      | Description                  |
-| ------------- | ---------------------------- |
-| `asin(x)`     | Arcsine (returns radians)    |
-| `acos(x)`     | Arccosine (returns radians)  |
-| `atan(x)`     | Arctangent (returns radians) |
-| `atan2(y, x)` | Two-argument arctangent      |
+| Function | Description |
+|----------|-------------|
+| `asin(x)` | Arcsine (returns radians) |
+| `acos(x)` | Arccosine (returns radians) |
+| `atan(x)` | Arctangent (returns radians) |
+| `atan2(y, x)` | Two-argument arctangent |
 
 ```javascript
 import "modules/math.jm" as m
@@ -82,10 +82,10 @@ print(m.atan2(1, 1))   // 0.7854 (π/4)
 
 ## Hyperbolic Functions
 
-| Function  | Description        |
-| --------- | ------------------ |
-| `sinh(x)` | Hyperbolic sine    |
-| `cosh(x)` | Hyperbolic cosine  |
+| Function | Description |
+|----------|-------------|
+| `sinh(x)` | Hyperbolic sine |
+| `cosh(x)` | Hyperbolic cosine |
 | `tanh(x)` | Hyperbolic tangent |
 
 ```javascript
@@ -98,12 +98,12 @@ print(m.tanh(1))   // 0.7616
 
 ## Exponential & Logarithmic Functions
 
-| Function           | Description                |
-| ------------------ | -------------------------- |
-| `exp(x)`           | e^x                        |
-| `ln(x)`            | Natural logarithm          |
-| `log10(x)`         | Base-10 logarithm          |
-| `log2(x)`          | Base-2 logarithm           |
+| Function | Description |
+|----------|-------------|
+| `exp(x)` | e^x |
+| `ln(x)` | Natural logarithm |
+| `log10(x)` | Base-10 logarithm |
+| `log2(x)` | Base-2 logarithm |
 | `logBase(x, base)` | Logarithm with custom base |
 
 ```javascript
@@ -123,27 +123,27 @@ Complex numbers are represented as objects: `{re: real, im: imaginary}`
 
 ### Creation
 
-| Function                 | Description                          |
-| ------------------------ | ------------------------------------ |
-| `complex(re, im)`        | Create from real and imaginary parts |
-| `complexPolar(r, theta)` | Create from polar coordinates        |
+| Function | Description |
+|----------|-------------|
+| `complex(re, im)` | Create from real and imaginary parts |
+| `complexPolar(r, theta)` | Create from polar coordinates |
 
 ### Operations
 
-| Function     | Description                 |
-| ------------ | --------------------------- |
-| `cabs(z)`    | Absolute value (magnitude)  |
-| `carg(z)`    | Argument (angle in radians) |
-| `conj(z)`    | Complex conjugate           |
-| `cadd(a, b)` | Addition                    |
-| `csub(a, b)` | Subtraction                 |
-| `cmul(a, b)` | Multiplication              |
-| `cdiv(a, b)` | Division                    |
-| `cpow(z, n)` | Integer power               |
-| `csqrt(z)`   | Square root                 |
-| `cexp(z)`    | Complex exponential         |
-| `cln(z)`     | Complex natural logarithm   |
-| `cstr(z)`    | Format as string            |
+| Function | Description |
+|----------|-------------|
+| `cabs(z)` | Absolute value (magnitude) |
+| `carg(z)` | Argument (angle in radians) |
+| `conj(z)` | Complex conjugate |
+| `cadd(a, b)` | Addition |
+| `csub(a, b)` | Subtraction |
+| `cmul(a, b)` | Multiplication |
+| `cdiv(a, b)` | Division |
+| `cpow(z, n)` | Integer power |
+| `csqrt(z)` | Square root |
+| `cexp(z)` | Complex exponential |
+| `cln(z)` | Complex natural logarithm |
+| `cstr(z)` | Format as string |
 
 ```javascript
 import "modules/math.jm" as m
@@ -178,15 +178,15 @@ print(m.cstr(eiPi))            // "-1 + 0i"
 
 Vectors are represented as arrays: `[x, y, z]`
 
-| Function       | Description             |
-| -------------- | ----------------------- |
-| `dot(a, b)`    | Dot product             |
-| `cross(a, b)`  | Cross product (3D only) |
-| `magnitude(v)` | Vector length           |
-| `normalize(v)` | Unit vector             |
-| `vadd(a, b)`   | Vector addition         |
-| `vsub(a, b)`   | Vector subtraction      |
-| `vscale(v, s)` | Scalar multiplication   |
+| Function | Description |
+|----------|-------------|
+| `dot(a, b)` | Dot product |
+| `cross(a, b)` | Cross product (3D only) |
+| `magnitude(v)` | Vector length |
+| `normalize(v)` | Unit vector |
+| `vadd(a, b)` | Vector addition |
+| `vsub(a, b)` | Vector subtraction |
+| `vscale(v, s)` | Scalar multiplication |
 
 ```javascript
 import "modules/math.jm" as m
@@ -209,22 +209,22 @@ Matrices are represented as 2D arrays: `[[row1], [row2], ...]`
 
 ### Creation
 
-| Function            | Description         |
-| ------------------- | ------------------- |
-| `identity(n)`       | n×n identity matrix |
-| `zeros(rows, cols)` | Zero matrix         |
+| Function | Description |
+|----------|-------------|
+| `identity(n)` | n×n identity matrix |
+| `zeros(rows, cols)` | Zero matrix |
 
 ### Operations
 
-| Function       | Description               |
-| -------------- | ------------------------- |
-| `madd(a, b)`   | Matrix addition           |
-| `msub(a, b)`   | Matrix subtraction        |
-| `mmul(a, b)`   | Matrix multiplication     |
-| `mscale(m, s)` | Scalar multiplication     |
-| `transpose(m)` | Transpose                 |
-| `det(m)`       | Determinant (2×2 and 3×3) |
-| `trace(m)`     | Trace (sum of diagonal)   |
+| Function | Description |
+|----------|-------------|
+| `madd(a, b)` | Matrix addition |
+| `msub(a, b)` | Matrix subtraction |
+| `mmul(a, b)` | Matrix multiplication |
+| `mscale(m, s)` | Scalar multiplication |
+| `transpose(m)` | Transpose |
+| `det(m)` | Determinant (2×2 and 3×3) |
+| `trace(m)` | Trace (sum of diagonal) |
 
 ```javascript
 import "modules/math.jm" as m
@@ -250,16 +250,16 @@ print(m.det(m3))            // -3
 
 ## Statistical Functions
 
-| Function            | Description             |
-| ------------------- | ----------------------- |
-| `sum(arr)`          | Sum of elements         |
-| `product(arr)`      | Product of elements     |
-| `mean(arr)`         | Arithmetic mean         |
-| `median(arr)`       | Median value            |
-| `mode(arr)`         | Most frequent value     |
-| `variance(arr)`     | Population variance     |
-| `stddev(arr)`       | Standard deviation      |
-| `covariance(x, y)`  | Covariance              |
+| Function | Description |
+|----------|-------------|
+| `sum(arr)` | Sum of elements |
+| `product(arr)` | Product of elements |
+| `mean(arr)` | Arithmetic mean |
+| `median(arr)` | Median value |
+| `mode(arr)` | Most frequent value |
+| `variance(arr)` | Population variance |
+| `stddev(arr)` | Standard deviation |
+| `covariance(x, y)` | Covariance |
 | `correlation(x, y)` | Correlation coefficient |
 
 ```javascript
@@ -283,10 +283,10 @@ print(m.correlation(x, y))  // 0.7746
 
 ## Combinatorics
 
-| Function             | Description               |
-| -------------------- | ------------------------- |
-| `factorial(n)`       | n!                        |
-| `permutations(n, r)` | P(n, r) = n! / (n-r)!     |
+| Function | Description |
+|----------|-------------|
+| `factorial(n)` | n! |
+| `permutations(n, r)` | P(n, r) = n! / (n-r)! |
 | `combinations(n, r)` | C(n, r) = n! / (r!(n-r)!) |
 
 ```javascript
@@ -301,13 +301,13 @@ print(m.combinations(10, 5))// 252
 
 ## Number Theory
 
-| Function          | Description             |
-| ----------------- | ----------------------- |
-| `gcd(a, b)`       | Greatest common divisor |
-| `lcm(a, b)`       | Least common multiple   |
-| `isPrime(n)`      | Check if prime          |
-| `primeFactors(n)` | List of prime factors   |
-| `fib(n)`          | Fibonacci number        |
+| Function | Description |
+|----------|-------------|
+| `gcd(a, b)` | Greatest common divisor |
+| `lcm(a, b)` | Least common multiple |
+| `isPrime(n)` | Check if prime |
+| `primeFactors(n)` | List of prime factors |
+| `fib(n)` | Fibonacci number |
 
 ```javascript
 import "modules/math.jm" as m
@@ -323,17 +323,17 @@ print(m.fib(20))            // 6765
 
 ## Utility Functions
 
-| Function                                    | Description              |
-| ------------------------------------------- | ------------------------ |
-| `clamp(x, min, max)`                        | Clamp value to range     |
-| `lerp(a, b, t)`                             | Linear interpolation     |
+| Function | Description |
+|----------|-------------|
+| `clamp(x, min, max)` | Clamp value to range |
+| `lerp(a, b, t)` | Linear interpolation |
 | `mapRange(x, inMin, inMax, outMin, outMax)` | Map value between ranges |
-| `radians(deg)`                              | Degrees to radians       |
-| `degrees(rad)`                              | Radians to degrees       |
-| `sign(x)`                                   | Sign function (-1, 0, 1) |
-| `hypot(a, b)`                               | √(a² + b²)               |
-| `cbrt(x)`                                   | Cube root                |
-| `nthRoot(x, n)`                             | Nth root                 |
+| `radians(deg)` | Degrees to radians |
+| `degrees(rad)` | Radians to degrees |
+| `sign(x)` | Sign function (-1, 0, 1) |
+| `hypot(a, b)` | √(a² + b²) |
+| `cbrt(x)` | Cube root |
+| `nthRoot(x, n)` | Nth root |
 
 ```javascript
 import "modules/math.jm" as m
