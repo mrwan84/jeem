@@ -13,12 +13,17 @@ print(cli.fgGreen() + "This is green text" + cli.reset())
 print(cli.fgBlue() + "This is blue text" + cli.reset())
 print(cli.fgYellow() + "This is yellow text" + cli.reset())
 print(cli.fgCyan() + "This is cyan text" + cli.reset())
-
+print(cli.bgRed() + "This is red background" + cli.reset())
+print(cli.bgGreen() + "this is Green background" + cli.reset())
+print("--- 256 and RGB Colors ---")
+print(cli.fg256(208) + "256 color" + cli.reset())
+print(cli.fgRgb(255, 128, 0) + "True color" + cli.reset())
 // --- Styles ---
 print("\n--- Text Styles ---")
 print(cli.bold() + "Bold text" + cli.reset())
 print(cli.dim() + "Dim text" + cli.reset())
 print(cli.underline() + "Underlined text" + cli.reset())
+print(cli.italic() + "Italic" + cli.reset())
 
 // --- Status Messages ---
 print("\n--- Status Messages ---")
