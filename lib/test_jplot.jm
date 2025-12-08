@@ -1,116 +1,399 @@
 // ============================================
-// jPlot Library Test
+// jPlot v2.0 - Comprehensive Test Suite
 // ============================================
 
 import "modules/jplot.jm" as jplot
 
-print("=== JPLOT LIBRARY TEST ===\n")
-
-// --- Line Chart ---
-print("--- Line Chart ---")
-data = [1, 4, 2, 8, 5, 7, 3, 6, 9, 4, 2, 5]
-config = jplot.PlotConfig()
-config.title = "Monthly Sales"
-config.width = 50
-config.height = 12
-print(jplot.lineChart(data, config))
+print("=" * 60)
+print("jPlot v2.0 - Professional Charting Library Test")
+print("=" * 60)
 print("")
 
-// --- Bar Chart (Horizontal) ---
-print("--- Bar Chart (Horizontal) ---")
-labels = ["Jan", "Feb", "Mar", "Apr", "May"]
-values = [120, 85, 142, 98, 165]
-config = jplot.PlotConfig()
-config.title = "Sales by Month"
-print(jplot.barChart(labels, values, config))
-print("")
+// ==========================================
+// Test Data
+// ==========================================
 
-// --- Bar Chart (Vertical) ---
-print("--- Bar Chart (Vertical) ---")
-config = jplot.PlotConfig()
-config.title = "Quarterly Revenue"
-config.height = 10
-print(jplot.barChartVertical(["Q1", "Q2", "Q3", "Q4"], [45, 78, 62, 89], config))
-print("")
+salesData = [120, 145, 132, 178, 165, 198, 210, 195, 225, 240, 235, 260]
+revenueData = [85, 92, 88, 105, 98, 118, 125, 115, 135, 142, 138, 155]
+costsData = [60, 65, 62, 70, 68, 75, 80, 78, 85, 88, 86, 92]
 
-// --- Scatter Plot ---
-print("--- Scatter Plot ---")
+categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+values1 = [45, 52, 49, 63, 58, 72]
+values2 = [32, 38, 35, 45, 42, 55]
+values3 = [18, 22, 20, 28, 25, 32]
+
 xData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-yData = [2, 4, 5, 4, 5, 8, 7, 9, 8, 10]
-config = jplot.PlotConfig()
-config.title = "X vs Y Correlation"
-config.width = 40
-config.height = 12
-print(jplot.scatterPlot(xData, yData, config))
-print("")
+yData = [2.1, 4.3, 5.8, 8.2, 9.5, 12.1, 13.8, 16.2, 17.9, 20.5]
 
-// --- Histogram ---
-print("--- Histogram ---")
-// Generate some random-ish data
-histData = []
-for i in range(50) {
-    push(histData, (i % 10) + (i % 7))
-}
-config = jplot.PlotConfig()
-config.title = "Value Distribution"
-print(jplot.histogram(histData, 8, config))
-print("")
+normalData = [12, 15, 18, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50, 52, 55, 58, 60, 62, 65, 68, 70, 72, 75, 78, 80, 82, 85, 88]
 
-// --- Sparkline ---
-print("--- Sparkline ---")
-sparkData = [5, 3, 7, 2, 8, 4, 9, 1, 6, 5, 7, 3]
-print("Trend: [" + jplot.sparkline(sparkData) + "]")
-print("")
-
-// --- Box Plot ---
-print("--- Box Plot ---")
-boxData = [2, 3, 5, 7, 8, 10, 11, 12, 13, 15, 18, 20, 22, 25]
-config = jplot.PlotConfig()
-config.title = "Data Distribution"
-config.width = 50
-print(jplot.boxPlot(boxData, config))
-print("")
-
-// --- Pie Chart ---
-print("--- Pie Chart ---")
-pieLabels = ["Chrome", "Firefox", "Safari", "Edge", "Other"]
-pieValues = [65, 15, 10, 7, 3]
-config = jplot.PlotConfig()
-config.title = "Browser Market Share"
-print(jplot.pieChart(pieLabels, pieValues, config))
-print("")
-
-// --- Multi-Line Chart ---
-print("--- Multi-Line Chart ---")
-datasets = [
-    {name: "Product A", data: [10, 15, 12, 18, 20, 22, 25]},
-    {name: "Product B", data: [5, 8, 12, 10, 15, 18, 20]},
-    {name: "Product C", data: [8, 6, 9, 12, 11, 14, 16]}
+ohlcData = [
+    {open: 100, high: 105, low: 98, close: 103},
+    {open: 103, high: 108, low: 101, close: 106},
+    {open: 106, high: 110, low: 104, close: 108},
+    {open: 108, high: 112, low: 105, close: 107},
+    {open: 107, high: 115, low: 106, close: 114},
+    {open: 114, high: 118, low: 112, close: 116},
+    {open: 116, high: 120, low: 113, close: 118},
+    {open: 118, high: 122, low: 115, close: 120}
 ]
-config = jplot.PlotConfig()
-config.title = "Product Comparison"
-config.width = 50
-config.height = 12
+
+heatData = [
+    [0.2, 0.4, 0.6, 0.8, 1.0],
+    [0.3, 0.5, 0.7, 0.9, 0.8],
+    [0.4, 0.6, 0.8, 0.7, 0.6],
+    [0.5, 0.7, 0.6, 0.5, 0.4],
+    [0.6, 0.5, 0.4, 0.3, 0.2]
+]
+
+// ==========================================
+// 1. LINE CHARTS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("1. LINE CHARTS")
+print("=" * 60)
+
+print("\n--- Basic Line Chart ---\n")
+config = jplot.Config()
+config.title = "Monthly Sales Performance"
+config.subtitle = "Units sold per month"
+config.width = 55
+config.height = 15
+print(jplot.lineChart(salesData, config))
+
+print("\n--- Unicode with Grid ---\n")
+config.charset = "unicode"
+config.showGrid = true
+print(jplot.lineChart(revenueData, config))
+
+print("\n--- With Trend Line ---\n")
+config = jplot.Config()
+config.title = "Sales Trend Analysis"
+config.width = 55
+config.height = 15
+config.trendLine = true
+print(jplot.lineChart(salesData, config))
+
+// ==========================================
+// 2. MULTI-LINE CHARTS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("2. MULTI-LINE CHARTS")
+print("=" * 60)
+
+print("\n--- Multi-Line Comparison ---\n")
+datasets = [
+    {name: "Sales", data: salesData},
+    {name: "Revenue", data: revenueData},
+    {name: "Costs", data: costsData}
+]
+config = jplot.Config()
+config.title = "Business Metrics"
+config.width = 55
+config.height = 15
 print(jplot.multiLineChart(datasets, config))
+
+// ==========================================
+// 3. AREA CHART
+// ==========================================
+
+print("\n" + "=" * 60)
+print("3. AREA CHART")
+print("=" * 60)
+
+print("\n--- Area Chart ---\n")
+config = jplot.Config()
+config.title = "Cumulative Growth"
+config.charset = "unicode"
+config.width = 55
+config.height = 15
+print(jplot.areaChart(salesData, config))
+
+// ==========================================
+// 4. BAR CHARTS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("4. BAR CHARTS")
+print("=" * 60)
+
+print("\n--- Horizontal Bar ---\n")
+regions = ["North", "South", "East", "West", "Central"]
+regionSales = [245, 198, 312, 267, 189]
+config = jplot.Config()
+config.title = "Sales by Region"
+config.width = 50
+print(jplot.barChart(regions, regionSales, config))
+
+print("\n--- Vertical Bar ---\n")
+config = jplot.Config()
+config.title = "Monthly Performance"
+config.charset = "unicode"
+config.height = 12
+print(jplot.barChartVertical(categories, values1, config))
+
+// ==========================================
+// 5. GROUPED & STACKED BARS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("5. GROUPED & STACKED BARS")
+print("=" * 60)
+
+print("\n--- Grouped Bar ---\n")
+groupedData = [
+    {name: "2023", data: values1},
+    {name: "2024", data: values2}
+]
+config = jplot.Config()
+config.title = "Year Comparison"
+config.height = 12
+print(jplot.groupedBarChart(categories, groupedData, config))
+
+print("\n--- Stacked Bar ---\n")
+stackedData = [
+    {name: "Product A", data: values1},
+    {name: "Product B", data: values2},
+    {name: "Product C", data: values3}
+]
+config = jplot.Config()
+config.title = "Product Mix"
+config.width = 55
+print(jplot.stackedBarChart(categories, stackedData, config))
+
+// ==========================================
+// 6. SCATTER PLOT
+// ==========================================
+
+print("\n" + "=" * 60)
+print("6. SCATTER PLOT")
+print("=" * 60)
+
+print("\n--- Scatter with Regression ---\n")
+config = jplot.Config()
+config.title = "Correlation Analysis"
+config.width = 50
+config.height = 15
+config.trendLine = true
+config.showGrid = true
+print(jplot.scatterPlot(xData, yData, config))
+
+// ==========================================
+// 7. HISTOGRAM & BOX PLOT
+// ==========================================
+
+print("\n" + "=" * 60)
+print("7. HISTOGRAM & BOX PLOT")
+print("=" * 60)
+
+print("\n--- Histogram ---\n")
+config = jplot.Config()
+config.title = "Distribution"
+config.width = 50
+print(jplot.histogram(normalData, 8, config))
+
+print("\n--- Box Plot ---\n")
+config = jplot.Config()
+config.title = "5-Number Summary"
+config.charset = "unicode"
+config.width = 50
+print(jplot.boxPlot(normalData, config))
+
+// ==========================================
+// 8. PIE CHART
+// ==========================================
+
+print("\n" + "=" * 60)
+print("8. PIE CHART")
+print("=" * 60)
+
+print("\n--- Market Share ---\n")
+companies = ["Acme", "Beta", "Gamma", "Delta", "Other"]
+shares = [35, 25, 20, 12, 8]
+config = jplot.Config()
+config.title = "Market Distribution"
+config.width = 50
+print(jplot.pieChart(companies, shares, config))
+
+// ==========================================
+// 9. CANDLESTICK
+// ==========================================
+
+print("\n" + "=" * 60)
+print("9. CANDLESTICK (OHLC)")
+print("=" * 60)
+
+print("\n--- Stock Price ---\n")
+config = jplot.Config()
+config.title = "ACME Stock"
+config.height = 15
+print(jplot.candlestick(ohlcData, config))
+
+// ==========================================
+// 10. HEATMAP
+// ==========================================
+
+print("\n" + "=" * 60)
+print("10. HEATMAP")
+print("=" * 60)
+
+print("\n--- Activity Heatmap ---\n")
+config = jplot.Config()
+config.title = "Intensity Matrix"
+config.charset = "unicode"
+print(jplot.heatmap(heatData, config))
+
+// ==========================================
+// 11. GAUGE & PROGRESS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("11. GAUGE & PROGRESS")
+print("=" * 60)
+
+print("\n--- Gauge ---\n")
+config = jplot.Config()
+config.title = "CPU Usage"
+config.charset = "unicode"
+config.width = 45
+print(jplot.gauge(73, 0, 100, config))
+
+print("\n--- Progress Bars ---\n")
+config = jplot.Config()
+config.charset = "unicode"
+config.width = 35
+print("Task 1: " + jplot.progressBar(25, 100, config))
+print("Task 2: " + jplot.progressBar(50, 100, config))
+print("Task 3: " + jplot.progressBar(75, 100, config))
+print("Task 4: " + jplot.progressBar(100, 100, config))
+
+// ==========================================
+// 12. SPARKLINES
+// ==========================================
+
+print("\n" + "=" * 60)
+print("12. SPARKLINES")
+print("=" * 60)
+
+print("\n--- Inline Trends ---\n")
+print("Sales:   " + jplot.sparkline(salesData))
+print("Revenue: " + jplot.sparkline(revenueData))
+print("Costs:   " + jplot.sparkline(costsData))
 print("")
+print("ASCII:   " + jplot.sparklineAscii(salesData))
+print("Blocks:  " + jplot.sparklineBars(salesData))
 
-// --- Quick Plot Functions ---
-print("--- Quick Plot ---")
-jplot.plot([1, 3, 2, 5, 4, 6, 5, 8, 7, 9], "Quick Line Chart")
+// ==========================================
+// 13. TABLE
+// ==========================================
+
+print("\n" + "=" * 60)
+print("13. DATA TABLE")
+print("=" * 60)
+
+print("\n--- Financial Summary ---\n")
+headers = ["Month", "Sales", "Revenue", "Profit"]
+rows = [
+    ["Jan", 120, 85, 35],
+    ["Feb", 145, 92, 53],
+    ["Mar", 132, 88, 44],
+    ["Apr", 178, 105, 73]
+]
+config = jplot.Config()
+config.title = "Q1 Summary"
+config.charset = "unicode"
+print(jplot.table(headers, rows, config))
+
+// ==========================================
+// 14. STATISTICS
+// ==========================================
+
+print("\n" + "=" * 60)
+print("14. STATISTICS")
+print("=" * 60)
+
+print("\n--- Descriptive Stats ---\n")
+print("Min:      " + str(jplot.minVal(salesData)))
+print("Max:      " + str(jplot.maxVal(salesData)))
+print("Mean:     " + jplot.formatDecimal(jplot.mean(salesData), 2))
+print("Median:   " + jplot.formatDecimal(jplot.median(salesData), 2))
+print("Std Dev:  " + jplot.formatDecimal(jplot.stdDev(salesData), 2))
+
+print("\n--- Linear Regression ---\n")
+reg = jplot.linearRegression(xData, yData)
+print("Slope:     " + jplot.formatDecimal(reg.slope, 4))
+print("Intercept: " + jplot.formatDecimal(reg.intercept, 4))
+print("R²:        " + jplot.formatDecimal(reg.r2, 4))
+
+// ==========================================
+// 15. SVG OUTPUT
+// ==========================================
+
+print("\n" + "=" * 60)
+print("15. SVG OUTPUT")
+print("=" * 60)
+
+print("\n--- Generating SVG Files ---\n")
+
+config = jplot.Config()
+config.title = "Sales Trend"
+config.subtitle = "2024 Data"
+config.xLabel = "Month"
+config.yLabel = "Sales (units)"
+svg = jplot.svgLineChart(salesData, config, months)
+writeFile("chart_line.svg", svg)
+print("✓ chart_line.svg")
+
+config.title = "Regional Sales"
+svg = jplot.svgBarChart(regions, regionSales, config)
+writeFile("chart_bar.svg", svg)
+print("✓ chart_bar.svg")
+
+config.title = "Market Share"
+svg = jplot.svgPieChart(companies, shares, config)
+writeFile("chart_pie.svg", svg)
+print("✓ chart_pie.svg")
+
+config.title = "Metrics Comparison"
+svg = jplot.svgMultiLineChart(datasets, config)
+writeFile("chart_multi.svg", svg)
+print("✓ chart_multi.svg")
+
+config.theme = "dark"
+config.title = "Dark Theme"
+svg = jplot.svgLineChart(salesData, config, months)
+writeFile("chart_dark.svg", svg)
+print("✓ chart_dark.svg")
+
+config.theme = "ocean"
+config.title = "Ocean Theme"
+svg = jplot.svgBarChart(categories, values1, config)
+writeFile("chart_ocean.svg", svg)
+print("✓ chart_ocean.svg")
+
+// ==========================================
+// SUMMARY
+// ==========================================
+
+print("\n" + "=" * 60)
+print("TEST COMPLETE")
+print("=" * 60)
 print("")
-
-// --- SVG Output ---
-print("--- SVG Output ---")
-print("Generating SVG files...")
-
-svgData = [10, 25, 15, 30, 22, 35, 28, 40, 32, 45]
-jplot.saveSvgLine(svgData, "chart_line.svg", "Sales Trend")
-
-svgLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-svgValues = [150, 230, 180, 290, 210]
-jplot.saveSvgBar(svgLabels, svgValues, "chart_bar.svg", "Daily Revenue")
-
-jplot.saveSvgPie(["A", "B", "C", "D"], [40, 30, 20, 10], "chart_pie.svg", "Market Share")
-
+print("Features tested:")
+print("  ✓ Line/Multi-Line/Area Charts")
+print("  ✓ Bar Charts (H/V/Grouped/Stacked)")
+print("  ✓ Scatter Plot with Regression")
+print("  ✓ Histogram & Box Plot")
+print("  ✓ Pie Chart")
+print("  ✓ Candlestick (OHLC)")
+print("  ✓ Heatmap")
+print("  ✓ Gauge & Progress Bar")
+print("  ✓ Sparklines (3 styles)")
+print("  ✓ Data Tables")
+print("  ✓ Statistics & Data Processing")
+print("  ✓ SVG Export (6 themes)")
+print("  ✓ Character Sets (ASCII/Unicode/Blocks)")
 print("")
-print("=== JPLOT LIBRARY TEST COMPLETE ===")

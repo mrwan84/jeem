@@ -1,564 +1,453 @@
 // ============================================
 // jPlot - Charting Library for Jeem
 // ============================================
-// ASCII terminal plots and SVG file output
+// Version 2.0 - ASCII, Unicode & SVG Charts
 // ============================================
 
 // ==========================================
-// CONFIGURATION
+// CONFIGURATION & THEMES
 // ==========================================
 
-func PlotConfig() {
+func Config() {
     return {
         width: 60,
         height: 20,
+        title: "",
+        subtitle: "",
         xLabel: "",
         yLabel: "",
-        title: "",
         showAxis: true,
         showGrid: false,
-        chars: {
-            point: "*",
-            line: "-",
-            bar: "#",
-            empty: " ",
-            axis: "|",
-            baseline: "-",
-            corner: "+",
-            grid: "."
+        showLegend: true,
+        showValues: true,
+        yMin: null,
+        yMax: null,
+        xMin: null,
+        xMax: null,
+        theme: "default",
+        charset: "ascii",
+        decimals: 1,
+        siUnits: false,
+        percent: false,
+        marginLeft: 10,
+        marginRight: 2,
+        colors: ["#4285f4", "#ea4335", "#fbbc04", "#34a853", "#ff6d01", "#46bdc6", "#7baaf7", "#f07b72"],
+        smooth: false,
+        trendLine: false,
+        movingAverage: 0
+    }
+}
+
+func getCharset(name) {
+    if (name == "unicode") {
+        return {
+            hLine: "─", vLine: "│", corner: "└", cornerTR: "┐", cornerTL: "┌", cornerBR: "┘",
+            cross: "┼", teeRight: "├", teeLeft: "┤", teeUp: "┴", teeDown: "┬",
+            point: "●", pointSmall: "•", pointHollow: "○", line: "─",
+            bar: "█", barLight: "▓", barMed: "▒", barDim: "░", empty: " ", grid: "·",
+            arrowUp: "▲", arrowDown: "▼", arrowRight: "►", arrowLeft: "◄", bullet: "◆",
+            markers: ["●", "■", "▲", "◆", "○", "□", "△", "◇", "★", "☆"]
+        }
+    } else if (name == "blocks") {
+        return {
+            hLine: "─", vLine: "│", corner: "└", cornerTR: "┐", cornerTL: "┌", cornerBR: "┘",
+            cross: "┼", teeRight: "├", teeLeft: "┤", teeUp: "┴", teeDown: "┬",
+            point: "█", pointSmall: "▪", pointHollow: "▫", line: "▀",
+            bar: "█", barLight: "▓", barMed: "▒", barDim: "░", empty: " ", grid: "┼",
+            arrowUp: "▲", arrowDown: "▼", arrowRight: "►", arrowLeft: "◄", bullet: "█",
+            markers: ["█", "▓", "▒", "░", "▪", "▫", "▀", "▄", "■", "□"]
+        }
+    } else {
+        return {
+            hLine: "-", vLine: "|", corner: "+", cornerTR: "+", cornerTL: "+", cornerBR: "+",
+            cross: "+", teeRight: "+", teeLeft: "+", teeUp: "+", teeDown: "+",
+            point: "*", pointSmall: ".", pointHollow: "o", line: "-",
+            bar: "#", barLight: "=", barMed: "-", barDim: ".", empty: " ", grid: ".",
+            arrowUp: "^", arrowDown: "v", arrowRight: ">", arrowLeft: "<", bullet: "*",
+            markers: ["*", "o", "+", "x", "#", "@", "=", "~", "%", "&"]
         }
     }
 }
 
+func getTheme(name) {
+    if (name == "dark") {
+        return { bg: "#1a1a2e", fg: "#eaeaea", axis: "#888888", grid: "#333355",
+            colors: ["#61afef", "#e06c75", "#98c379", "#e5c07b", "#c678dd", "#56b6c2", "#be5046", "#d19a66"] }
+    } else if (name == "ocean") {
+        return { bg: "#0a192f", fg: "#ccd6f6", axis: "#8892b0", grid: "#172a45",
+            colors: ["#64ffda", "#f78c6c", "#c792ea", "#82aaff", "#c3e88d", "#ffcb6b", "#89ddff", "#ff5370"] }
+    } else if (name == "forest") {
+        return { bg: "#1b2d1b", fg: "#d4e6d4", axis: "#7a9f7a", grid: "#2d4a2d",
+            colors: ["#98c379", "#56b6c2", "#e5c07b", "#61afef", "#c678dd", "#e06c75", "#d19a66", "#be5046"] }
+    } else if (name == "mono") {
+        return { bg: "#ffffff", fg: "#000000", axis: "#000000", grid: "#cccccc",
+            colors: ["#000000", "#333333", "#555555", "#777777", "#999999", "#bbbbbb", "#dddddd", "#eeeeee"] }
+    } else {
+        return { bg: "#ffffff", fg: "#333333", axis: "#333333", grid: "#e0e0e0",
+            colors: ["#4285f4", "#ea4335", "#fbbc04", "#34a853", "#ff6d01", "#46bdc6", "#7baaf7", "#f07b72"] }
+    }
+}
+
 // ==========================================
-// HELPER FUNCTIONS
+// MATH & STATISTICS
 // ==========================================
 
 func minVal(arr) {
     if (arr.len() == 0) { return 0 }
     m = arr[0]
-    for v in arr {
-        if (v < m) { m = v }
-    }
+    for i in range(arr.len()) { if (arr[i] < m) { m = arr[i] } }
     return m
 }
 
 func maxVal(arr) {
     if (arr.len() == 0) { return 0 }
     m = arr[0]
-    for v in arr {
-        if (v > m) { m = v }
-    }
+    for i in range(arr.len()) { if (arr[i] > m) { m = arr[i] } }
     return m
 }
 
-func scaleValue(val, minV, maxV, size) {
-    if (maxV == minV) { return int(size / 2) }
-    return int((val - minV) / (maxV - minV) * (size - 1))
-}
-
-func padLeft(s, width) {
-    s = str(s)
-    while (s.len() < width) { s = " " + s }
+func sum(arr) {
+    s = 0
+    for i in range(arr.len()) { s = s + arr[i] }
     return s
 }
 
-func padRight(s, width) {
-    s = str(s)
-    while (s.len() < width) { s = s + " " }
-    return s
+func mean(arr) {
+    if (arr.len() == 0) { return 0 }
+    return sum(arr) / arr.len()
 }
 
-func repeatChar(c, n) {
-    result = ""
-    for i in range(n) { result = result + c }
+func sortArray(arr) {
+    result = []
+    for i in range(arr.len()) { push(result, arr[i]) }
+    for i in range(result.len()) {
+        for j in range(result.len() - 1 - i) {
+            if (result[j] > result[j+1]) {
+                temp = result[j]
+                result[j] = result[j+1]
+                result[j+1] = temp
+            }
+        }
+    }
     return result
 }
 
-func formatNum(n, decimals) {
-    if (decimals == null) { decimals = 1 }
-    if (n == int(n)) { return str(int(n)) }
-    s = str(n)
-    dotIdx = indexOf(s, ".")
-    if (dotIdx < 0) { return s }
-    endIdx = dotIdx + decimals + 1
-    if (endIdx > s.len()) { endIdx = s.len() }
-    return slice(s, 0, endIdx)
+func median(arr) {
+    if (arr.len() == 0) { return 0 }
+    sorted = sortArray(arr)
+    n = sorted.len()
+    if (n % 2 == 0) { return (sorted[n/2 - 1] + sorted[n/2]) / 2 }
+    return sorted[int(n/2)]
+}
+
+func quartile(arr, q) {
+    sorted = sortArray(arr)
+    n = sorted.len()
+    pos = q * (n - 1)
+    lower = int(pos)
+    frac = pos - lower
+    if (lower + 1 < n) { return sorted[lower] * (1 - frac) + sorted[lower + 1] * frac }
+    return sorted[lower]
+}
+
+func stdDev(arr) {
+    if (arr.len() < 2) { return 0 }
+    m = mean(arr)
+    sumSq = 0
+    for i in range(arr.len()) { diff = arr[i] - m; sumSq = sumSq + diff * diff }
+    return sqrt(sumSq / (arr.len() - 1))
+}
+
+func variance(arr) { sd = stdDev(arr); return sd * sd }
+
+func sqrt(x) {
+    if (x <= 0) { return 0 }
+    guess = x / 2
+    for i in range(20) { guess = (guess + x / guess) / 2 }
+    return guess
+}
+
+func abs(x) { if (x < 0) { return -x } return x }
+func floor(x) { return int(x) }
+func ceil(x) { if (x == int(x)) { return int(x) } if (x > 0) { return int(x) + 1 } return int(x) }
+func round(x) { if (x >= 0) { return int(x + 0.5) } return int(x - 0.5) }
+
+func pow(base, exp) {
+    if (exp == 0) { return 1 }
+    result = 1
+    e = int(abs(exp))
+    for i in range(e) { result = result * base }
+    if (exp < 0) { return 1 / result }
+    return result
+}
+
+func log10(x) {
+    if (x <= 0) { return 0 }
+    result = 0
+    while (x >= 10) { x = x / 10; result = result + 1 }
+    while (x < 1) { x = x * 10; result = result - 1 }
+    return result
+}
+
+func sin_approx(x) {
+    pi = 3.14159265359
+    while (x > pi) { x = x - 2 * pi }
+    while (x < -pi) { x = x + 2 * pi }
+    result = x; term = x
+    for i in range(1, 10) { term = -term * x * x / ((2 * i) * (2 * i + 1)); result = result + term }
+    return result
+}
+
+func cos_approx(x) { pi = 3.14159265359; return sin_approx(x + pi / 2) }
+
+// ==========================================
+// STRING UTILITIES
+// ==========================================
+
+func padLeft(s, width) { s = str(s); while (s.len() < width) { s = " " + s } return s }
+func padRight(s, width) { s = str(s); while (s.len() < width) { s = s + " " } return s }
+func padCenter(s, width) { s = str(s); while (s.len() < width) { s = " " + s; if (s.len() < width) { s = s + " " } } return s }
+func repeatChar(c, n) { s = ""; for i in range(n) { s = s + c } return s }
+func truncate(s, maxLen) { if (s.len() <= maxLen) { return s } if (maxLen < 4) { return slice(s, 0, maxLen) } return slice(s, 0, maxLen - 3) + "..." }
+
+// ==========================================
+// NUMBER FORMATTING
+// ==========================================
+
+func formatDecimal(n, decimals) {
+    if (decimals == 0) { return str(round(n)) }
+    factor = pow(10, decimals)
+    rounded = round(n * factor) / factor
+    s = str(rounded)
+    dotPos = -1
+    for i in range(s.len()) { if (s[i] == ".") { dotPos = i } }
+    if (dotPos == -1) { s = s + "."; dotPos = s.len() - 1 }
+    currentDecimals = s.len() - dotPos - 1
+    while (currentDecimals < decimals) { s = s + "0"; currentDecimals = currentDecimals + 1 }
+    return s
+}
+
+func formatNum(n, config) {
+    decimals = 1
+    if (config != null && config.decimals != null) { decimals = config.decimals }
+    if (config != null && config.siUnits) {
+        if (abs(n) >= 1000000000) { return formatDecimal(n / 1000000000, decimals) + "B" }
+        else if (abs(n) >= 1000000) { return formatDecimal(n / 1000000, decimals) + "M" }
+        else if (abs(n) >= 1000) { return formatDecimal(n / 1000, decimals) + "K" }
+    }
+    if (config != null && config.percent) { return formatDecimal(n * 100, decimals) + "%" }
+    return formatDecimal(n, decimals)
+}
+
+func formatAxis(value, dataRange) {
+    if (dataRange > 1000000) { return formatDecimal(value / 1000000, 1) + "M" }
+    else if (dataRange > 10000) { return formatDecimal(value / 1000, 1) + "K" }
+    else if (dataRange < 0.01) { return formatDecimal(value, 4) }
+    else if (dataRange < 1) { return formatDecimal(value, 2) }
+    else if (dataRange < 10) { return formatDecimal(value, 1) }
+    return formatDecimal(value, 0)
 }
 
 // ==========================================
-// LINE CHART (ASCII)
+// DATA PROCESSING
+// ==========================================
+
+func normalize(arr) {
+    minV = minVal(arr); maxV = maxVal(arr); r = maxV - minV
+    if (r == 0) { r = 1 }
+    result = []
+    for i in range(arr.len()) { push(result, (arr[i] - minV) / r) }
+    return result
+}
+
+func movingAverage(arr, window) {
+    if (window < 1) { return arr }
+    result = []
+    for i in range(arr.len()) {
+        start = i - int(window / 2)
+        if (start < 0) { start = 0 }
+        endIdx = start + window
+        if (endIdx > arr.len()) { endIdx = arr.len(); start = endIdx - window; if (start < 0) { start = 0 } }
+        s = 0; count = 0
+        for j in range(start, endIdx) { s = s + arr[j]; count = count + 1 }
+        push(result, s / count)
+    }
+    return result
+}
+
+func linearRegression(xArr, yArr) {
+    n = xArr.len()
+    if (n < 2) { return {slope: 0, intercept: mean(yArr), r2: 0} }
+    sumX = sum(xArr); sumY = sum(yArr)
+    sumXY = 0; sumXX = 0
+    for i in range(n) { sumXY = sumXY + xArr[i] * yArr[i]; sumXX = sumXX + xArr[i] * xArr[i] }
+    denom = n * sumXX - sumX * sumX
+    if (denom == 0) { denom = 1 }
+    slope = (n * sumXY - sumX * sumY) / denom
+    intercept = (sumY - slope * sumX) / n
+    ssRes = 0; ssTot = 0; meanY = sumY / n
+    for i in range(n) { predicted = slope * xArr[i] + intercept; ssRes = ssRes + (yArr[i] - predicted) * (yArr[i] - predicted); ssTot = ssTot + (yArr[i] - meanY) * (yArr[i] - meanY) }
+    r2 = 0
+    if (ssTot > 0) { r2 = 1 - ssRes / ssTot }
+    return {slope: slope, intercept: intercept, r2: r2}
+}
+
+func trendLine(arr) {
+    xArr = []
+    for i in range(arr.len()) { push(xArr, i) }
+    reg = linearRegression(xArr, arr)
+    result = []
+    for i in range(arr.len()) { push(result, reg.slope * i + reg.intercept) }
+    return result
+}
+
+func interpolate(arr, newLen) {
+    if (arr.len() < 2) { return arr }
+    result = []; ratio = (arr.len() - 1) / (newLen - 1)
+    for i in range(newLen) {
+        pos = i * ratio; lower = int(pos); upper = lower + 1
+        if (upper >= arr.len()) { upper = arr.len() - 1 }
+        frac = pos - lower
+        value = arr[lower] * (1 - frac) + arr[upper] * frac
+        push(result, value)
+    }
+    return result
+}
+
+func cumSum(arr) { result = []; total = 0; for i in range(arr.len()) { total = total + arr[i]; push(result, total) } return result }
+func diff(arr) { result = []; for i in range(1, arr.len()) { push(result, arr[i] - arr[i-1]) } return result }
+func pctChange(arr) { result = []; for i in range(1, arr.len()) { if (arr[i-1] != 0) { push(result, (arr[i] - arr[i-1]) / arr[i-1]) } else { push(result, 0) } } return result }
+
+// ==========================================
+// CANVAS OPERATIONS
+// ==========================================
+
+func createCanvas(width, height, fillChar) {
+    canvas = []
+    for y in range(height) { row = []; for x in range(width) { push(row, fillChar) } push(canvas, row) }
+    return canvas
+}
+
+func drawPoint(canvas, x, y, char) {
+    height = canvas.len()
+    if (height == 0) { return }
+    width = canvas[0].len()
+    xi = round(x); yi = round(y)
+    if (xi >= 0 && xi < width && yi >= 0 && yi < height) { canvas[yi][xi] = char }
+}
+
+func drawLine(canvas, x1, y1, x2, y2, char) {
+    dx = abs(x2 - x1); dy = abs(y2 - y1)
+    sx = 1; if (x1 >= x2) { sx = -1 }
+    sy = 1; if (y1 >= y2) { sy = -1 }
+    err = dx - dy
+    x = round(x1); y = round(y1); x2i = round(x2); y2i = round(y2)
+    steps = 0; maxSteps = (dx + dy + 1) * 2
+    while (steps < maxSteps) {
+        drawPoint(canvas, x, y, char)
+        if (x == x2i && y == y2i) { return }
+        e2 = 2 * err
+        if (e2 > -dy) { err = err - dy; x = x + sx }
+        if (e2 < dx) { err = err + dx; y = y + sy }
+        steps = steps + 1
+    }
+}
+
+func canvasToString(canvas) {
+    lines = []
+    for y in range(canvas.len()) { line = ""; for x in range(canvas[y].len()) { line = line + canvas[y][x] } push(lines, line) }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// AXIS GENERATION
+// ==========================================
+
+func niceNum(dataRange, doRound) {
+    exponent = floor(log10(dataRange))
+    fraction = dataRange / pow(10, exponent)
+    niceFraction = 1
+    if (doRound) {
+        if (fraction < 1.5) { niceFraction = 1 }
+        else if (fraction < 3) { niceFraction = 2 }
+        else if (fraction < 7) { niceFraction = 5 }
+        else { niceFraction = 10 }
+    } else {
+        if (fraction <= 1) { niceFraction = 1 }
+        else if (fraction <= 2) { niceFraction = 2 }
+        else if (fraction <= 5) { niceFraction = 5 }
+        else { niceFraction = 10 }
+    }
+    return niceFraction * pow(10, exponent)
+}
+
+func generateTicks(minVal, maxVal, maxTicks) {
+    tickRange = maxVal - minVal
+    if (tickRange == 0) { tickRange = 1 }
+    tickSpacing = niceNum(tickRange / (maxTicks - 1), true)
+    niceMin = floor(minVal / tickSpacing) * tickSpacing
+    niceMax = ceil(maxVal / tickSpacing) * tickSpacing
+    ticks = []; tick = niceMin; safety = 0
+    while (tick <= niceMax + tickSpacing * 0.5 && safety < 20) {
+        if (tick >= minVal - tickSpacing * 0.01 && tick <= maxVal + tickSpacing * 0.01) { push(ticks, tick) }
+        tick = tick + tickSpacing; safety = safety + 1
+    }
+    return ticks
+}
+
+// ==========================================
+// LINE CHART
 // ==========================================
 
 func lineChart(data, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = config.width
-    height = config.height
-    
-    minY = minVal(data)
-    maxY = maxVal(data)
-    
-    // Add some padding if all values are the same
-    if (minY == maxY) {
-        minY = minY - 1
-        maxY = maxY + 1
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width; height = config.height
+    plotData = data
+    if (config.movingAverage > 0) { plotData = movingAverage(data, config.movingAverage) }
+    minY = config.yMin; maxY = config.yMax
+    if (minY == null) { minY = minVal(plotData) }
+    if (maxY == null) { maxY = maxVal(plotData) }
+    dataRange = maxY - minY
+    if (dataRange == 0) { dataRange = 1 }
+    padding = dataRange * 0.05
+    if (config.yMin == null) { minY = minY - padding }
+    if (config.yMax == null) { maxY = maxY + padding }
+    dataRange = maxY - minY
+    canvas = createCanvas(width, height, cs.empty)
+    if (config.showGrid) { for y in range(0, height, 3) { for x in range(0, width, 6) { canvas[y][x] = cs.grid } } }
+    points = []
+    for i in range(plotData.len()) {
+        px = 0
+        if (plotData.len() > 1) { px = i * (width - 1) / (plotData.len() - 1) }
+        py = height - 1 - ((plotData[i] - minY) / dataRange) * (height - 1)
+        push(points, {x: px, y: py})
     }
-    
-    // Create canvas
-    canvas = []
-    for y in range(height) {
-        row = []
-        for x in range(width) {
-            push(row, config.chars.empty)
-        }
-        push(canvas, row)
-    }
-    
-    // Plot data points
-    for i in range(data.len()) {
-        x = scaleValue(i, 0, data.len() - 1, width)
-        y = scaleValue(data[i], minY, maxY, height)
-        y = height - 1 - y  // Flip Y axis
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            canvas[y][x] = config.chars.point
-        }
-    }
-    
-    // Connect points with lines (optional)
-    for i in range(data.len() - 1) {
-        x1 = scaleValue(i, 0, data.len() - 1, width)
-        x2 = scaleValue(i + 1, 0, data.len() - 1, width)
-        y1 = height - 1 - scaleValue(data[i], minY, maxY, height)
-        y2 = height - 1 - scaleValue(data[i + 1], minY, maxY, height)
-        
-        // Simple line drawing between adjacent x positions
-        for x in range(x1 + 1, x2) {
-            t = (x - x1) / (x2 - x1)
-            y = int(y1 + (y2 - y1) * t)
-            if (y >= 0 && y < height) {
-                if (canvas[y][x] == config.chars.empty) {
-                    canvas[y][x] = config.chars.line
-                }
-            }
+    for i in range(points.len() - 1) { drawLine(canvas, points[i].x, points[i].y, points[i+1].x, points[i+1].y, cs.line) }
+    for i in range(points.len()) { drawPoint(canvas, points[i].x, points[i].y, cs.point) }
+    if (config.trendLine) {
+        trend = trendLine(plotData)
+        for i in range(trend.len() - 1) {
+            px1 = 0; px2 = 0
+            if (trend.len() > 1) { px1 = i * (width - 1) / (trend.len() - 1); px2 = (i + 1) * (width - 1) / (trend.len() - 1) }
+            py1 = height - 1 - ((trend[i] - minY) / dataRange) * (height - 1)
+            py2 = height - 1 - ((trend[i + 1] - minY) / dataRange) * (height - 1)
+            drawLine(canvas, px1, py1, px2, py2, cs.barDim)
         }
     }
-    
-    // Render
     lines = []
-    
-    // Title
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    // Y-axis labels width
-    labelWidth = 8
-    
-    // Chart with axis
+    if (config.title != "") { push(lines, config.title); if (config.subtitle != "") { push(lines, config.subtitle) } push(lines, "") }
+    yTicks = generateTicks(minY, maxY, 5); labelWidth = config.marginLeft
     for y in range(height) {
-        // Y label
-        yVal = ""
-        if (y == 0) {
-            yVal = formatNum(maxY, 1)
-        } else if (y == height - 1) {
-            yVal = formatNum(minY, 1)
-        } else if (y == int(height / 2)) {
-            yVal = formatNum((maxY + minY) / 2, 1)
-        }
-        
-        line = padLeft(yVal, labelWidth - 1) + " "
-        
-        if (config.showAxis) {
-            line = line + config.chars.axis
-        }
-        
-        for x in range(width) {
-            line = line + canvas[y][x]
-        }
+        label = ""
+        for t in range(yTicks.len()) { tickY = height - 1 - ((yTicks[t] - minY) / dataRange) * (height - 1); if (abs(y - tickY) < 0.5) { label = formatAxis(yTicks[t], dataRange) } }
+        line = padLeft(label, labelWidth - 1) + " "
+        if (config.showAxis) { line = line + cs.vLine }
+        for x in range(width) { line = line + canvas[y][x] }
         push(lines, line)
     }
-    
-    // X axis
-    if (config.showAxis) {
-        axisLine = repeatChar(" ", labelWidth) + config.chars.corner + repeatChar(config.chars.baseline, width)
-        push(lines, axisLine)
-    }
-    
-    // X label
-    if (config.xLabel != "") {
-        push(lines, repeatChar(" ", labelWidth + width / 2 - config.xLabel.len() / 2) + config.xLabel)
-    }
-    
-    return join(lines, "\n")
-}
-
-// ==========================================
-// BAR CHART (HORIZONTAL)
-// ==========================================
-
-func barChart(labels, values, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    maxV = maxVal(values)
-    if (maxV == 0) { maxV = 1 }
-    
-    // Find max label length
-    maxLabelLen = 0
-    for label in labels {
-        if (str(label).len() > maxLabelLen) {
-            maxLabelLen = str(label).len()
-        }
-    }
-    
-    barWidth = config.width - maxLabelLen - 15
-    if (barWidth < 10) { barWidth = 10 }
-    
-    lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    for i in range(labels.len()) {
-        label = padRight(str(labels[i]), maxLabelLen)
-        barLen = int(values[i] / maxV * barWidth)
-        bar = repeatChar(config.chars.bar, barLen)
-        value = " " + formatNum(values[i], 1)
-        push(lines, label + " |" + bar + value)
-    }
-    
-    // Axis
-    push(lines, repeatChar(" ", maxLabelLen) + " +" + repeatChar("-", barWidth + 8))
-    
-    // Scale
-    scaleLine = repeatChar(" ", maxLabelLen) + " 0"
-    midPoint = repeatChar(" ", int(barWidth / 2) - 2) + formatNum(maxV / 2, 1)
-    endPoint = repeatChar(" ", barWidth - int(barWidth / 2) - 4) + formatNum(maxV, 1)
-    push(lines, scaleLine + midPoint + endPoint)
-    
-    return join(lines, "\n")
-}
-
-// ==========================================
-// BAR CHART (VERTICAL)
-// ==========================================
-
-func barChartVertical(labels, values, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    height = config.height
-    maxV = maxVal(values)
-    if (maxV == 0) { maxV = 1 }
-    
-    barWidth = 3
-    spacing = 1
-    numBars = labels.len()
-    
-    lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    // Draw bars from top to bottom
-    for row in range(height) {
-        threshold = maxV * (height - row) / height
-        line = padLeft(formatNum(threshold, 0), 6) + " |"
-        
-        for i in range(numBars) {
-            if (values[i] >= threshold) {
-                line = line + repeatChar(config.chars.bar, barWidth)
-            } else {
-                line = line + repeatChar(" ", barWidth)
-            }
-            line = line + repeatChar(" ", spacing)
-        }
-        push(lines, line)
-    }
-    
-    // X axis
-    push(lines, repeatChar(" ", 7) + "+" + repeatChar("-", numBars * (barWidth + spacing)))
-    
-    // Labels
-    labelLine = repeatChar(" ", 8)
-    for i in range(numBars) {
-        lbl = str(labels[i])
-        if (lbl.len() > barWidth) {
-            lbl = slice(lbl, 0, barWidth)
-        }
-        labelLine = labelLine + padRight(lbl, barWidth + spacing)
-    }
-    push(lines, labelLine)
-    
-    return join(lines, "\n")
-}
-
-// ==========================================
-// SCATTER PLOT
-// ==========================================
-
-func scatterPlot(xData, yData, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = config.width
-    height = config.height
-    
-    minX = minVal(xData)
-    maxX = maxVal(xData)
-    minY = minVal(yData)
-    maxY = maxVal(yData)
-    
-    if (minX == maxX) { minX = minX - 1; maxX = maxX + 1 }
-    if (minY == maxY) { minY = minY - 1; maxY = maxY + 1 }
-    
-    // Create canvas
-    canvas = []
-    for y in range(height) {
-        row = []
-        for x in range(width) {
-            push(row, config.chars.empty)
-        }
-        push(canvas, row)
-    }
-    
-    // Plot points
-    for i in range(xData.len()) {
-        x = scaleValue(xData[i], minX, maxX, width)
-        y = scaleValue(yData[i], minY, maxY, height)
-        y = height - 1 - y
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            canvas[y][x] = config.chars.point
-        }
-    }
-    
-    // Render
-    lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    labelWidth = 8
-    
-    for y in range(height) {
-        yVal = ""
-        if (y == 0) {
-            yVal = formatNum(maxY, 1)
-        } else if (y == height - 1) {
-            yVal = formatNum(minY, 1)
-        }
-        
-        line = padLeft(yVal, labelWidth - 1) + " "
-        if (config.showAxis) {
-            line = line + config.chars.axis
-        }
-        
-        for x in range(width) {
-            line = line + canvas[y][x]
-        }
-        push(lines, line)
-    }
-    
-    if (config.showAxis) {
-        push(lines, repeatChar(" ", labelWidth) + config.chars.corner + repeatChar(config.chars.baseline, width))
-        xLabels = padLeft(formatNum(minX, 1), labelWidth) + repeatChar(" ", width - 8) + formatNum(maxX, 1)
-        push(lines, xLabels)
-    }
-    
-    return join(lines, "\n")
-}
-
-// ==========================================
-// HISTOGRAM
-// ==========================================
-
-func histogram(data, bins, config) {
-    if (bins == null) { bins = 10 }
-    if (config == null) { config = PlotConfig() }
-    
-    minV = minVal(data)
-    maxV = maxVal(data)
-    
-    if (minV == maxV) { maxV = minV + 1 }
-    
-    binWidth = (maxV - minV) / bins
-    counts = []
-    labels = []
-    
-    for i in range(bins) {
-        push(counts, 0)
-        binStart = minV + i * binWidth
-        push(labels, formatNum(binStart, 1))
-    }
-    
-    // Count values in each bin
-    for v in data {
-        binIdx = int((v - minV) / binWidth)
-        if (binIdx >= bins) { binIdx = bins - 1 }
-        if (binIdx < 0) { binIdx = 0 }
-        counts[binIdx] = counts[binIdx] + 1
-    }
-    
-    return barChart(labels, counts, config)
-}
-
-// ==========================================
-// SPARKLINE
-// ==========================================
-
-func sparkline(data) {
-    if (data.len() == 0) { return "" }
-    
-    chars = [" ", "_", ".", "-", "=", "~", "^", "*"]
-    minV = minVal(data)
-    maxV = maxVal(data)
-    
-    if (minV == maxV) { return repeatChar(chars[4], data.len()) }
-    
-    result = ""
-    for v in data {
-        idx = scaleValue(v, minV, maxV, chars.len())
-        if (idx < 0) { idx = 0 }
-        if (idx >= chars.len()) { idx = chars.len() - 1 }
-        result = result + chars[idx]
-    }
-    
-    return result
-}
-
-// ==========================================
-// BOX PLOT
-// ==========================================
-
-func boxPlot(data, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = config.width
-    
-    // Sort data
-    sorted = []
-    for v in data { push(sorted, v) }
-    sorted = sort(sorted)
-    
-    n = sorted.len()
-    if (n == 0) { return "" }
-    
-    minV = sorted[0]
-    maxV = sorted[n - 1]
-    q1 = sorted[int(n * 0.25)]
-    median = sorted[int(n * 0.5)]
-    q3 = sorted[int(n * 0.75)]
-    
-    if (minV == maxV) { maxV = minV + 1 }
-    
-    // Scale positions
-    minPos = 0
-    maxPos = width - 1
-    q1Pos = scaleValue(q1, minV, maxV, width)
-    medPos = scaleValue(median, minV, maxV, width)
-    q3Pos = scaleValue(q3, minV, maxV, width)
-    
-    lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    // Top whisker line
-    line1 = ""
-    for i in range(width) {
-        if (i == minPos || i == maxPos) {
-            line1 = line1 + "|"
-        } else if (i > minPos && i < q1Pos) {
-            line1 = line1 + "-"
-        } else if (i > q3Pos && i < maxPos) {
-            line1 = line1 + "-"
-        } else if (i >= q1Pos && i <= q3Pos) {
-            line1 = line1 + "-"
-        } else {
-            line1 = line1 + " "
-        }
-    }
-    push(lines, line1)
-    
-    // Box line
-    line2 = ""
-    for i in range(width) {
-        if (i == q1Pos || i == q3Pos) {
-            line2 = line2 + "|"
-        } else if (i == medPos) {
-            line2 = line2 + "|"
-        } else if (i > q1Pos && i < q3Pos) {
-            line2 = line2 + "#"
-        } else if (i == minPos || i == maxPos) {
-            line2 = line2 + "|"
-        } else if ((i > minPos && i < q1Pos) || (i > q3Pos && i < maxPos)) {
-            line2 = line2 + "-"
-        } else {
-            line2 = line2 + " "
-        }
-    }
-    push(lines, line2)
-    
-    // Bottom line (same as top)
-    push(lines, line1)
-    
-    // Labels
-    push(lines, "")
-    labelLine = formatNum(minV, 1)
-    labelLine = labelLine + repeatChar(" ", int(width / 2) - labelLine.len() - 2)
-    labelLine = labelLine + formatNum(median, 1)
-    labelLine = labelLine + repeatChar(" ", width - labelLine.len() - str(formatNum(maxV, 1)).len())
-    labelLine = labelLine + formatNum(maxV, 1)
-    push(lines, labelLine)
-    
-    push(lines, "Min" + repeatChar(" ", int(width / 2) - 6) + "Median" + repeatChar(" ", int(width / 2) - 8) + "Max")
-    
-    return join(lines, "\n")
-}
-
-// ==========================================
-// PIE CHART (ASCII)
-// ==========================================
-
-func pieChart(labels, values, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    total = 0
-    for v in values { total = total + v }
-    if (total == 0) { return "No data" }
-    
-    lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
-    }
-    
-    // ASCII pie representation using proportional bars
-    barWidth = 40
-    
-    for i in range(labels.len()) {
-        pct = values[i] / total * 100
-        barLen = int(values[i] / total * barWidth)
-        
-        chars = ["#", "=", "+", "-", "."]
-        char = chars[i % chars.len()]
-        
-        bar = repeatChar(char, barLen)
-        line = padRight(str(labels[i]), 15) + " |" + bar + "| " + formatNum(pct, 1) + "%"
-        push(lines, line)
-    }
-    
-    push(lines, "")
-    push(lines, "Total: " + formatNum(total, 1))
-    
+    if (config.showAxis) { push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, width)); xLabels = padLeft("1", labelWidth) + repeatChar(" ", width - 6) + str(plotData.len()); push(lines, xLabels) }
+    if (config.xLabel != "") { push(lines, padCenter(config.xLabel, labelWidth + width)) }
     return join(lines, "\n")
 }
 
@@ -567,89 +456,378 @@ func pieChart(labels, values, config) {
 // ==========================================
 
 func multiLineChart(datasets, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = config.width
-    height = config.height
-    
-    // Find global min/max
-    allData = []
-    maxLen = 0
-    for ds in datasets {
-        for v in ds.data {
-            push(allData, v)
-        }
-        if (ds.data.len() > maxLen) { maxLen = ds.data.len() }
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width; height = config.height
+    allMin = null; allMax = null; maxLen = 0
+    for d in range(datasets.len()) {
+        data = datasets[d].data
+        if (data.len() > maxLen) { maxLen = data.len() }
+        for i in range(data.len()) { if (allMin == null || data[i] < allMin) { allMin = data[i] } if (allMax == null || data[i] > allMax) { allMax = data[i] } }
     }
-    
-    minY = minVal(allData)
-    maxY = maxVal(allData)
-    
-    if (minY == maxY) { minY = minY - 1; maxY = maxY + 1 }
-    
-    // Create canvas
-    canvas = []
-    for y in range(height) {
-        row = []
-        for x in range(width) {
-            push(row, config.chars.empty)
-        }
-        push(canvas, row)
+    if (allMin == null) { allMin = 0 }; if (allMax == null) { allMax = 1 }
+    minY = config.yMin != null ? config.yMin : allMin; maxY = config.yMax != null ? config.yMax : allMax
+    dataRange = maxY - minY; if (dataRange == 0) { dataRange = 1 }
+    padding = dataRange * 0.05; minY = minY - padding; maxY = maxY + padding; dataRange = maxY - minY
+    canvas = createCanvas(width, height, cs.empty)
+    if (config.showGrid) { for y in range(0, height, 3) { for x in range(0, width, 6) { canvas[y][x] = cs.grid } } }
+    for d in range(datasets.len()) {
+        data = datasets[d].data; marker = cs.markers[d % cs.markers.len()]
+        points = []
+        for i in range(data.len()) { px = 0; if (maxLen > 1) { px = i * (width - 1) / (maxLen - 1) } py = height - 1 - ((data[i] - minY) / dataRange) * (height - 1); push(points, {x: px, y: py}) }
+        lineChar = cs.line; if (d > 0) { lineChar = cs.barDim }
+        for i in range(points.len() - 1) { drawLine(canvas, points[i].x, points[i].y, points[i+1].x, points[i+1].y, lineChar) }
+        for i in range(points.len()) { drawPoint(canvas, points[i].x, points[i].y, marker) }
     }
-    
-    // Plot each dataset with different markers
-    markers = ["*", "o", "+", "x", "#", "@"]
-    
-    for dsIdx in range(datasets.len()) {
-        ds = datasets[dsIdx]
-        marker = markers[dsIdx % markers.len()]
-        
-        for i in range(ds.data.len()) {
-            x = scaleValue(i, 0, maxLen - 1, width)
-            y = scaleValue(ds.data[i], minY, maxY, height)
-            y = height - 1 - y
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                canvas[y][x] = marker
-            }
-        }
-    }
-    
-    // Render
     lines = []
-    
-    if (config.title != "") {
-        push(lines, config.title)
-        push(lines, "")
+    if (config.title != "") { push(lines, config.title); if (config.subtitle != "") { push(lines, config.subtitle) } push(lines, "") }
+    if (config.showLegend) { legendLine = "Legend: "; for d in range(datasets.len()) { marker = cs.markers[d % cs.markers.len()]; name = datasets[d].name; if (name == null) { name = "Series " + str(d + 1) } legendLine = legendLine + marker + "=" + name + "  " } push(lines, legendLine); push(lines, "") }
+    labelWidth = config.marginLeft; yTicks = generateTicks(minY, maxY, 5)
+    for y in range(height) { label = ""; for t in range(yTicks.len()) { tickY = height - 1 - ((yTicks[t] - minY) / dataRange) * (height - 1); if (abs(y - tickY) < 0.5) { label = formatAxis(yTicks[t], dataRange) } } line = padLeft(label, labelWidth - 1) + " " + cs.vLine; for x in range(width) { line = line + canvas[y][x] } push(lines, line) }
+    push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, width))
+    return join(lines, "\n")
+}
+
+// ==========================================
+// AREA CHART
+// ==========================================
+
+func areaChart(data, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width; height = config.height
+    minY = config.yMin != null ? config.yMin : minVal(data); maxY = config.yMax != null ? config.yMax : maxVal(data)
+    dataRange = maxY - minY; if (dataRange == 0) { dataRange = 1 }
+    canvas = createCanvas(width, height, cs.empty)
+    for i in range(data.len()) {
+        px = 0; if (data.len() > 1) { px = round(i * (width - 1) / (data.len() - 1)) }
+        py = round(height - 1 - ((data[i] - minY) / dataRange) * (height - 1))
+        for y in range(py, height) { if (y == py) { canvas[y][px] = cs.bar } else if (y == py + 1) { canvas[y][px] = cs.barLight } else if (y == py + 2) { canvas[y][px] = cs.barMed } else { canvas[y][px] = cs.barDim } }
     }
-    
-    // Legend
-    legendLine = "Legend: "
-    for i in range(datasets.len()) {
-        legendLine = legendLine + markers[i % markers.len()] + "=" + datasets[i].name + "  "
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    labelWidth = config.marginLeft
+    for y in range(height) { label = ""; if (y == 0) { label = formatAxis(maxY, dataRange) } else if (y == height - 1) { label = formatAxis(minY, dataRange) } line = padLeft(label, labelWidth - 1) + " " + cs.vLine; for x in range(width) { line = line + canvas[y][x] } push(lines, line) }
+    if (config.showAxis) { push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, width)) }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// BAR CHARTS
+// ==========================================
+
+func barChart(labels, values, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width; maxV = maxVal(values); if (maxV == 0) { maxV = 1 }
+    maxLabel = 0; for i in range(labels.len()) { if (str(labels[i]).len() > maxLabel) { maxLabel = str(labels[i]).len() } }
+    maxLabel = maxLabel + 1; barWidth = width - maxLabel - 2
+    lines = []
+    if (config.title != "") { push(lines, config.title); if (config.subtitle != "") { push(lines, config.subtitle) } push(lines, "") }
+    for i in range(values.len()) {
+        barLen = round((values[i] / maxV) * barWidth); label = padRight(str(labels[i]), maxLabel)
+        bar = ""; for b in range(barLen) { ratio = b / barLen; if (ratio < 0.7) { bar = bar + cs.bar } else if (ratio < 0.9) { bar = bar + cs.barLight } else { bar = bar + cs.barMed } }
+        valueStr = ""; if (config.showValues) { valueStr = " " + formatNum(values[i], config) }
+        push(lines, label + cs.vLine + bar + valueStr)
     }
-    push(lines, legendLine)
-    push(lines, "")
-    
-    labelWidth = 8
-    
-    for y in range(height) {
-        yVal = ""
-        if (y == 0) {
-            yVal = formatNum(maxY, 1)
-        } else if (y == height - 1) {
-            yVal = formatNum(minY, 1)
-        }
-        
-        line = padLeft(yVal, labelWidth - 1) + " " + config.chars.axis
-        
-        for x in range(width) {
-            line = line + canvas[y][x]
+    if (config.showAxis) { push(lines, repeatChar(" ", maxLabel) + cs.corner + repeatChar(cs.hLine, barWidth)); push(lines, padLeft("0", maxLabel) + repeatChar(" ", barWidth - formatNum(maxV, config.len())) + formatNum(maxV, config)) }
+    return join(lines, "\n")
+}
+
+func barChartVertical(labels, values, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    height = config.height; barWidth = 3; gap = 1
+    maxV = maxVal(values); minV = 0; if (config.yMin != null) { minV = config.yMin }
+    dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    labelWidth = config.marginLeft; totalWidth = values.len() * (barWidth + gap)
+    yTicks = generateTicks(minV, maxV, 5)
+    for row in range(height) {
+        label = ""; for t in range(yTicks.len()) { tickY = height - 1 - ((yTicks[t] - minV) / dataRange) * (height - 1); if (abs(row - tickY) < 0.5) { label = formatAxis(yTicks[t], dataRange) } }
+        line = padLeft(label, labelWidth - 1) + " " + cs.vLine
+        for i in range(values.len()) { barHeight = round(((values[i] - minV) / dataRange) * (height - 1)); rowFromBottom = height - 1 - row; if (rowFromBottom <= barHeight) { for b in range(barWidth) { line = line + cs.bar } } else { for b in range(barWidth) { line = line + " " } } line = line + " " }
+        push(lines, line)
+    }
+    push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, totalWidth))
+    labelLine = repeatChar(" ", labelWidth + 1); for i in range(labels.len()) { labelLine = labelLine + padCenter(truncate(str(labels[i]), barWidth), barWidth + gap) }
+    push(lines, labelLine)
+    return join(lines, "\n")
+}
+
+func groupedBarChart(labels, datasets, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    height = config.height; barWidth = 2; gap = 1; groupGap = 2
+    maxV = 0; for d in range(datasets.len()) { for i in range(datasets[d].data.len()) { if (datasets[d].data[i] > maxV) { maxV = datasets[d].data[i] } } }
+    if (maxV == 0) { maxV = 1 }
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    if (config.showLegend) { legendLine = ""; for d in range(datasets.len()) { marker = cs.markers[d % cs.markers.len()]; name = datasets[d].name; if (name == null) { name = "Series " + str(d + 1) } legendLine = legendLine + marker + "=" + name + "  " } push(lines, legendLine); push(lines, "") }
+    labelWidth = config.marginLeft; groupWidth = datasets.len() * (barWidth + gap) + groupGap; totalWidth = labels.len() * groupWidth
+    for row in range(height) {
+        label = ""; if (row == 0) { label = formatNum(maxV, config) } else if (row == height - 1) { label = "0" }
+        line = padLeft(label, labelWidth - 1) + " " + cs.vLine
+        for i in range(labels.len()) {
+            for d in range(datasets.len()) {
+                barHeight = round((datasets[d].data[i] / maxV) * (height - 1)); rowFromBottom = height - 1 - row; barChar = cs.markers[d % cs.markers.len()]
+                if (rowFromBottom <= barHeight) { for b in range(barWidth) { line = line + barChar } } else { for b in range(barWidth) { line = line + " " } }
+                line = line + " "
+            }
+            line = line + " "
         }
         push(lines, line)
     }
-    
-    push(lines, repeatChar(" ", labelWidth) + config.chars.corner + repeatChar(config.chars.baseline, width))
-    
+    push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, totalWidth))
+    labelLine = repeatChar(" ", labelWidth + 1); for i in range(labels.len()) { labelLine = labelLine + padCenter(truncate(str(labels[i]), groupWidth - groupGap), groupWidth) }
+    push(lines, labelLine)
+    return join(lines, "\n")
+}
+
+func stackedBarChart(labels, datasets, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset); width = config.width
+    totals = []; for i in range(labels.len()) { total = 0; for d in range(datasets.len()) { if (i < datasets[d].data.len()) { total = total + datasets[d].data[i] } } push(totals, total) }
+    maxV = maxVal(totals); if (maxV == 0) { maxV = 1 }
+    maxLabel = 0; for i in range(labels.len()) { if (str(labels[i]).len() > maxLabel) { maxLabel = str(labels[i]).len() } }
+    maxLabel = maxLabel + 1; barWidth = width - maxLabel - 10
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    if (config.showLegend) { legendLine = ""; for d in range(datasets.len()) { marker = cs.markers[d % cs.markers.len()]; name = datasets[d].name; if (name == null) { name = "Series " + str(d + 1) } legendLine = legendLine + marker + "=" + name + "  " } push(lines, legendLine); push(lines, "") }
+    for i in range(labels.len()) {
+        label = padRight(str(labels[i]), maxLabel); bar = ""
+        for d in range(datasets.len()) { segLen = 0; if (i < datasets[d].data.len()) { segLen = round((datasets[d].data[i] / maxV) * barWidth) } marker = cs.markers[d % cs.markers.len()]; for s in range(segLen) { bar = bar + marker } }
+        valueStr = " " + formatNum(totals[i], config)
+        push(lines, label + cs.vLine + bar + valueStr)
+    }
+    if (config.showAxis) { push(lines, repeatChar(" ", maxLabel) + cs.corner + repeatChar(cs.hLine, barWidth)) }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// SCATTER PLOT
+// ==========================================
+
+func scatterPlot(xData, yData, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width; height = config.height
+    minX = config.xMin != null ? config.xMin : minVal(xData); maxX = config.xMax != null ? config.xMax : maxVal(xData)
+    minY = config.yMin != null ? config.yMin : minVal(yData); maxY = config.yMax != null ? config.yMax : maxVal(yData)
+    rangeX = maxX - minX; rangeY = maxY - minY
+    if (rangeX == 0) { rangeX = 1 }; if (rangeY == 0) { rangeY = 1 }
+    paddingX = rangeX * 0.05; paddingY = rangeY * 0.05
+    minX = minX - paddingX; maxX = maxX + paddingX; minY = minY - paddingY; maxY = maxY + paddingY
+    rangeX = maxX - minX; rangeY = maxY - minY
+    canvas = createCanvas(width, height, cs.empty)
+    if (config.showGrid) { for y in range(0, height, 3) { for x in range(0, width, 6) { canvas[y][x] = cs.grid } } }
+    for i in range(xData.len()) { px = round(((xData[i] - minX) / rangeX) * (width - 1)); py = round(height - 1 - ((yData[i] - minY) / rangeY) * (height - 1)); drawPoint(canvas, px, py, cs.point) }
+    if (config.trendLine) { reg = linearRegression(xData, yData); y1 = reg.slope * minX + reg.intercept; y2 = reg.slope * maxX + reg.intercept; px1 = 0; py1 = round(height - 1 - ((y1 - minY) / rangeY) * (height - 1)); px2 = width - 1; py2 = round(height - 1 - ((y2 - minY) / rangeY) * (height - 1)); drawLine(canvas, px1, py1, px2, py2, cs.barDim) }
+    lines = []
+    if (config.title != "") { push(lines, config.title); if (config.subtitle != "") { push(lines, config.subtitle) } push(lines, "") }
+    if (config.trendLine) { reg = linearRegression(xData, yData); push(lines, "R² = " + formatDecimal(reg.r2, 3)); push(lines, "") }
+    labelWidth = config.marginLeft; yTicks = generateTicks(minY, maxY, 5)
+    for y in range(height) { label = ""; for t in range(yTicks.len()) { tickY = height - 1 - ((yTicks[t] - minY) / rangeY) * (height - 1); if (abs(y - tickY) < 0.5) { label = formatAxis(yTicks[t], rangeY) } } line = padLeft(label, labelWidth - 1) + " "; if (config.showAxis) { line = line + cs.vLine } for x in range(width) { line = line + canvas[y][x] } push(lines, line) }
+    if (config.showAxis) { push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, width)); xLabels = padLeft(formatAxis(minX, rangeX), labelWidth) + repeatChar(" ", width - 8) + formatAxis(maxX, rangeX); push(lines, xLabels) }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// HISTOGRAM
+// ==========================================
+
+func histogram(data, numBins, config) {
+    if (config == null) { config = Config() }
+    if (numBins == null || numBins < 1) { numBins = 10 }
+    cs = getCharset(config.charset); width = config.width
+    minV = minVal(data); maxV = maxVal(data); dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    binWidth = dataRange / numBins
+    bins = []; binLabels = []; for i in range(numBins) { push(bins, 0); push(binLabels, minV + i * binWidth) }
+    for i in range(data.len()) { binIndex = int((data[i] - minV) / binWidth); if (binIndex >= numBins) { binIndex = numBins - 1 }; if (binIndex < 0) { binIndex = 0 } bins[binIndex] = bins[binIndex] + 1 }
+    maxCount = maxVal(bins); if (maxCount == 0) { maxCount = 1 }
+    maxLabel = 6; barWidth = width - maxLabel - 10
+    lines = []
+    if (config.title != "") { push(lines, config.title); if (config.subtitle != "") { push(lines, config.subtitle) } push(lines, "") }
+    push(lines, "n=" + str(data.len()) + " μ=" + formatDecimal(mean(data), 2) + " σ=" + formatDecimal(stdDev(data), 2)); push(lines, "")
+    for i in range(numBins) { barLen = round((bins[i] / maxCount) * barWidth); label = padLeft(formatDecimal(binLabels[i], 1), maxLabel - 1); bar = ""; for b in range(barLen) { bar = bar + cs.bar } valueStr = ""; if (config.showValues) { valueStr = " " + str(bins[i]) } push(lines, label + " " + cs.vLine + bar + valueStr) }
+    if (config.showAxis) { push(lines, repeatChar(" ", maxLabel) + cs.corner + repeatChar(cs.hLine, barWidth)); push(lines, padLeft("0", maxLabel) + repeatChar(" ", barWidth - 6) + str(maxCount)) }
+    return join(lines, "\n")
+}
+
+// ==========================================
+// BOX PLOT
+// ==========================================
+
+func boxPlot(data, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    width = config.width
+    minV = minVal(data)
+    maxV = maxVal(data)
+    q1 = quartile(data, 0.25)
+    med = median(data)
+    q3 = quartile(data, 0.75)
+    dataRange = maxV - minV
+    if (dataRange == 0) { dataRange = 1 }
+    minPos = round(((minV - minV) / dataRange) * (width - 1))
+    q1Pos = round(((q1 - minV) / dataRange) * (width - 1))
+    medPos = round(((med - minV) / dataRange) * (width - 1))
+    q3Pos = round(((q3 - minV) / dataRange) * (width - 1))
+    maxPos = round(((maxV - minV) / dataRange) * (width - 1))
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    push(lines, "n=" + str(data.len()) + " IQR=" + formatDecimal(q3 - q1, 2)); push(lines, "")
+    topLine = ""; for i in range(width) { if (i >= q1Pos && i <= q3Pos) { topLine = topLine + cs.hLine } else { topLine = topLine + " " } } push(lines, topLine)
+    boxLine = ""; for i in range(width) { if (i < minPos) { boxLine = boxLine + " " } else if (i == minPos) { boxLine = boxLine + cs.vLine } else if (i < q1Pos) { boxLine = boxLine + cs.hLine } else if (i == q1Pos) { boxLine = boxLine + cs.vLine } else if (i == medPos) { boxLine = boxLine + cs.vLine } else if (i < q3Pos) { boxLine = boxLine + cs.bar } else if (i == q3Pos) { boxLine = boxLine + cs.vLine } else if (i < maxPos) { boxLine = boxLine + cs.hLine } else if (i == maxPos) { boxLine = boxLine + cs.vLine } else { boxLine = boxLine + " " } } push(lines, boxLine)
+    botLine = ""; for i in range(width) { if (i >= q1Pos && i <= q3Pos) { botLine = botLine + cs.hLine } else { botLine = botLine + " " } } push(lines, botLine)
+    push(lines, ""); labelLine = padLeft(formatNum(minV, config), minPos + 4) + repeatChar(" ", medPos - minPos - 4) + formatNum(med, config) + repeatChar(" ", maxPos - medPos - 4) + formatNum(maxV, config); push(lines, labelLine)
+    statLine = padLeft("Min", minPos + 3) + repeatChar(" ", medPos - minPos - 5) + "Median" + repeatChar(" ", maxPos - medPos - 5) + "Max"; push(lines, statLine)
+    return join(lines, "\n")
+}
+
+// ==========================================
+// PIE CHART
+// ==========================================
+
+func pieChart(labels, values, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset); width = config.width
+    total = sum(values); if (total == 0) { total = 1 }
+    maxLabel = 0; for i in range(labels.len()) { if (str(labels[i]).len() > maxLabel) { maxLabel = str(labels[i]).len() } }
+    maxLabel = maxLabel + 2; barWidth = width - maxLabel - 8
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    for i in range(values.len()) { pct = (values[i] / total) * 100; barLen = round((values[i] / total) * barWidth); label = padRight(str(labels[i]), maxLabel); marker = cs.markers[i % cs.markers.len()]; bar = ""; for b in range(barLen) { bar = bar + marker } pctStr = " " + formatDecimal(pct, 0) + "%"; push(lines, label + cs.vLine + bar + pctStr) }
+    push(lines, ""); push(lines, "Total: " + formatNum(total, config))
+    return join(lines, "\n")
+}
+
+// ==========================================
+// CANDLESTICK
+// ==========================================
+
+func candlestick(ohlcData, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset); height = config.height
+    minV = null; maxV = null
+    for i in range(ohlcData.len()) { if (minV == null || ohlcData[i].low < minV) { minV = ohlcData[i].low } if (maxV == null || ohlcData[i].high > maxV) { maxV = ohlcData[i].high } }
+    if (minV == null) { minV = 0 }; if (maxV == null) { maxV = 1 }
+    dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    candleWidth = 3; gap = 1; width = ohlcData.len() * (candleWidth + gap)
+    canvas = createCanvas(width, height, " ")
+    for i in range(ohlcData.len()) {
+        d = ohlcData[i]; x = i * (candleWidth + gap) + 1
+        highY = height - 1 - round(((d.high - minV) / dataRange) * (height - 1))
+        lowY = height - 1 - round(((d.low - minV) / dataRange) * (height - 1))
+        openY = height - 1 - round(((d.open - minV) / dataRange) * (height - 1))
+        closeY = height - 1 - round(((d.close - minV) / dataRange) * (height - 1))
+        for y in range(highY, lowY + 1) { canvas[y][x] = cs.vLine }
+        bodyTop = openY; bodyBot = closeY; if (closeY < openY) { bodyTop = closeY; bodyBot = openY }
+        bullish = d.close >= d.open; bodyChar = cs.bar; if (!bullish) { bodyChar = cs.barDim }
+        for y in range(bodyTop, bodyBot + 1) { for dx in range(-1, 2) { if (x + dx >= 0 && x + dx < width) { canvas[y][x + dx] = bodyChar } } }
+    }
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    labelWidth = config.marginLeft
+    for y in range(height) { yVal = maxV - (y / (height - 1)) * dataRange; label = ""; if (y == 0) { label = formatNum(maxV, config) } else if (y == height - 1) { label = formatNum(minV, config) } line = padLeft(label, labelWidth - 1) + " " + cs.vLine; for x in range(width) { line = line + canvas[y][x] } push(lines, line) }
+    push(lines, repeatChar(" ", labelWidth) + cs.corner + repeatChar(cs.hLine, width))
+    return join(lines, "\n")
+}
+
+// ==========================================
+// HEATMAP
+// ==========================================
+
+func heatmap(matrix, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    minV = null; maxV = null
+    for r in range(matrix.len()) { for c in range(matrix[r].len()) { if (minV == null || matrix[r][c] < minV) { minV = matrix[r][c] } if (maxV == null || matrix[r][c] > maxV) { maxV = matrix[r][c] } } }
+    if (minV == null) { minV = 0 }; if (maxV == null) { maxV = 1 }
+    dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    heatChars = [" ", cs.barDim, cs.barMed, cs.barLight, cs.bar]
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    for r in range(matrix.len()) { line = ""; for c in range(matrix[r].len()) { level = int(((matrix[r][c] - minV) / dataRange) * 4); if (level < 0) { level = 0 } if (level > 4) { level = 4 } line = line + heatChars[level] + heatChars[level] } push(lines, line) }
+    push(lines, ""); legendLine = formatNum(minV, config) + " "; for i in range(heatChars.len()) { legendLine = legendLine + heatChars[i] + heatChars[i] } legendLine = legendLine + " " + formatNum(maxV, config); push(lines, legendLine)
+    return join(lines, "\n")
+}
+
+// ==========================================
+// GAUGE & PROGRESS
+// ==========================================
+
+func gauge(value, minV, maxV, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset); width = config.width; if (width < 20) { width = 40 }
+    dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    pct = (value - minV) / dataRange; if (pct < 0) { pct = 0 } if (pct > 1) { pct = 1 }
+    filledWidth = round(pct * (width - 2))
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    push(lines, cs.cornerTL + repeatChar(cs.hLine, width - 2) + cs.cornerTR)
+    bar = cs.vLine; for i in range(width - 2) { ratio = i / (width - 2); if (i < filledWidth) { if (ratio < 0.5) { bar = bar + cs.bar } else if (ratio < 0.75) { bar = bar + cs.barLight } else { bar = bar + cs.barMed } } else { bar = bar + cs.barDim } } bar = bar + cs.vLine; push(lines, bar)
+    push(lines, cs.corner + repeatChar(cs.hLine, width - 2) + cs.cornerBR)
+    labelLine = formatNum(minV, config) + repeatChar(" ", width - str(minV.len()) - str(maxV.len()) - 2) + formatNum(maxV, config); push(lines, labelLine)
+    valueStr = formatNum(value, config); if (config.percent) { valueStr = formatDecimal(pct * 100, 0) + "%" }
+    push(lines, ""); push(lines, padCenter(valueStr, width))
+    return join(lines, "\n")
+}
+
+func progressBar(current, total, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset); width = config.width; if (width < 10) { width = 40 }
+    pct = current / total; if (pct < 0) { pct = 0 } if (pct > 1) { pct = 1 }
+    filledWidth = round(pct * width)
+    bar = ""; for i in range(width) { if (i < filledWidth) { bar = bar + cs.bar } else { bar = bar + cs.barDim } }
+    return bar + " " + formatDecimal(pct * 100, 0) + "%"
+}
+
+// ==========================================
+// SPARKLINES
+// ==========================================
+
+func sparkline(data) {
+    if (data.len() == 0) { return "" }
+    blocks = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+    minV = minVal(data); maxV = maxVal(data); dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    result = ""; for i in range(data.len()) { level = int(((data[i] - minV) / dataRange) * 7); if (level < 0) { level = 0 } if (level > 7) { level = 7 } result = result + blocks[level] }
+    return result
+}
+
+func sparklineAscii(data) {
+    if (data.len() == 0) { return "" }
+    chars = ["_", ".", "-", "~", "=", "^", "*"]
+    minV = minVal(data); maxV = maxVal(data); dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    result = ""; for i in range(data.len()) { level = int(((data[i] - minV) / dataRange) * 6); if (level < 0) { level = 0 } if (level > 6) { level = 6 } result = result + chars[level] }
+    return result
+}
+
+func sparklineBars(data) {
+    if (data.len() == 0) { return "" }
+    minV = minVal(data); maxV = maxVal(data); dataRange = maxV - minV; if (dataRange == 0) { dataRange = 1 }
+    result = ""; for i in range(data.len()) { level = int(((data[i] - minV) / dataRange) * 4); if (level == 0) { result = result + "░" } else if (level == 1) { result = result + "▒" } else if (level == 2) { result = result + "▓" } else { result = result + "█" } }
+    return result
+}
+
+// ==========================================
+// TABLE
+// ==========================================
+
+func table(headers, rows, config) {
+    if (config == null) { config = Config() }
+    cs = getCharset(config.charset)
+    colWidths = []; for i in range(headers.len()) { push(colWidths, str(headers[i].len())) }
+    for r in range(rows.len()) { for c in range(rows[r].len()) { if (c < colWidths.len()) { if (str(rows[r][c].len()) > colWidths[c]) { colWidths[c] = str(rows[r][c].len()) } } } }
+    for i in range(colWidths.len()) { colWidths[i] = colWidths[i] + 2 }
+    lines = []
+    if (config.title != "") { push(lines, config.title); push(lines, "") }
+    border = cs.cornerTL; for i in range(colWidths.len()) { border = border + repeatChar(cs.hLine, colWidths[i]); if (i < colWidths.len() - 1) { border = border + cs.teeDown } } border = border + cs.cornerTR; push(lines, border)
+    headerLine = cs.vLine; for i in range(headers.len()) { headerLine = headerLine + padCenter(str(headers[i]), colWidths[i]) + cs.vLine } push(lines, headerLine)
+    separator = cs.teeRight; for i in range(colWidths.len()) { separator = separator + repeatChar(cs.hLine, colWidths[i]); if (i < colWidths.len() - 1) { separator = separator + cs.cross } } separator = separator + cs.teeLeft; push(lines, separator)
+    for r in range(rows.len()) { rowLine = cs.vLine; for c in range(colWidths.len()) { cell = ""; if (c < rows[r].len()) { cell = str(rows[r][c]) } rowLine = rowLine + padCenter(cell, colWidths[c]) + cs.vLine } push(lines, rowLine) }
+    bottomBorder = cs.corner; for i in range(colWidths.len()) { bottomBorder = bottomBorder + repeatChar(cs.hLine, colWidths[i]); if (i < colWidths.len() - 1) { bottomBorder = bottomBorder + cs.teeUp } } bottomBorder = bottomBorder + cs.cornerBR; push(lines, bottomBorder)
     return join(lines, "\n")
 }
 
@@ -657,240 +835,149 @@ func multiLineChart(datasets, config) {
 // SVG OUTPUT
 // ==========================================
 
-func svgHeader(width, height, title) {
+func svgHeader(width, height, theme) {
+    if (theme == null) { theme = getTheme("default") }
     svg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-    svg = svg + "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + str(width) + "\" height=\"" + str(height) + "\">\n"
-    svg = svg + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n"
-    if (title != "") {
-        svg = svg + "<text x=\"" + str(width / 2) + "\" y=\"25\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"bold\">" + title + "</text>\n"
-    }
+    svg = svg + "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + str(width) + "\" height=\"" + str(height) + "\" viewBox=\"0 0 " + str(width) + " " + str(height) + "\">\n"
+    svg = svg + "<defs><style>\n"
+    svg = svg + ".title { font: bold 18px -apple-system, BlinkMacSystemFont, sans-serif; fill: " + theme.fg + "; }\n"
+    svg = svg + ".subtitle { font: 13px sans-serif; fill: " + theme.axis + "; }\n"
+    svg = svg + ".axis { font: 11px sans-serif; fill: " + theme.axis + "; }\n"
+    svg = svg + ".label { font: 12px sans-serif; fill: " + theme.fg + "; }\n"
+    svg = svg + ".grid { stroke: " + theme.grid + "; stroke-width: 1; stroke-dasharray: 3,3; }\n"
+    svg = svg + "</style>"
+    for i in range(8) { svg = svg + "<linearGradient id=\"grad" + str(i) + "\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" style=\"stop-color:" + theme.colors[i] + ";stop-opacity:1\"/><stop offset=\"100%\" style=\"stop-color:" + theme.colors[i] + ";stop-opacity:0.7\"/></linearGradient>" }
+    svg = svg + "</defs>\n<rect width=\"100%\" height=\"100%\" fill=\"" + theme.bg + "\"/>\n"
     return svg
 }
 
-func svgFooter() {
-    return "</svg>"
-}
+func svgFooter() { return "</svg>" }
 
-func svgLineChart(data, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = 600
-    height = 400
-    padding = 50
-    chartWidth = width - padding * 2
-    chartHeight = height - padding * 2
-    
-    minY = minVal(data)
-    maxY = maxVal(data)
-    if (minY == maxY) { minY = minY - 1; maxY = maxY + 1 }
-    
-    svg = svgHeader(width, height, config.title)
-    
-    // Axes
-    svg = svg + "<line x1=\"" + str(padding) + "\" y1=\"" + str(padding) + "\" x2=\"" + str(padding) + "\" y2=\"" + str(height - padding) + "\" stroke=\"black\"/>\n"
-    svg = svg + "<line x1=\"" + str(padding) + "\" y1=\"" + str(height - padding) + "\" x2=\"" + str(width - padding) + "\" y2=\"" + str(height - padding) + "\" stroke=\"black\"/>\n"
-    
-    // Build path
-    path = "M"
+func svgLineChart(data, config, labels) {
+    if (config == null) { config = Config() }
+    if (labels == null) { labels = [] }
+    theme = getTheme(config.theme)
+    svgWidth = 700; svgHeight = 450; margin = {top: 60, right: 40, bottom: 80, left: 70}
+    plotWidth = svgWidth - margin.left - margin.right; plotHeight = svgHeight - margin.top - margin.bottom
+    minY = config.yMin != null ? config.yMin : minVal(data); maxY = config.yMax != null ? config.yMax : maxVal(data)
+    dataRange = maxY - minY; if (dataRange == 0) { dataRange = 1 }
+    padding = dataRange * 0.1; minY = minY - padding; maxY = maxY + padding; dataRange = maxY - minY
+    svg = svgHeader(svgWidth, svgHeight, theme)
+    if (config.title != "") { svg = svg + "<text x=\"" + str(svgWidth / 2) + "\" y=\"28\" text-anchor=\"middle\" class=\"title\">" + config.title + "</text>\n" }
+    if (config.subtitle != "") { svg = svg + "<text x=\"" + str(svgWidth / 2) + "\" y=\"48\" text-anchor=\"middle\" class=\"subtitle\">" + config.subtitle + "</text>\n" }
+    yTicks = generateTicks(minY, maxY, 6)
+    for i in range(yTicks.len()) { y = margin.top + plotHeight - ((yTicks[i] - minY) / dataRange) * plotHeight; svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(round(y)) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(round(y)) + "\" class=\"grid\"/>\n"; svg = svg + "<text x=\"" + str(margin.left - 10) + "\" y=\"" + str(round(y) + 4) + "\" text-anchor=\"end\" class=\"axis\">" + formatAxis(yTicks[i], dataRange) + "</text>\n" }
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(margin.top) + "\" x2=\"" + str(margin.left) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(svgHeight - margin.bottom) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    // X-axis labels
     for i in range(data.len()) {
-        x = padding + (i / (data.len() - 1)) * chartWidth
-        y = height - padding - ((data[i] - minY) / (maxY - minY)) * chartHeight
-        if (i > 0) { path = path + " L" }
-        path = path + str(int(x)) + "," + str(int(y))
+        x = margin.left + (i / (data.len() - 1)) * plotWidth
+        labelText = ""
+        if (labels.len() > i) { labelText = str(labels[i]) }
+        else { labelText = str(i + 1) }
+        svg = svg + "<text x=\"" + str(round(x)) + "\" y=\"" + str(svgHeight - margin.bottom + 20) + "\" text-anchor=\"middle\" class=\"axis\">" + labelText + "</text>\n"
     }
-    
-    svg = svg + "<path d=\"" + path + "\" fill=\"none\" stroke=\"steelblue\" stroke-width=\"2\"/>\n"
-    
-    // Points
-    for i in range(data.len()) {
-        x = padding + (i / (data.len() - 1)) * chartWidth
-        y = height - padding - ((data[i] - minY) / (maxY - minY)) * chartHeight
-        svg = svg + "<circle cx=\"" + str(int(x)) + "\" cy=\"" + str(int(y)) + "\" r=\"4\" fill=\"steelblue\"/>\n"
-    }
-    
-    // Y axis labels
-    svg = svg + "<text x=\"" + str(padding - 5) + "\" y=\"" + str(padding + 5) + "\" text-anchor=\"end\" font-size=\"12\">" + formatNum(maxY, 1) + "</text>\n"
-    svg = svg + "<text x=\"" + str(padding - 5) + "\" y=\"" + str(height - padding + 5) + "\" text-anchor=\"end\" font-size=\"12\">" + formatNum(minY, 1) + "</text>\n"
-    
+    // X-axis label (title)
+    if (config.xLabel != "") { svg = svg + "<text x=\"" + str(svgWidth / 2) + "\" y=\"" + str(svgHeight - 15) + "\" text-anchor=\"middle\" class=\"label\">" + config.xLabel + "</text>\n" }
+    // Y-axis label (title)
+    if (config.yLabel != "") { svg = svg + "<text x=\"15\" y=\"" + str(svgHeight / 2) + "\" text-anchor=\"middle\" class=\"label\" transform=\"rotate(-90 15 " + str(svgHeight / 2) + ")\">" + config.yLabel + "</text>\n" }
+    areaD = "M" + str(margin.left) + "," + str(svgHeight - margin.bottom)
+    for i in range(data.len()) { x = margin.left + (i / (data.len() - 1)) * plotWidth; y = margin.top + plotHeight - ((data[i] - minY) / dataRange) * plotHeight; areaD = areaD + " L" + str(round(x)) + "," + str(round(y)) }
+    areaD = areaD + " L" + str(svgWidth - margin.right) + "," + str(svgHeight - margin.bottom) + " Z"
+    svg = svg + "<path d=\"" + areaD + "\" fill=\"" + theme.colors[0] + "\" fill-opacity=\"0.15\"/>\n"
+    pathD = "M"
+    for i in range(data.len()) { x = margin.left + (i / (data.len() - 1)) * plotWidth; y = margin.top + plotHeight - ((data[i] - minY) / dataRange) * plotHeight; if (i == 0) { pathD = pathD + str(round(x)) + "," + str(round(y)) } else { pathD = pathD + " L" + str(round(x)) + "," + str(round(y)) } }
+    svg = svg + "<path d=\"" + pathD + "\" fill=\"none\" stroke=\"" + theme.colors[0] + "\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/>\n"
+    for i in range(data.len()) { x = margin.left + (i / (data.len() - 1)) * plotWidth; y = margin.top + plotHeight - ((data[i] - minY) / dataRange) * plotHeight; svg = svg + "<circle cx=\"" + str(round(x)) + "\" cy=\"" + str(round(y)) + "\" r=\"4\" fill=\"" + theme.bg + "\" stroke=\"" + theme.colors[0] + "\" stroke-width=\"2\"/>\n" }
     svg = svg + svgFooter()
     return svg
 }
 
 func svgBarChart(labels, values, config) {
-    if (config == null) { config = PlotConfig() }
-    
-    width = 600
-    height = 400
-    padding = 60
-    chartWidth = width - padding * 2
-    chartHeight = height - padding * 2
-    
-    maxV = maxVal(values)
-    if (maxV == 0) { maxV = 1 }
-    
-    barWidth = chartWidth / labels.len() * 0.8
-    spacing = chartWidth / labels.len() * 0.2
-    
-    svg = svgHeader(width, height, config.title)
-    
-    // Axes
-    svg = svg + "<line x1=\"" + str(padding) + "\" y1=\"" + str(padding) + "\" x2=\"" + str(padding) + "\" y2=\"" + str(height - padding) + "\" stroke=\"black\"/>\n"
-    svg = svg + "<line x1=\"" + str(padding) + "\" y1=\"" + str(height - padding) + "\" x2=\"" + str(width - padding) + "\" y2=\"" + str(height - padding) + "\" stroke=\"black\"/>\n"
-    
-    // Colors
-    colors = ["steelblue", "coral", "mediumseagreen", "mediumpurple", "orange", "pink"]
-    
-    // Bars
-    for i in range(labels.len()) {
-        barHeight = (values[i] / maxV) * chartHeight
-        x = padding + i * (barWidth + spacing) + spacing / 2
-        y = height - padding - barHeight
-        color = colors[i % colors.len()]
-        
-        svg = svg + "<rect x=\"" + str(int(x)) + "\" y=\"" + str(int(y)) + "\" width=\"" + str(int(barWidth)) + "\" height=\"" + str(int(barHeight)) + "\" fill=\"" + color + "\"/>\n"
-        
-        // Label
-        labelX = x + barWidth / 2
-        svg = svg + "<text x=\"" + str(int(labelX)) + "\" y=\"" + str(height - padding + 20) + "\" text-anchor=\"middle\" font-size=\"12\">" + str(labels[i]) + "</text>\n"
-        
-        // Value
-        svg = svg + "<text x=\"" + str(int(labelX)) + "\" y=\"" + str(int(y) - 5) + "\" text-anchor=\"middle\" font-size=\"11\">" + formatNum(values[i], 1) + "</text>\n"
-    }
-    
+    if (config == null) { config = Config() }
+    theme = getTheme(config.theme)
+    svgWidth = 700; svgHeight = 450; margin = {top: 60, right: 40, bottom: 100, left: 70}
+    plotWidth = svgWidth - margin.left - margin.right; plotHeight = svgHeight - margin.top - margin.bottom
+    maxV = maxVal(values); if (maxV == 0) { maxV = 1 }
+    barWidth = (plotWidth / values.len()) * 0.7; barGap = (plotWidth / values.len()) * 0.15
+    svg = svgHeader(svgWidth, svgHeight, theme)
+    if (config.title != "") { svg = svg + "<text x=\"" + str(svgWidth / 2) + "\" y=\"28\" text-anchor=\"middle\" class=\"title\">" + config.title + "</text>\n" }
+    yTicks = generateTicks(0, maxV, 5)
+    for i in range(yTicks.len()) { y = margin.top + plotHeight - (yTicks[i] / maxV) * plotHeight; svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(round(y)) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(round(y)) + "\" class=\"grid\"/>\n"; svg = svg + "<text x=\"" + str(margin.left - 10) + "\" y=\"" + str(round(y) + 4) + "\" text-anchor=\"end\" class=\"axis\">" + formatAxis(yTicks[i], maxV) + "</text>\n" }
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(margin.top) + "\" x2=\"" + str(margin.left) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(svgHeight - margin.bottom) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    for i in range(values.len()) { barHeight = (values[i] / maxV) * plotHeight; x = margin.left + i * (barWidth + barGap * 2) + barGap; y = svgHeight - margin.bottom - barHeight; color = theme.colors[i % 8]; svg = svg + "<rect x=\"" + str(round(x)) + "\" y=\"" + str(round(y)) + "\" width=\"" + str(round(barWidth)) + "\" height=\"" + str(round(barHeight)) + "\" fill=\"url(#grad" + str(i % 8) + ")\" rx=\"3\"/>\n"; if (config.showValues) { svg = svg + "<text x=\"" + str(round(x + barWidth / 2)) + "\" y=\"" + str(round(y - 8)) + "\" text-anchor=\"middle\" class=\"axis\">" + formatNum(values[i], config) + "</text>\n" } svg = svg + "<text x=\"" + str(round(x + barWidth / 2)) + "\" y=\"" + str(svgHeight - margin.bottom + 20) + "\" text-anchor=\"middle\" class=\"label\" transform=\"rotate(-45 " + str(round(x + barWidth / 2)) + " " + str(svgHeight - margin.bottom + 20) + ")\">" + str(labels[i]) + "</text>\n" }
     svg = svg + svgFooter()
     return svg
 }
 
 func svgPieChart(labels, values, config) {
-    if (config == null) { config = PlotConfig() }
+    if (config == null) { config = Config() }
+    theme = getTheme(config.theme)
+    svgWidth = 700; svgHeight = 450
+    total = sum(values); if (total == 0) { total = 1 }
+    svg = svgHeader(svgWidth, svgHeight, theme)
+    if (config.title != "") { svg = svg + "<text x=\"" + str(svgWidth / 2) + "\" y=\"30\" text-anchor=\"middle\" class=\"title\">" + config.title + "</text>\n" }
     
-    width = 500
-    height = 400
-    cx = 200
-    cy = 200
-    radius = 150
-    
-    total = 0
-    for v in values { total = total + v }
-    if (total == 0) { return "" }
-    
-    svg = svgHeader(width, height, config.title)
-    
-    colors = ["steelblue", "coral", "mediumseagreen", "mediumpurple", "orange", "pink", "gold", "tomato"]
-    
-    startAngle = 0
+    // Simple bar representation instead of pie slices
+    barX = 80; barY = 80; barWidth = 300; barHeight = 30; gap = 10
     
     for i in range(values.len()) {
-        sliceAngle = (values[i] / total) * 360
-        endAngle = startAngle + sliceAngle
+        y = barY + i * (barHeight + gap)
+        width = round((values[i] / total) * barWidth)
+        color = theme.colors[i % 8]
+        pct = formatDecimal((values[i] / total) * 100, 1) + "%"
         
-        // Convert to radians
-        startRad = startAngle * 3.14159 / 180
-        endRad = endAngle * 3.14159 / 180
-        
-        // Calculate arc points
-        x1 = cx + radius * cos_approx(startRad)
-        y1 = cy + radius * sin_approx(startRad)
-        x2 = cx + radius * cos_approx(endRad)
-        y2 = cy + radius * sin_approx(endRad)
-        
-        largeArc = sliceAngle > 180 ? 1 : 0
-        
-        color = colors[i % colors.len()]
-        
-        path = "M" + str(cx) + "," + str(cy) + " L" + str(int(x1)) + "," + str(int(y1))
-        path = path + " A" + str(radius) + "," + str(radius) + " 0 " + str(largeArc) + ",1 " + str(int(x2)) + "," + str(int(y2)) + " Z"
-        
-        svg = svg + "<path d=\"" + path + "\" fill=\"" + color + "\" stroke=\"white\" stroke-width=\"2\"/>\n"
-        
-        startAngle = endAngle
+        svg = svg + "<rect x=\"" + str(barX) + "\" y=\"" + str(y) + "\" width=\"" + str(width) + "\" height=\"" + str(barHeight) + "\" fill=\"" + color + "\" rx=\"3\"/>\n"
+        svg = svg + "<text x=\"" + str(barX + width + 10) + "\" y=\"" + str(y + 20) + "\" class=\"label\">" + str(labels[i]) + " (" + pct + ")</text>\n"
     }
     
-    // Legend
-    legendX = 380
-    legendY = 50
-    
-    for i in range(labels.len()) {
-        color = colors[i % colors.len()]
-        pct = formatNum(values[i] / total * 100, 1)
-        
-        svg = svg + "<rect x=\"" + str(legendX) + "\" y=\"" + str(legendY + i * 25) + "\" width=\"15\" height=\"15\" fill=\"" + color + "\"/>\n"
-        svg = svg + "<text x=\"" + str(legendX + 20) + "\" y=\"" + str(legendY + i * 25 + 12) + "\" font-size=\"12\">" + str(labels[i]) + " (" + pct + "%)</text>\n"
-    }
+    // Total
+    totalY = barY + values.len() * (barHeight + gap) + 20
+    svg = svg + "<text x=\"" + str(barX) + "\" y=\"" + str(totalY) + "\" class=\"title\">Total: " + formatNum(total, config) + "</text>\n"
     
     svg = svg + svgFooter()
     return svg
 }
 
-// Simple trig approximations for SVG
-func sin_approx(x) {
-    // Normalize to [-PI, PI]
-    pi = 3.14159265
-    while (x > pi) { x = x - 2 * pi }
-    while (x < -pi) { x = x + 2 * pi }
-    
-    // Taylor series
-    result = x
-    term = x
-    for n in range(1, 10) {
-        term = term * (-x * x) / ((2 * n) * (2 * n + 1))
-        result = result + term
-    }
-    return result
-}
-
-func cos_approx(x) {
-    return sin_approx(x + 3.14159265 / 2)
+func svgMultiLineChart(datasets, config) {
+    if (config == null) { config = Config() }
+    theme = getTheme(config.theme)
+    svgWidth = 750; svgHeight = 450; margin = {top: 60, right: 150, bottom: 60, left: 70}
+    plotWidth = svgWidth - margin.left - margin.right; plotHeight = svgHeight - margin.top - margin.bottom
+    minY = null; maxY = null; maxLen = 0
+    for d in range(datasets.len()) { data = datasets[d].data; if (data.len() > maxLen) { maxLen = data.len() } for i in range(data.len()) { if (minY == null || data[i] < minY) { minY = data[i] } if (maxY == null || data[i] > maxY) { maxY = data[i] } } }
+    if (minY == null) { minY = 0 }; if (maxY == null) { maxY = 1 }
+    dataRange = maxY - minY; if (dataRange == 0) { dataRange = 1 }
+    padding = dataRange * 0.1; minY = minY - padding; maxY = maxY + padding; dataRange = maxY - minY
+    svg = svgHeader(svgWidth, svgHeight, theme)
+    if (config.title != "") { svg = svg + "<text x=\"" + str((svgWidth - margin.right + margin.left) / 2) + "\" y=\"28\" text-anchor=\"middle\" class=\"title\">" + config.title + "</text>\n" }
+    yTicks = generateTicks(minY, maxY, 6)
+    for i in range(yTicks.len()) { y = margin.top + plotHeight - ((yTicks[i] - minY) / dataRange) * plotHeight; svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(round(y)) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(round(y)) + "\" class=\"grid\"/>\n"; svg = svg + "<text x=\"" + str(margin.left - 10) + "\" y=\"" + str(round(y) + 4) + "\" text-anchor=\"end\" class=\"axis\">" + formatAxis(yTicks[i], dataRange) + "</text>\n" }
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(margin.top) + "\" x2=\"" + str(margin.left) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    svg = svg + "<line x1=\"" + str(margin.left) + "\" y1=\"" + str(svgHeight - margin.bottom) + "\" x2=\"" + str(svgWidth - margin.right) + "\" y2=\"" + str(svgHeight - margin.bottom) + "\" stroke=\"" + theme.axis + "\"/>\n"
+    for d in range(datasets.len()) { data = datasets[d].data; color = theme.colors[d % 8]; pathD = "M"; for i in range(data.len()) { x = margin.left + (i / (maxLen - 1)) * plotWidth; y = margin.top + plotHeight - ((data[i] - minY) / dataRange) * plotHeight; if (i == 0) { pathD = pathD + str(round(x)) + "," + str(round(y)) } else { pathD = pathD + " L" + str(round(x)) + "," + str(round(y)) } } svg = svg + "<path d=\"" + pathD + "\" fill=\"none\" stroke=\"" + color + "\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/>\n"; for i in range(data.len()) { x = margin.left + (i / (maxLen - 1)) * plotWidth; y = margin.top + plotHeight - ((data[i] - minY) / dataRange) * plotHeight; svg = svg + "<circle cx=\"" + str(round(x)) + "\" cy=\"" + str(round(y)) + "\" r=\"4\" fill=\"" + theme.bg + "\" stroke=\"" + color + "\" stroke-width=\"2\"/>\n" } }
+    legendX = svgWidth - margin.right + 15; legendY = margin.top + 20
+    for d in range(datasets.len()) { y = legendY + d * 30; color = theme.colors[d % 8]; name = datasets[d].name; if (name == null) { name = "Series " + str(d + 1) } svg = svg + "<line x1=\"" + str(legendX) + "\" y1=\"" + str(y) + "\" x2=\"" + str(legendX + 25) + "\" y2=\"" + str(y) + "\" stroke=\"" + color + "\" stroke-width=\"3\"/>\n"; svg = svg + "<circle cx=\"" + str(legendX + 12) + "\" cy=\"" + str(y) + "\" r=\"4\" fill=\"" + theme.bg + "\" stroke=\"" + color + "\" stroke-width=\"2\"/>\n"; svg = svg + "<text x=\"" + str(legendX + 35) + "\" y=\"" + str(y + 4) + "\" class=\"label\">" + name + "</text>\n" }
+    svg = svg + svgFooter()
+    return svg
 }
 
 // ==========================================
 // CONVENIENCE FUNCTIONS
 // ==========================================
 
-func plot(data, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    print(lineChart(data, config))
-}
+func plot(data, title) { config = Config(); config.title = title; print(lineChart(data, config)) }
+func plotBar(labels, values, title) { config = Config(); config.title = title; print(barChart(labels, values, config)) }
+func plotScatter(xData, yData, title) { config = Config(); config.title = title; print(scatterPlot(xData, yData, config)) }
+func plotHistogram(data, bins, title) { config = Config(); config.title = title; print(histogram(data, bins, config)) }
+func plotMulti(datasets, title) { config = Config(); config.title = title; print(multiLineChart(datasets, config)) }
 
-func plotBar(labels, values, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    print(barChart(labels, values, config))
-}
+func saveSvgLine(data, filename, title) { config = Config(); config.title = title; svg = svgLineChart(data, config); writeFile(filename, svg); print("Saved: " + filename) }
+func saveSvgBar(labels, values, filename, title) { config = Config(); config.title = title; svg = svgBarChart(labels, values, config); writeFile(filename, svg); print("Saved: " + filename) }
+func saveSvgPie(labels, values, filename, title) { config = Config(); config.title = title; svg = svgPieChart(labels, values, config); writeFile(filename, svg); print("Saved: " + filename) }
+func saveSvgMulti(datasets, filename, title) { config = Config(); config.title = title; svg = svgMultiLineChart(datasets, config); writeFile(filename, svg); print("Saved: " + filename) }
 
-func plotScatter(x, y, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    print(scatterPlot(x, y, config))
-}
-
-func plotHistogram(data, bins, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    print(histogram(data, bins, config))
-}
-
-func saveSvgLine(data, filename, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    svg = svgLineChart(data, config)
-    writeFile(filename, svg)
-    print("Saved:", filename)
-}
-
-func saveSvgBar(labels, values, filename, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    svg = svgBarChart(labels, values, config)
-    writeFile(filename, svg)
-    print("Saved:", filename)
-}
-
-func saveSvgPie(labels, values, filename, title) {
-    config = PlotConfig()
-    if (title != null) { config.title = title }
-    svg = svgPieChart(labels, values, config)
-    writeFile(filename, svg)
-    print("Saved:", filename)
-}
+// ============================================
+// jPlot v2.0 - Charting Library
+// ============================================

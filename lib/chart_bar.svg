@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
-<rect width="100%" height="100%" fill="white"/>
-<text x="300" y="25" text-anchor="middle" font-size="16" font-weight="bold">Daily Revenue</text>
-<line x1="60" y1="60" x2="60" y2="340" stroke="black"/>
-<line x1="60" y1="340" x2="540" y2="340" stroke="black"/>
-<rect x="69" y="195" width="76" height="144" fill="steelblue"/>
-<text x="108" y="360" text-anchor="middle" font-size="12">Mon</text>
-<text x="108" y="190" text-anchor="middle" font-size="11">150</text>
-<rect x="165" y="117" width="76" height="222" fill="coral"/>
-<text x="204" y="360" text-anchor="middle" font-size="12">Tue</text>
-<text x="204" y="112" text-anchor="middle" font-size="11">230</text>
-<rect x="261" y="166" width="76" height="173" fill="mediumseagreen"/>
-<text x="300" y="360" text-anchor="middle" font-size="12">Wed</text>
-<text x="300" y="161" text-anchor="middle" font-size="11">180</text>
-<rect x="357" y="60" width="76" height="280" fill="mediumpurple"/>
-<text x="396" y="360" text-anchor="middle" font-size="12">Thu</text>
-<text x="396" y="55" text-anchor="middle" font-size="11">290</text>
-<rect x="453" y="137" width="76" height="202" fill="orange"/>
-<text x="492" y="360" text-anchor="middle" font-size="12">Fri</text>
-<text x="492" y="132" text-anchor="middle" font-size="11">210</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="450" viewBox="0 0 700 450">
+<defs><style>
+.title { font: bold 18px -apple-system, BlinkMacSystemFont, sans-serif; fill: #333333; }
+.subtitle { font: 13px sans-serif; fill: #333333; }
+.axis { font: 11px sans-serif; fill: #333333; }
+.label { font: 12px sans-serif; fill: #333333; }
+.grid { stroke: #e0e0e0; stroke-width: 1; stroke-dasharray: 3,3; }
+</style><linearGradient id="grad0" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4285f4;stop-opacity:1"/><stop offset="100%" style="stop-color:#4285f4;stop-opacity:0.7"/></linearGradient><linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ea4335;stop-opacity:1"/><stop offset="100%" style="stop-color:#ea4335;stop-opacity:0.7"/></linearGradient><linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fbbc04;stop-opacity:1"/><stop offset="100%" style="stop-color:#fbbc04;stop-opacity:0.7"/></linearGradient><linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#34a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#34a853;stop-opacity:0.7"/></linearGradient><linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ff6d01;stop-opacity:1"/><stop offset="100%" style="stop-color:#ff6d01;stop-opacity:0.7"/></linearGradient><linearGradient id="grad5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#46bdc6;stop-opacity:1"/><stop offset="100%" style="stop-color:#46bdc6;stop-opacity:0.7"/></linearGradient><linearGradient id="grad6" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#7baaf7;stop-opacity:1"/><stop offset="100%" style="stop-color:#7baaf7;stop-opacity:0.7"/></linearGradient><linearGradient id="grad7" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f07b72;stop-opacity:1"/><stop offset="100%" style="stop-color:#f07b72;stop-opacity:0.7"/></linearGradient></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="350" y="28" text-anchor="middle" class="title">Regional Sales</text>
+<line x1="70" y1="350" x2="660" y2="350" class="grid"/>
+<text x="60" y="354" text-anchor="end" class="axis">0</text>
+<line x1="70" y1="257" x2="660" y2="257" class="grid"/>
+<text x="60" y="261" text-anchor="end" class="axis">100</text>
+<line x1="70" y1="164" x2="660" y2="164" class="grid"/>
+<text x="60" y="168" text-anchor="end" class="axis">200</text>
+<line x1="70" y1="71" x2="660" y2="71" class="grid"/>
+<text x="60" y="75" text-anchor="end" class="axis">300</text>
+<line x1="70" y1="60" x2="70" y2="350" stroke="#333333"/>
+<line x1="70" y1="350" x2="660" y2="350" stroke="#333333"/>
+<rect x="88" y="122" width="83" height="228" fill="url(#grad0)" rx="3"/>
+<text x="129" y="114" text-anchor="middle" class="axis">245.0</text>
+<text x="129" y="370" text-anchor="middle" class="label" transform="rotate(-45 129 370)">North</text>
+<rect x="206" y="166" width="83" height="184" fill="url(#grad1)" rx="3"/>
+<text x="247" y="158" text-anchor="middle" class="axis">198.0</text>
+<text x="247" y="370" text-anchor="middle" class="label" transform="rotate(-45 247 370)">South</text>
+<rect x="324" y="60" width="83" height="290" fill="url(#grad2)" rx="3"/>
+<text x="365" y="52" text-anchor="middle" class="axis">312.0</text>
+<text x="365" y="370" text-anchor="middle" class="label" transform="rotate(-45 365 370)">East</text>
+<rect x="442" y="102" width="83" height="248" fill="url(#grad3)" rx="3"/>
+<text x="483" y="94" text-anchor="middle" class="axis">267.0</text>
+<text x="483" y="370" text-anchor="middle" class="label" transform="rotate(-45 483 370)">West</text>
+<rect x="560" y="174" width="83" height="176" fill="url(#grad4)" rx="3"/>
+<text x="601" y="166" text-anchor="middle" class="axis">189.0</text>
+<text x="601" y="370" text-anchor="middle" class="label" transform="rotate(-45 601 370)">Central</text>
 </svg>

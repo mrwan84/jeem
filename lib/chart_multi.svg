@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="450" viewBox="0 0 750 450">
+<defs><style>
+.title { font: bold 18px -apple-system, BlinkMacSystemFont, sans-serif; fill: #333333; }
+.subtitle { font: 13px sans-serif; fill: #333333; }
+.axis { font: 11px sans-serif; fill: #333333; }
+.label { font: 12px sans-serif; fill: #333333; }
+.grid { stroke: #e0e0e0; stroke-width: 1; stroke-dasharray: 3,3; }
+</style><linearGradient id="grad0" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4285f4;stop-opacity:1"/><stop offset="100%" style="stop-color:#4285f4;stop-opacity:0.7"/></linearGradient><linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ea4335;stop-opacity:1"/><stop offset="100%" style="stop-color:#ea4335;stop-opacity:0.7"/></linearGradient><linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fbbc04;stop-opacity:1"/><stop offset="100%" style="stop-color:#fbbc04;stop-opacity:0.7"/></linearGradient><linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#34a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#34a853;stop-opacity:0.7"/></linearGradient><linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ff6d01;stop-opacity:1"/><stop offset="100%" style="stop-color:#ff6d01;stop-opacity:0.7"/></linearGradient><linearGradient id="grad5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#46bdc6;stop-opacity:1"/><stop offset="100%" style="stop-color:#46bdc6;stop-opacity:0.7"/></linearGradient><linearGradient id="grad6" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#7baaf7;stop-opacity:1"/><stop offset="100%" style="stop-color:#7baaf7;stop-opacity:0.7"/></linearGradient><linearGradient id="grad7" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f07b72;stop-opacity:1"/><stop offset="100%" style="stop-color:#f07b72;stop-opacity:0.7"/></linearGradient></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="335" y="28" text-anchor="middle" class="title">Metrics Comparison</text>
+<line x1="70" y1="376" x2="600" y2="376" class="grid"/>
+<text x="60" y="380" text-anchor="end" class="axis">50</text>
+<line x1="70" y1="308" x2="600" y2="308" class="grid"/>
+<text x="60" y="312" text-anchor="end" class="axis">100</text>
+<line x1="70" y1="239" x2="600" y2="239" class="grid"/>
+<text x="60" y="243" text-anchor="end" class="axis">150</text>
+<line x1="70" y1="170" x2="600" y2="170" class="grid"/>
+<text x="60" y="174" text-anchor="end" class="axis">200</text>
+<line x1="70" y1="101" x2="600" y2="101" class="grid"/>
+<text x="60" y="105" text-anchor="end" class="axis">250</text>
+<line x1="70" y1="60" x2="70" y2="390" stroke="#333333"/>
+<line x1="70" y1="390" x2="600" y2="390" stroke="#333333"/>
+<path d="M70,280 L118,246 L166,264 L215,200 L263,218 L311,173 L359,156 L407,177 L455,136 L504,115 L552,122 L600,88" fill="none" stroke="#4285f4" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="70" cy="280" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="118" cy="246" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="166" cy="264" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="215" cy="200" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="263" cy="218" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="311" cy="173" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="359" cy="156" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="407" cy="177" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="455" cy="136" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="504" cy="115" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="552" cy="122" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<circle cx="600" cy="88" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<path d="M70,328 L118,319 L166,324 L215,301 L263,310 L311,283 L359,273 L407,287 L455,259 L504,250 L552,255 L600,232" fill="none" stroke="#ea4335" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="70" cy="328" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="118" cy="319" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="166" cy="324" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="215" cy="301" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="263" cy="310" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="311" cy="283" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="359" cy="273" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="407" cy="287" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="455" cy="259" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="504" cy="250" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="552" cy="255" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<circle cx="600" cy="232" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<path d="M70,363 L118,356 L166,360 L215,349 L263,352 L311,342 L359,335 L407,338 L455,328 L504,324 L552,327 L600,319" fill="none" stroke="#fbbc04" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="70" cy="363" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="118" cy="356" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="166" cy="360" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="215" cy="349" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="263" cy="352" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="311" cy="342" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="359" cy="335" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="407" cy="338" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="455" cy="328" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="504" cy="324" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="552" cy="327" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<circle cx="600" cy="319" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<line x1="615" y1="80" x2="640" y2="80" stroke="#4285f4" stroke-width="3"/>
+<circle cx="627" cy="80" r="4" fill="#ffffff" stroke="#4285f4" stroke-width="2"/>
+<text x="650" y="84" class="label">Sales</text>
+<line x1="615" y1="110" x2="640" y2="110" stroke="#ea4335" stroke-width="3"/>
+<circle cx="627" cy="110" r="4" fill="#ffffff" stroke="#ea4335" stroke-width="2"/>
+<text x="650" y="114" class="label">Revenue</text>
+<line x1="615" y1="140" x2="640" y2="140" stroke="#fbbc04" stroke-width="3"/>
+<circle cx="627" cy="140" r="4" fill="#ffffff" stroke="#fbbc04" stroke-width="2"/>
+<text x="650" y="144" class="label">Costs</text>
+</svg>

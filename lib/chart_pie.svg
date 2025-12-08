@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400">
-<rect width="100%" height="100%" fill="white"/>
-<text x="250" y="25" text-anchor="middle" font-size="16" font-weight="bold">Market Share</text>
-<path d="M200,200 L350,200 A150,150 0 0,1 78,288 Z" fill="steelblue" stroke="white" stroke-width="2"/>
-<path d="M200,200 L78,288 A150,150 0 0,1 153,57 Z" fill="coral" stroke="white" stroke-width="2"/>
-<path d="M200,200 L153,57 A150,150 0 0,1 321,111 Z" fill="mediumseagreen" stroke="white" stroke-width="2"/>
-<path d="M200,200 L321,111 A150,150 0 0,1 349,199 Z" fill="mediumpurple" stroke="white" stroke-width="2"/>
-<rect x="380" y="50" width="15" height="15" fill="steelblue"/>
-<text x="400" y="62" font-size="12">A (40%)</text>
-<rect x="380" y="75" width="15" height="15" fill="coral"/>
-<text x="400" y="87" font-size="12">B (30%)</text>
-<rect x="380" y="100" width="15" height="15" fill="mediumseagreen"/>
-<text x="400" y="112" font-size="12">C (20%)</text>
-<rect x="380" y="125" width="15" height="15" fill="mediumpurple"/>
-<text x="400" y="137" font-size="12">D (10%)</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="450" viewBox="0 0 700 450">
+<defs><style>
+.title { font: bold 18px -apple-system, BlinkMacSystemFont, sans-serif; fill: #333333; }
+.subtitle { font: 13px sans-serif; fill: #333333; }
+.axis { font: 11px sans-serif; fill: #333333; }
+.label { font: 12px sans-serif; fill: #333333; }
+.grid { stroke: #e0e0e0; stroke-width: 1; stroke-dasharray: 3,3; }
+</style><linearGradient id="grad0" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#4285f4;stop-opacity:1"/><stop offset="100%" style="stop-color:#4285f4;stop-opacity:0.7"/></linearGradient><linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ea4335;stop-opacity:1"/><stop offset="100%" style="stop-color:#ea4335;stop-opacity:0.7"/></linearGradient><linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fbbc04;stop-opacity:1"/><stop offset="100%" style="stop-color:#fbbc04;stop-opacity:0.7"/></linearGradient><linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#34a853;stop-opacity:1"/><stop offset="100%" style="stop-color:#34a853;stop-opacity:0.7"/></linearGradient><linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ff6d01;stop-opacity:1"/><stop offset="100%" style="stop-color:#ff6d01;stop-opacity:0.7"/></linearGradient><linearGradient id="grad5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#46bdc6;stop-opacity:1"/><stop offset="100%" style="stop-color:#46bdc6;stop-opacity:0.7"/></linearGradient><linearGradient id="grad6" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#7baaf7;stop-opacity:1"/><stop offset="100%" style="stop-color:#7baaf7;stop-opacity:0.7"/></linearGradient><linearGradient id="grad7" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f07b72;stop-opacity:1"/><stop offset="100%" style="stop-color:#f07b72;stop-opacity:0.7"/></linearGradient></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="350" y="30" text-anchor="middle" class="title">Market Share</text>
+<rect x="80" y="80" width="105" height="30" fill="#4285f4" rx="3"/>
+<text x="195" y="100" class="label">Acme (35.0%)</text>
+<rect x="80" y="120" width="75" height="30" fill="#ea4335" rx="3"/>
+<text x="165" y="140" class="label">Beta (25.0%)</text>
+<rect x="80" y="160" width="60" height="30" fill="#fbbc04" rx="3"/>
+<text x="150" y="180" class="label">Gamma (20.0%)</text>
+<rect x="80" y="200" width="36" height="30" fill="#34a853" rx="3"/>
+<text x="126" y="220" class="label">Delta (12.0%)</text>
+<rect x="80" y="240" width="24" height="30" fill="#ff6d01" rx="3"/>
+<text x="114" y="260" class="label">Other (8.0%)</text>
+<text x="80" y="300" class="title">Total: 100.0</text>
 </svg>

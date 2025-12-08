@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="450" viewBox="0 0 700 450">
+<defs><style>
+.title { font: bold 18px -apple-system, BlinkMacSystemFont, sans-serif; fill: #ccd6f6; }
+.subtitle { font: 13px sans-serif; fill: #8892b0; }
+.axis { font: 11px sans-serif; fill: #8892b0; }
+.label { font: 12px sans-serif; fill: #ccd6f6; }
+.grid { stroke: #172a45; stroke-width: 1; stroke-dasharray: 3,3; }
+</style><linearGradient id="grad0" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#64ffda;stop-opacity:1"/><stop offset="100%" style="stop-color:#64ffda;stop-opacity:0.7"/></linearGradient><linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f78c6c;stop-opacity:1"/><stop offset="100%" style="stop-color:#f78c6c;stop-opacity:0.7"/></linearGradient><linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#c792ea;stop-opacity:1"/><stop offset="100%" style="stop-color:#c792ea;stop-opacity:0.7"/></linearGradient><linearGradient id="grad3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#82aaff;stop-opacity:1"/><stop offset="100%" style="stop-color:#82aaff;stop-opacity:0.7"/></linearGradient><linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#c3e88d;stop-opacity:1"/><stop offset="100%" style="stop-color:#c3e88d;stop-opacity:0.7"/></linearGradient><linearGradient id="grad5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ffcb6b;stop-opacity:1"/><stop offset="100%" style="stop-color:#ffcb6b;stop-opacity:0.7"/></linearGradient><linearGradient id="grad6" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#89ddff;stop-opacity:1"/><stop offset="100%" style="stop-color:#89ddff;stop-opacity:0.7"/></linearGradient><linearGradient id="grad7" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ff5370;stop-opacity:1"/><stop offset="100%" style="stop-color:#ff5370;stop-opacity:0.7"/></linearGradient></defs>
+<rect width="100%" height="100%" fill="#0a192f"/>
+<text x="350" y="28" text-anchor="middle" class="title">Ocean Theme</text>
+<line x1="70" y1="350" x2="660" y2="350" class="grid"/>
+<text x="60" y="354" text-anchor="end" class="axis">0</text>
+<line x1="70" y1="269" x2="660" y2="269" class="grid"/>
+<text x="60" y="273" text-anchor="end" class="axis">20</text>
+<line x1="70" y1="189" x2="660" y2="189" class="grid"/>
+<text x="60" y="193" text-anchor="end" class="axis">40</text>
+<line x1="70" y1="108" x2="660" y2="108" class="grid"/>
+<text x="60" y="112" text-anchor="end" class="axis">60</text>
+<line x1="70" y1="60" x2="70" y2="350" stroke="#8892b0"/>
+<line x1="70" y1="350" x2="660" y2="350" stroke="#8892b0"/>
+<rect x="85" y="169" width="69" height="181" fill="url(#grad0)" rx="3"/>
+<text x="119" y="161" text-anchor="middle" class="axis">45.0</text>
+<text x="119" y="370" text-anchor="middle" class="label" transform="rotate(-45 119 370)">Jan</text>
+<rect x="183" y="141" width="69" height="209" fill="url(#grad1)" rx="3"/>
+<text x="217" y="133" text-anchor="middle" class="axis">52.0</text>
+<text x="217" y="370" text-anchor="middle" class="label" transform="rotate(-45 217 370)">Feb</text>
+<rect x="281" y="153" width="69" height="197" fill="url(#grad2)" rx="3"/>
+<text x="316" y="145" text-anchor="middle" class="axis">49.0</text>
+<text x="316" y="370" text-anchor="middle" class="label" transform="rotate(-45 316 370)">Mar</text>
+<rect x="380" y="96" width="69" height="254" fill="url(#grad3)" rx="3"/>
+<text x="414" y="88" text-anchor="middle" class="axis">63.0</text>
+<text x="414" y="370" text-anchor="middle" class="label" transform="rotate(-45 414 370)">Apr</text>
+<rect x="478" y="116" width="69" height="234" fill="url(#grad4)" rx="3"/>
+<text x="513" y="108" text-anchor="middle" class="axis">58.0</text>
+<text x="513" y="370" text-anchor="middle" class="label" transform="rotate(-45 513 370)">May</text>
+<rect x="576" y="60" width="69" height="290" fill="url(#grad5)" rx="3"/>
+<text x="611" y="52" text-anchor="middle" class="axis">72.0</text>
+<text x="611" y="370" text-anchor="middle" class="label" transform="rotate(-45 611 370)">Jun</text>
+</svg>
