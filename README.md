@@ -1,8 +1,7 @@
+<img src="https://raw.githubusercontent.com/mrwan84/jeem/d433445c6970a153a0b9c5920651a8ad0963fd45/logo/jeem-logo.svg" width=200 height=200/>
+
 # Jeem Programming Language
 A lightweight, scripting language written in C.
-
-![JEEM](https://raw.githubusercontent.com/mrwan84/jeem/d433445c6970a153a0b9c5920651a8ad0963fd45/logo/jeem-logo.svg)
-
 
 ## Features
 
